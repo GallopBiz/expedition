@@ -7,9 +7,12 @@ This README tracks the main modules and key functionalities (menus) for the Expe
 ## Modules & Menus
 
 ### 1. Authentication & User Management
-- [ ] Login / Logout
-- [ ] Registration
-- [ ] Role-based Access (Expeditor, Project Team, Supplier)
+- [x] Login / Logout (Breeze, login is default page)
+- [x] Registration (Breeze)
+- [x] Role-based Access (Manager, Expeditor, Supplier)
+### 1a. User Management (Manager Only)
+- [x] Manager can view all users (card layout)
+- [x] Manager can create new users (card layout)
 
 ### 2. Work Package Management
 - [ ] Create Work Package
@@ -54,10 +57,13 @@ This README tracks the main modules and key functionalities (menus) for the Expe
 
 ---
 
-## Implementation Progress
-- [ ] Initial Project Setup
-- [ ] Breeze Auth with Blade
-- [ ] README with Modules (this file)
+- [x] Initial Project Setup
+- [x] Breeze Auth with Blade
+- [x] README with Modules (this file)
+- [x] Role column in users table
+- [x] Default users for each role (seeded)
+- [x] Role-based middleware (Laravel 12+)
+- [x] Manager-only user management UI (card layout)
 
 ---
 
