@@ -31,6 +31,7 @@ use App\Http\Controllers\ExpeditingFormController;
 Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
     Route::get('/expediting-forms/create', [ExpeditingFormController::class, 'create'])->name('expediting_forms.create');
     Route::post('/expediting-forms', [ExpeditingFormController::class, 'store'])->name('expediting_forms.store');
+    Route::post('/expediting-forms/context-check', [ExpeditingFormController::class, 'checkContext'])->name('expediting_forms.context_check');
 });
 
 require __DIR__.'/auth.php';
