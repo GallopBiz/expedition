@@ -37,7 +37,7 @@
                     <label class="block mb-1 font-semibold" for="password_confirmation">Confirm Password</label>
                     <input class="w-full border rounded px-3 py-2" type="password" name="password_confirmation" id="password_confirmation" required>
                 </div>
-                <button class="bg-indigo-600 text-white px-4 py-2 rounded" type="submit">Create User</button>
+                    <button class="btn" type="submit">Create User</button>
                 <a href="{{ route('users.index') }}" class="ml-2 text-indigo-600">Cancel</a>
             </form>
         </x-card>

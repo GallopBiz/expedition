@@ -24,5 +24,14 @@ Route::middleware(['auth', 'role:Manager'])->group(function () {
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
 });
 
+
+use App\Http\Controllers\ExpeditingFormController;
+
+// Expediting form routes for Manager and Expeditor
+Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
+    Route::get('/expediting-forms/create', [ExpeditingFormController::class, 'create'])->name('expediting_forms.create');
+    Route::post('/expediting-forms', [ExpeditingFormController::class, 'store'])->name('expediting_forms.store');
+});
+
 require __DIR__.'/auth.php';
 

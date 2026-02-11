@@ -19,6 +19,14 @@
                         <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                             {{ __('Users') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('users.create')" :active="request()->routeIs('users.create')">
+                            {{ __('Create User') }}
+                        </x-nav-link>
+                    @endif
+                    @if(Auth::user() && (Auth::user()->role === 'Manager' || Auth::user()->role === 'Expeditor'))
+                        <x-nav-link :href="route('expediting_forms.create')" :active="request()->routeIs('expediting_forms.create')">
+                            {{ __('Expediting Form') }}
+                        </x-nav-link>
                     @endif
                 </div>
             </div>
@@ -78,6 +86,14 @@
             @if(Auth::user() && Auth::user()->role === 'Manager')
                 <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                     {{ __('Users') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('users.create')" :active="request()->routeIs('users.create')">
+                    {{ __('Create User') }}
+                </x-responsive-nav-link>
+            @endif
+            @if(Auth::user() && (Auth::user()->role === 'Manager' || Auth::user()->role === 'Expeditor'))
+                <x-responsive-nav-link :href="route('expediting_forms.create')" :active="request()->routeIs('expediting_forms.create')">
+                    {{ __('Expediting Form') }}
                 </x-responsive-nav-link>
             @endif
         </div>

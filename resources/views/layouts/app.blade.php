@@ -13,6 +13,26 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @stack('styles')
+        <style>
+            :root {
+                --primary-color: #01426a;
+                --secondary-color: #00b5e2;
+            }
+            .btn, .form-button {
+                background: var(--primary-color) !important;
+                color: #fff !important;
+                font-weight: 600;
+                border-radius: 0.375rem;
+                padding: 0.5rem 1.5rem;
+                transition: background 0.2s;
+                border: none;
+            }
+            .btn:hover, .form-button:hover {
+                background: var(--secondary-color) !important;
+                color: #fff !important;
+            }
+        </style>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
@@ -32,5 +52,6 @@
                 {{ $slot }}
             </main>
         </div>
+        @stack('scripts')
     </body>
 </html>
