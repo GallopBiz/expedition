@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\ExpeditingContext;
+use App\Models\ExpeditingForm;
+
 
 class ExpeditingFormController extends Controller
 {
@@ -24,7 +27,12 @@ class ExpeditingFormController extends Controller
         public function create()
         {
             $suppliers = \App\Models\User::where('role', 'Supplier')->get(['id', 'name', 'email']);
-            return view('expediting_forms.create', compact('suppliers'));
+            $expeditors = \App\Models\User::where('role', 'Expeditor')->get(['id', 'name', 'email']);
+            $workpackageNames = \App\Models\ExpeditingContext::distinct()->pluck('workpackage_name');
+            $poNumbers = \App\Models\ExpeditingContext::distinct()->pluck('po_number');
+            $customerContacts = \App\Models\ExpeditingContext::distinct()->pluck('customer_procurement_contact');
+            $technicalOwners = \App\Models\ExpeditingContext::distinct()->pluck('technical_workpackage_owner');
+            return view('expediting_forms.create', compact('suppliers', 'expeditors', 'workpackageNames', 'poNumbers', 'customerContacts', 'technicalOwners'));
         }
 
     /**
@@ -33,32 +41,86 @@ class ExpeditingFormController extends Controller
         /**
          * Store a newly created expediting form in storage.
          */
-        public function store(Request $request)
-        {
-            $validated = $request->validate([
-                'work_package' => 'required|string|max:255',
-                'lli' => 'nullable|boolean',
-                'expediting_category' => 'required|string|max:255',
-                'workpackage_name' => 'required|string|max:255',
-                'supplier' => 'required|string|max:255',
-                'order_date' => 'nullable|date',
-                'contract_data_available_dmcs' => 'nullable|boolean',
-                'po_number' => 'nullable|string|max:255',
-                'incoterms' => 'nullable|string|max:255',
-                'exyte_procurement_contract_manager' => 'nullable|string|max:255',
-                'customer_procurement_contact' => 'nullable|string|max:255',
-                'kickoff_status' => 'nullable|string|max:255',
-                'technical_workpackage_owner' => 'nullable|string|max:255',
-                'workstream_building' => 'nullable|string|max:255',
-                'expediting_contact' => 'nullable|string|max:255',
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            // Context fields
+            'workpackage_name' => 'required|string|max:255',
+            'supplier' => 'required|string|max:255',
+            'po_number' => 'required|string|max:255',
+            'lli' => 'nullable',
+            'expediting_category' => 'nullable',
+            'order_date' => 'nullable|date',
+            'contract_data_available_dmcs' => 'nullable',
+            'incoterms' => 'nullable',
+            'exyte_procurement_contract_manager' => 'nullable',
+            'customer_procurement_contact' => 'nullable',
+            'kickoff_status' => 'nullable',
+            'technical_workpackage_owner' => 'nullable',
+            // Execution lines
+            'executions' => 'required|array|min:1',
+            'executions.*.work_package' => 'required|string|max:255',
+            'executions.*.workstream_building' => 'required|string|max:255',
+            'executions.*.expediting_contact' => 'required|string|max:255',
+        ]);
+
+        // Find or create context
+        $context = ExpeditingContext::firstOrCreate(
+            [
+                'supplier' => $validated['supplier'],
+                'workpackage_name' => $validated['workpackage_name'],
+                'po_number' => $validated['po_number'],
+            ],
+            [
+                'lli' => $validated['lli'] ?? null,
+                'expediting_category' => $validated['expediting_category'] ?? null,
+                'order_date' => $validated['order_date'] ?? null,
+                'contract_data_available_dmcs' => $validated['contract_data_available_dmcs'] ?? null,
+                'incoterms' => $validated['incoterms'] ?? null,
+                'exyte_procurement_contract_manager' => $validated['exyte_procurement_contract_manager'] ?? null,
+                'customer_procurement_contact' => $validated['customer_procurement_contact'] ?? null,
+                'kickoff_status' => $validated['kickoff_status'] ?? null,
+                'technical_workpackage_owner' => $validated['technical_workpackage_owner'] ?? null,
+            ]
+        );
+
+        $errors = [];
+        foreach ($validated['executions'] as $i => $exec) {
+            // Prevent duplicate execution for this context
+            $exists = ExpeditingForm::where('context_id', $context->id)
+                ->where('work_package', $exec['work_package'])
+                ->where('workstream_building', $exec['workstream_building'])
+                ->exists();
+            if ($exists) {
+                $errors[] = "Duplicate execution for Work Package '{$exec['work_package']}' and Building '{$exec['workstream_building']}' (row ".($i+1).")";
+                continue;
+            }
+            ExpeditingForm::create([
+                'context_id' => $context->id,
+                'work_package' => $exec['work_package'],
+                'workstream_building' => $exec['workstream_building'],
+                'expediting_contact' => $exec['expediting_contact'],
+                'created_by' => auth()->user() ? auth()->user()->name : 'system',
+                'expediting_category' => $context->expediting_category,
+                'workpackage_name' => $context->workpackage_name,
+                'supplier' => $context->supplier,
+                'order_date' => $context->order_date,
+                'contract_data_available_dmcs' => $context->contract_data_available_dmcs,
+                'po_number' => $context->po_number,
+                'incoterms' => $context->incoterms,
+                'exyte_procurement_contract_manager' => $context->exyte_procurement_contract_manager,
+                'customer_procurement_contact' => $context->customer_procurement_contact,
+                'kickoff_status' => $context->kickoff_status,
+                'technical_workpackage_owner' => $context->technical_workpackage_owner,
             ]);
-
-            $validated['created_by'] = auth()->user()->name;
-
-            ExpeditingForm::create($validated);
-
-            return redirect()->route('expediting_forms.create')->with('success', 'Expediting form created successfully.');
         }
+
+        if (count($errors)) {
+            return redirect()->back()->withErrors(['executions' => $errors])->withInput();
+        }
+
+        return redirect()->route('expediting_forms.create')->with('success', 'Expediting form and executions created successfully.');
+    }
 
     /**
      * Display the specified resource.
@@ -91,4 +153,40 @@ class ExpeditingFormController extends Controller
     {
         //
     }
+
+    /**
+     * AJAX endpoint to check for reusable context.
+     * Returns { exists: bool, data: context fields or null }
+     */
+    public function checkContext(Request $request)
+    {
+        $request->validate([
+            'supplier' => 'required|string',
+            'workpackage_name' => 'required|string',
+            'po_number' => 'required|string',
+        ]);
+        $context = ExpeditingContext::where('supplier', $request->supplier)
+            ->where('workpackage_name', $request->workpackage_name)
+            ->where('po_number', $request->po_number)
+            ->first();
+        if ($context) {
+            return response()->json([
+                'exists' => true,
+                'data' => [
+                    'lli' => $context->lli,
+                    'expediting_category' => $context->expediting_category,
+                    'order_date' => $context->order_date,
+                    'contract_data_available_dmcs' => $context->contract_data_available_dmcs,
+                    'incoterms' => $context->incoterms,
+                    'exyte_procurement_contract_manager' => $context->exyte_procurement_contract_manager,
+                    'customer_procurement_contact' => $context->customer_procurement_contact,
+                    'kickoff_status' => $context->kickoff_status,
+                    'technical_workpackage_owner' => $context->technical_workpackage_owner,
+                ]
+            ]);
+        } else {
+            return response()->json(['exists' => false, 'data' => null]);
+        }
+    }
+
 }
