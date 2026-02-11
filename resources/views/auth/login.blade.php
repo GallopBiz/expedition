@@ -1,5 +1,6 @@
 <x-guest-layout>
     <div class="text-center mb-6">
+        <img src="/images/exyte-logo.png" alt="Exyte Logo" class="mx-auto mb-4 h-16">
         <h1 class="text-3xl font-bold text-indigo-700">Expedition</h1>
     </div>
     <!-- Session Status -->
