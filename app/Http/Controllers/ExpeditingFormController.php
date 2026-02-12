@@ -1,21 +1,50 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
+use App\Mail\SupplierExpeditingFormLink;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\ExpeditingContext;
 use App\Models\ExpeditingForm;
 
 
+
 class ExpeditingFormController extends Controller
 {
+
+    /**
+     * Send a professional email to the supplier with a secure, expiring auto-login link.
+     */
+    public function sendEmail(Request $request, ExpeditingForm $expeditingForm)
+    {
+        // Find supplier user by name or email (adjust as needed)
+        $supplier = User::where('name', $expeditingForm->supplier)
+            ->orWhere('email', $expeditingForm->supplier)
+            ->first();
+        if (!$supplier) {
+            return redirect()->back()->with('error', 'Supplier not found.');
+        }
+
+        // Generate signed URL (valid for 48 hours)
+        $link = URL::signedRoute('supplier.expedite.access', ['expeditingForm' => $expeditingForm->id], now()->addHours(48));
+
+        // Send email
+        Mail::to($supplier->email)->send(new SupplierExpeditingFormLink($supplier->name, $link, $expeditingForm));
+
+        return redirect()->back()->with('success', 'Email sent to supplier successfully.');
+    }
     /**
      * Display a listing of the resource.
      */
-    public function index()
+        /**
+     * Show all submitted expediting forms in a list.
+     */
+    public function list()
     {
-        //
+        $expeditingForms = ExpeditingForm::orderByDesc('created_at')->get();
+        return view('expediting_forms.list', compact('expeditingForms'));
     }
 
     /**
@@ -24,16 +53,18 @@ class ExpeditingFormController extends Controller
         /**
          * Show the form for creating a new expediting form.
          */
-        public function create()
-        {
-            $suppliers = \App\Models\User::where('role', 'Supplier')->get(['id', 'name', 'email']);
-            $expeditors = \App\Models\User::where('role', 'Expeditor')->get(['id', 'name', 'email']);
-            $workpackageNames = \App\Models\ExpeditingContext::distinct()->pluck('workpackage_name');
-            $poNumbers = \App\Models\ExpeditingContext::distinct()->pluck('po_number');
-            $customerContacts = \App\Models\ExpeditingContext::distinct()->pluck('customer_procurement_contact');
-            $technicalOwners = \App\Models\ExpeditingContext::distinct()->pluck('technical_workpackage_owner');
-            return view('expediting_forms.create', compact('suppliers', 'expeditors', 'workpackageNames', 'poNumbers', 'customerContacts', 'technicalOwners'));
-        }
+    
+    public function create()
+    {
+        $suppliers = User::where('role', 'Supplier')->get(['id', 'name', 'email']);
+        $expeditors = User::where('role', 'Expeditor')->get(['id', 'name', 'email']);
+        $workpackageNames = ExpeditingContext::distinct()->pluck('workpackage_name');
+        $poNumbers = ExpeditingContext::distinct()->pluck('po_number');
+        $customerContacts = ExpeditingContext::distinct()->pluck('customer_procurement_contact');
+        $technicalOwners = ExpeditingContext::distinct()->pluck('technical_workpackage_owner');
+        return view('expediting_forms.create', compact('suppliers', 'expeditors', 'workpackageNames', 'poNumbers', 'customerContacts', 'technicalOwners'));
+    }
+
 
     /**
      * Store a newly created resource in storage.

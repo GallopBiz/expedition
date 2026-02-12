@@ -27,6 +27,9 @@
                         <x-nav-link :href="route('expediting_forms.create')" :active="request()->routeIs('expediting_forms.create')">
                             {{ __('Expediting Form') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('expediting_forms.list')" :active="request()->routeIs('expediting_forms.list')">
+                            {{ __('Expediting List') }}
+                        </x-nav-link>
                     @endif
                 </div>
             </div>
@@ -94,6 +97,9 @@
             @if(Auth::user() && (Auth::user()->role === 'Manager' || Auth::user()->role === 'Expeditor'))
                 <x-responsive-nav-link :href="route('expediting_forms.create')" :active="request()->routeIs('expediting_forms.create')">
                     {{ __('Expediting Form') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('expediting_forms.list')" :active="request()->routeIs('expediting_forms.list')">
+                    {{ __('Expediting List') }}
                 </x-responsive-nav-link>
             @endif
         </div>

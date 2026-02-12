@@ -36,7 +36,18 @@ Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
     Route::get('/expediting-forms/create', [ExpeditingFormController::class, 'create'])->name('expediting_forms.create');
     Route::post('/expediting-forms', [ExpeditingFormController::class, 'store'])->name('expediting_forms.store');
     Route::post('/expediting-forms/context-check', [ExpeditingFormController::class, 'checkContext'])->name('expediting_forms.context_check');
+    Route::get('/expediting-forms/list', [ExpeditingFormController::class, 'list'])->name('expediting_forms.list');
+    Route::post('/expediting-forms/{expeditingForm}/send-email', [ExpeditingFormController::class, 'sendEmail'])->name('expediting_forms.send_email');
+    Route::get('/expediting-forms/{expeditingForm}/edit', [ExpeditingFormController::class, 'edit'])->name('expediting_forms.edit');
+    Route::put('/expediting-forms/{expeditingForm}', [ExpeditingFormController::class, 'update'])->name('expediting_forms.update');
+    Route::delete('/expediting-forms/{expeditingForm}', [ExpeditingFormController::class, 'destroy'])->name('expediting_forms.destroy');
 });
+
+// Supplier auto-login link (signed, expires in 48 hours)
+// use App\Http\Controllers\ExpeditingFormController;
+Route::get('/supplier/expediting-form/{expeditingForm}/access', [ExpeditingFormController::class, 'supplierAccess'])
+    ->name('supplier.expedite.access')
+    ->middleware(['signed']);
 
 require __DIR__.'/auth.php';
 
