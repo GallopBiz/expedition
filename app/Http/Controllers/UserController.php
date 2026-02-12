@@ -31,6 +31,21 @@ class UserController extends Controller
             'phone' => 'nullable|string|max:20',
             'role' => 'required|in:Manager,Expeditor,Supplier',
         ];
+        // Add company fields if supplier
+        if ($request->role === 'Supplier') {
+            $rules['company_name'] = 'nullable|string|max:255';
+            $rules['company_address'] = 'nullable|string|max:255';
+            $rules['contact1_name'] = 'nullable|string|max:255';
+            $rules['contact1_position'] = 'nullable|string|max:255';
+            $rules['contact1_mail'] = 'nullable|email|max:255';
+            $rules['contact1_mobile'] = 'nullable|string|max:50';
+            $rules['contact1_phone'] = 'nullable|string|max:50';
+            $rules['contact2_name'] = 'nullable|string|max:255';
+            $rules['contact2_position'] = 'nullable|string|max:255';
+            $rules['contact2_mail'] = 'nullable|email|max:255';
+            $rules['contact2_mobile'] = 'nullable|string|max:50';
+            $rules['contact2_phone'] = 'nullable|string|max:50';
+        }
         if ($request->filled('password')) {
             $rules['password'] = 'string|min:8|confirmed';
         }
@@ -39,6 +54,12 @@ class UserController extends Controller
             $validated['password'] = Hash::make($request->password);
         } else {
             unset($validated['password']);
+        }
+        // Only allow company fields for supplier
+        if ($request->role !== 'Supplier') {
+            unset($validated['company_name'], $validated['company_address'],
+                $validated['contact1_name'], $validated['contact1_position'], $validated['contact1_mail'], $validated['contact1_mobile'], $validated['contact1_phone'],
+                $validated['contact2_name'], $validated['contact2_position'], $validated['contact2_mail'], $validated['contact2_mobile'], $validated['contact2_phone']);
         }
         $user->update($validated);
         return redirect()->route('users.index')->with('success', 'User updated successfully.');
@@ -73,23 +94,37 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'nullable|string|max:20',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:Manager,Expeditor,Supplier',
-        ]);
-
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'is_active' => true,
-        ]);
-
+        ];
+        if ($request->role === 'Supplier') {
+            $rules['company_name'] = 'nullable|string|max:255';
+            $rules['company_address'] = 'nullable|string|max:255';
+            $rules['contact1_name'] = 'nullable|string|max:255';
+            $rules['contact1_position'] = 'nullable|string|max:255';
+            $rules['contact1_mail'] = 'nullable|email|max:255';
+            $rules['contact1_mobile'] = 'nullable|string|max:50';
+            $rules['contact1_phone'] = 'nullable|string|max:50';
+            $rules['contact2_name'] = 'nullable|string|max:255';
+            $rules['contact2_position'] = 'nullable|string|max:255';
+            $rules['contact2_mail'] = 'nullable|email|max:255';
+            $rules['contact2_mobile'] = 'nullable|string|max:50';
+            $rules['contact2_phone'] = 'nullable|string|max:50';
+        }
+        $validated = $request->validate($rules);
+        $validated['password'] = Hash::make($request->password);
+        $validated['is_active'] = true;
+        // Only allow company fields for supplier
+        if ($request->role !== 'Supplier') {
+            unset($validated['company_name'], $validated['company_address'],
+                $validated['contact1_name'], $validated['contact1_position'], $validated['contact1_mail'], $validated['contact1_mobile'], $validated['contact1_phone'],
+                $validated['contact2_name'], $validated['contact2_position'], $validated['contact2_mail'], $validated['contact2_mobile'], $validated['contact2_phone']);
+        }
+        User::create($validated);
         return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
 }
