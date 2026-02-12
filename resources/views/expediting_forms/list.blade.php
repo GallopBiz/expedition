@@ -1,3 +1,15 @@
+    @if(session('success'))
+        <div id="emailSuccessAlert" class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-green-100 border border-green-400 text-green-800 px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 animate-fade-in">
+            <span class="material-icons text-green-600">check_circle</span>
+            <span>{{ session('success') }}</span>
+        </div>
+        <script>
+            setTimeout(function() {
+                var alert = document.getElementById('emailSuccessAlert');
+                if(alert) alert.style.display = 'none';
+            }, 3500);
+        </script>
+    @endif
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
