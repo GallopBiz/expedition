@@ -11,8 +11,17 @@ use App\Models\ExpeditingForm;
 
 
 
+
 class ExpeditingFormController extends Controller
 {
+    /**
+     * Allow supplier to access their expediting form via secure link.
+     */
+    public function supplierAccess(Request $request, ExpeditingForm $expeditingForm)
+    {
+        // Optionally, you can add extra checks here (e.g., mark as viewed, log access, etc.)
+        return view('expediting_forms.supplier_access', compact('expeditingForm'));
+    }
 
     /**
      * Send a professional email to the supplier with a secure, expiring auto-login link.
