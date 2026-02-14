@@ -17,8 +17,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 use App\Http\Controllers\UserController;
-// User management routes for Manager only
-Route::middleware(['auth', 'role:Manager'])->group(function () {
+// User management routes for Manager and Expeditor
+Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
@@ -45,8 +45,12 @@ Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
 
 // Supplier auto-login link (signed, expires in 48 hours)
 // use App\Http\Controllers\ExpeditingFormController;
+
 Route::get('/supplier/expediting-form/{expeditingForm}/access', [ExpeditingFormController::class, 'supplierAccess'])
     ->name('supplier.expedite.access')
+    ->middleware(['signed']);
+Route::post('/supplier/expediting-form/{expeditingForm}/access', [ExpeditingFormController::class, 'supplierUpdate'])
+    ->name('supplier.expedite.update')
     ->middleware(['signed']);
 
 require __DIR__.'/auth.php';

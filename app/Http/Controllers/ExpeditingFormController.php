@@ -19,8 +19,103 @@ class ExpeditingFormController extends Controller
      */
     public function supplierAccess(Request $request, ExpeditingForm $expeditingForm)
     {
-        // Optionally, you can add extra checks here (e.g., mark as viewed, log access, etc.)
-        return view('expediting_forms.supplier_access', compact('expeditingForm'));
+        // If already submitted, show expired alert only for guests
+        if ($expeditingForm->email_link_submitted) {
+            if (!auth()->check() || auth()->user()->role !== 'Supplier' || auth()->user()->email !== $expeditingForm->supplier) {
+                return view('expediting_forms.supplier_access', [
+                    'expeditingForm' => $expeditingForm,
+                    'linkExpired' => true,
+                ]);
+            }
+        }
+        return view('expediting_forms.supplier_access', [
+            'expeditingForm' => $expeditingForm,
+            'linkExpired' => false,
+        ]);
+    }
+
+    /**
+     * Handle supplier form submission and log date changes.
+     */
+    public function supplierUpdate(Request $request, ExpeditingForm $expeditingForm)
+    {
+        $editableFields = [
+            'equipment_type_tag_number',
+            'detailed_scope_of_delivery',
+            'quantity',
+            'supplier',
+            'sub_supplier',
+            'place_of_manufacturing',
+            'order_status',
+            'drawing_approval',
+            'design_status',
+            'material_status',
+            'fabrication_status',
+            'fat_status',
+            'start_of_manufacturing_actual',
+            'end_of_manufacturing',
+            'fat_date_actual',
+            'contractual_delivery_to_site_date',
+            'actual_delivery_to_site_supplier',
+            'manufacturing_duration',
+            'ready_for_shipment',
+            'storage_at_supplier',
+            'delivered',
+            'comments',
+        ];
+
+        $validated = $request->validate([
+            'equipment_type_tag_number' => 'nullable|string|max:255',
+            'detailed_scope_of_delivery' => 'nullable|string',
+            'quantity' => 'nullable|numeric',
+            'supplier' => 'nullable|string|max:255',
+            'sub_supplier' => 'nullable|string|max:255',
+            'place_of_manufacturing' => 'nullable|string|max:255',
+            'order_status' => 'nullable|string',
+            'drawing_approval' => 'nullable|string',
+            'design_status' => 'nullable|integer|min:0|max:100',
+            'material_status' => 'nullable|integer|min:0|max:100',
+            'fabrication_status' => 'nullable|integer|min:0|max:100',
+            'fat_status' => 'nullable|integer|min:0|max:100',
+            'start_of_manufacturing_actual' => 'nullable|date',
+            'end_of_manufacturing' => 'nullable|date',
+            'fat_date_actual' => 'nullable|date',
+            'contractual_delivery_to_site_date' => 'nullable|date',
+            'actual_delivery_to_site_supplier' => 'nullable|date',
+            'manufacturing_duration' => 'nullable|numeric',
+            'ready_for_shipment' => 'nullable|in:Yes,No',
+            'storage_at_supplier' => 'nullable|in:Yes,No',
+            'delivered' => 'nullable|in:Yes,No',
+            'comments' => 'nullable|string',
+        ]);
+
+        // Track changes for all editable fields and always link to supplier email
+        $supplierEmail = $expeditingForm->supplier;
+        $userIdentifier = auth()->check() ? auth()->user()->email : $supplierEmail;
+        $now = now();
+        foreach ($editableFields as $field) {
+            if (array_key_exists($field, $validated)) {
+                $old = $expeditingForm->$field;
+                $new = $validated[$field];
+                if ($old != $new) {
+                    \App\Models\ExpeditingFormHistory::create([
+                        'expediting_form_id' => $expeditingForm->id,
+                        'field_changed' => $field,
+                        'old_value' => $old,
+                        'new_value' => $new,
+                        'changed_by' => $userIdentifier,
+                        'changed_at' => $now,
+                    ]);
+                }
+            }
+        }
+
+        // Only update allowed fields
+        $expeditingForm->fill(array_intersect_key($validated, array_flip($editableFields)));
+        $expeditingForm->email_link_submitted = true;
+        $expeditingForm->save();
+
+        return redirect()->back()->with('success', 'Form updated successfully.');
     }
 
     /**
@@ -35,6 +130,10 @@ class ExpeditingFormController extends Controller
         if (!$supplier) {
             return redirect()->back()->with('error', 'Supplier not found.');
         }
+
+        // Reset link submitted so supplier can fill again
+        $expeditingForm->email_link_submitted = false;
+        $expeditingForm->save();
 
         // Generate signed URL (valid for 48 hours)
         $link = URL::signedRoute('supplier.expedite.access', ['expeditingForm' => $expeditingForm->id], now()->addHours(48));

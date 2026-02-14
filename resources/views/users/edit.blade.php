@@ -122,6 +122,12 @@
             </div>
 
             <div class="mt-8"></div>
+            <!-- Success alert for profile update -->
+            @if(session('success'))
+                <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2500)" class="mb-6 bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded-lg shadow">
+                    <span class="font-semibold">{{ session('success') }}</span>
+                </div>
+            @endif
             <div class="p-8 bg-white shadow-lg rounded-2xl border border-gray-100">
                 <div class="w-full">
                     <h3 class="text-lg font-bold text-gray-700 mb-4">Change Password</h3>
