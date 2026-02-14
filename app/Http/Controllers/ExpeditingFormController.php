@@ -20,17 +20,30 @@ class ExpeditingFormController extends Controller
     public function supplierAccess(Request $request, ExpeditingForm $expeditingForm)
     {
         // If already submitted, show expired alert only for guests
+        $actualDeliveryHistories = $expeditingForm->actualDeliveryHistories()
+            ->orderByDesc('changed_at')
+            ->get();
         if ($expeditingForm->email_link_submitted) {
             if (!auth()->check() || auth()->user()->role !== 'Supplier' || auth()->user()->email !== $expeditingForm->supplier) {
                 return view('expediting_forms.supplier_access', [
                     'expeditingForm' => $expeditingForm,
                     'linkExpired' => true,
+                    'actualDeliveryHistories' => $actualDeliveryHistories,
                 ]);
             }
         }
+        $dateHistories = $expeditingForm->dateHistories()
+            ->orderByDesc('changed_at')
+            ->get();
+        $emailLogs = $expeditingForm->emailLogs()
+            ->orderByDesc('sent_at')
+            ->get();
         return view('expediting_forms.supplier_access', [
             'expeditingForm' => $expeditingForm,
             'linkExpired' => false,
+            'dateHistories' => $dateHistories,
+            'emailLogs' => $emailLogs,
+            'actualDeliveryHistories' => $actualDeliveryHistories,
         ]);
     }
 
@@ -39,6 +52,19 @@ class ExpeditingFormController extends Controller
      */
     public function supplierUpdate(Request $request, ExpeditingForm $expeditingForm)
     {
+        // Track changes for 'actual_delivery_to_site_supplier' only
+        $oldActualDelivery = $expeditingForm->actual_delivery_to_site_supplier;
+        $newActualDelivery = $request->input('actual_delivery_to_site_supplier');
+        if ($oldActualDelivery != $newActualDelivery) {
+            \App\Models\ExpeditingFormActualDeliveryHistory::create([
+                'expediting_form_id' => $expeditingForm->id,
+                'old_value' => $oldActualDelivery,
+                'new_value' => $newActualDelivery,
+                'changed_by' => auth()->check() ? auth()->user()->email : ($expeditingForm->supplier ?? 'guest'),
+                'changed_at' => now(),
+            ]);
+        }
+        // ...existing code...
         $editableFields = [
             'equipment_type_tag_number',
             'detailed_scope_of_delivery',
@@ -63,7 +89,6 @@ class ExpeditingFormController extends Controller
             'delivered',
             'comments',
         ];
-
         $validated = $request->validate([
             'equipment_type_tag_number' => 'nullable|string|max:255',
             'detailed_scope_of_delivery' => 'nullable|string',
@@ -88,8 +113,7 @@ class ExpeditingFormController extends Controller
             'delivered' => 'nullable|in:Yes,No',
             'comments' => 'nullable|string',
         ]);
-
-        // Track changes for all editable fields and always link to supplier email
+        // ...existing code...
         $supplierEmail = $expeditingForm->supplier;
         $userIdentifier = auth()->check() ? auth()->user()->email : $supplierEmail;
         $now = now();
@@ -109,12 +133,10 @@ class ExpeditingFormController extends Controller
                 }
             }
         }
-
-        // Only update allowed fields
+        // ...existing code...
         $expeditingForm->fill(array_intersect_key($validated, array_flip($editableFields)));
         $expeditingForm->email_link_submitted = true;
         $expeditingForm->save();
-
         return redirect()->back()->with('success', 'Form updated successfully.');
     }
 
@@ -141,14 +163,19 @@ class ExpeditingFormController extends Controller
         // Send email
         Mail::to($supplier->email)->send(new SupplierExpeditingFormLink($supplier->name, $link, $expeditingForm));
 
+        \App\Models\ExpeditingFormEmailLog::create([
+            'expediting_form_id' => $expeditingForm->id,
+            'recipient_email' => $supplier->email,
+            'sent_by' => auth()->check() ? auth()->user()->email : 'system',
+            'sent_at' => now(),
+            'subject' => 'Expediting Form Submission Link',
+            'message' => $link,
+        ]);
+
         return redirect()->back()->with('success', 'Email sent to supplier successfully.');
     }
-    /**
-     * Display a listing of the resource.
-     */
-        /**
-     * Show all submitted expediting forms in a list.
-     */
+
+    // Show all submitted expediting forms in a list.
     public function list()
     {
         $expeditingForms = ExpeditingForm::orderByDesc('created_at')->get();

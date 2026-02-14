@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class ExpeditingForm extends Model
 {
+    public function actualDeliveryHistories()
+    {
+        return $this->hasMany(ExpeditingFormActualDeliveryHistory::class, 'expediting_form_id');
+    }
     protected $fillable = [
         'context_id',
         'work_package',
@@ -38,6 +42,16 @@ class ExpeditingForm extends Model
         'delivered',
         'comments',
     ];
+
+    public function emailLogs()
+    {
+        return $this->hasMany(ExpeditingFormEmailLog::class, 'expediting_form_id');
+    }
+
+    public function dateHistories()
+    {
+        return $this->hasMany(ExpeditingFormDateHistory::class, 'expediting_form_id');
+    }
 
     public function context()
     {

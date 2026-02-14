@@ -1,4 +1,9 @@
+
 <?php
+// Work Packages List (all roles)
+Route::get('/work-packages', function () {
+    return view('work_packages');
+})->name('work_packages');
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
