@@ -25,13 +25,22 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
+        // If only password fields are filled, validate and update password only
+        if ($request->filled('password') && !$request->filled('name') && !$request->filled('email') && !$request->filled('role')) {
+            $request->validate([
+                'password' => 'string|min:8|confirmed',
+            ]);
+            $user->password = Hash::make($request->password);
+            $user->save();
+            return redirect()->route('users.edit', $user->id)->with('status', 'password-updated');
+        }
+        // Otherwise, validate all fields as before
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'role' => 'required|in:Manager,Expeditor,Supplier',
         ];
-        // Add company fields if supplier
         if ($request->role === 'Supplier') {
             $rules['company_name'] = 'nullable|string|max:255';
             $rules['company_address'] = 'nullable|string|max:255';
@@ -55,7 +64,6 @@ class UserController extends Controller
         } else {
             unset($validated['password']);
         }
-        // Only allow company fields for supplier
         if ($request->role !== 'Supplier') {
             unset($validated['company_name'], $validated['company_address'],
                 $validated['contact1_name'], $validated['contact1_position'], $validated['contact1_mail'], $validated['contact1_mobile'], $validated['contact1_phone'],

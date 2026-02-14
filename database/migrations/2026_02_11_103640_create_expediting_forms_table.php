@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string('workstream_building')->nullable();
             $table->string('expediting_contact')->nullable();
             $table->string('created_by')->nullable();
+            $table->boolean('email_link_submitted')->default(false);
             $table->timestamps();
         });
     }
