@@ -15,6 +15,11 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    @if(Auth::user() && Auth::user()->role === 'Supplier')
+                        <x-nav-link :href="route('work_packages')" :active="request()->routeIs('work_packages')">
+                            {{ __('Work Packages') }}
+                        </x-nav-link>
+                    @endif
                     @if(Auth::user() && Auth::user()->role === 'Manager')
                         <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                             {{ __('Users') }}
@@ -93,6 +98,11 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            @if(Auth::user() && Auth::user()->role === 'Supplier')
+                <x-responsive-nav-link :href="route('work_packages')" :active="request()->routeIs('work_packages')">
+                    {{ __('Work Packages') }}
+                </x-responsive-nav-link>
+            @endif
             @if(Auth::user() && Auth::user()->role === 'Manager')
                 <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                     {{ __('Users') }}

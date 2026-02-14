@@ -7,6 +7,41 @@
     </x-slot>
 
     <div class="w-full px-2 md:px-8 mt-6 font-sans">
+
+
+
+
+
+
+
+        <!-- Email log always last -->
+        @if(isset($emailLogs) && $emailLogs->count())
+            <div class="mt-8 bg-white rounded-xl shadow border border-gray-100 p-4">
+                <h3 class="text-xs font-bold text-[#01426a] mb-2 tracking-wide">Email Log</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-xs border border-gray-200">
+                        <thead class="bg-[#f8fafc] text-[#01426a]">
+                            <tr>
+                                <th class="px-1 py-1 border border-gray-200">To</th>
+                                <th class="px-1 py-1 border border-gray-200">By</th>
+                                <th class="px-1 py-1 border border-gray-200">At</th>
+                                <th class="px-1 py-1 border border-gray-200">Subject</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($emailLogs as $log)
+                                <tr>
+                                    <td class="px-1 py-1 border border-gray-200">{{ $log->recipient_email }}</td>
+                                    <td class="px-1 py-1 border border-gray-200">{{ $log->sent_by }}</td>
+                                    <td class="px-1 py-1 border border-gray-200">{{ $log->sent_at }}</td>
+                                    <td class="px-1 py-1 border border-gray-200">{{ $log->subject }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
         <div class="bg-gradient-to-br from-[#e6eef4] to-white p-4 md:p-8 rounded-2xl shadow-2xl w-full border border-[#01426a22]">
             @if(session('success'))
                 <div class="mb-4 p-2 bg-green-100 text-green-800 rounded">{{ session('success') }}</div>
@@ -142,9 +177,49 @@
                             <label class="block text-sm font-medium text-gray-700">Contractual Delivery to Site Date</label>
                             <input type="date" name="contractual_delivery_to_site_date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="{{ old('contractual_delivery_to_site_date', $expeditingForm->contractual_delivery_to_site_date) }}">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Actual Delivery to Site Supplier</label>
+                        <div x-data="{ showHistory: false }">
+                            <label class="block text-sm font-medium text-gray-700">Actual Delivery to Site – Supplier
+                                @if(isset($actualDeliveryHistories) && $actualDeliveryHistories->count())
+                                    <button type="button" @click="showHistory = true" class="ml-2 align-middle text-[#01426a] hover:text-[#357ab7]" title="View Change History">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </button>
+                                @endif
+                            </label>
                             <input type="date" name="actual_delivery_to_site_supplier" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="{{ old('actual_delivery_to_site_supplier', $expeditingForm->actual_delivery_to_site_supplier) }}">
+                            <!-- Modal Popup for Change History -->
+                            <div x-show="showHistory" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                                <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl relative">
+                                    <button type="button" @click="showHistory = false" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                    <h3 class="text-base font-bold text-[#01426a] mb-3">Change History</h3>
+                                    <table class="min-w-full text-xs border border-gray-200 bg-white">
+                                        <thead class="bg-[#f8fafc] text-[#01426a]">
+                                            <tr>
+                                                <th class="px-1 py-1 border border-gray-200">Old Value</th>
+                                                <th class="px-1 py-1 border border-gray-200">New Value</th>
+                                                <th class="px-1 py-1 border border-gray-200">Changed By</th>
+                                                <th class="px-1 py-1 border border-gray-200">Changed At</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($actualDeliveryHistories as $history)
+                                                <tr>
+                                                    <td class="px-1 py-1 border border-gray-200">{{ $history->old_value }}</td>
+                                                    <td class="px-1 py-1 border border-gray-200">{{ $history->new_value }}</td>
+                                                    <td class="px-1 py-1 border border-gray-200">{{ $history->changed_by }}</td>
+                                                    <td class="px-1 py-1 border border-gray-200">{{ $history->changed_at }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
