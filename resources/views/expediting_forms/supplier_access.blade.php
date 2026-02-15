@@ -252,10 +252,12 @@
                                 <option value="">Select</option>
                                 <option value="Yes" @if(old('delivered', $expeditingForm->delivered)==='Yes') selected @endif>Yes</option>
                                 <option value="No" @if(old('delivered', $expeditingForm->delivered)==='No') selected @endif>No</option>
+                                <option value="Delay- FAT Issue" @if(old('delivered', $expeditingForm->delivered)==='Delay- FAT Issue') selected @endif>Delay- FAT Issue</option>
+                                <option value="Other" @if(old('delivered', $expeditingForm->delivered)==='Other') selected @endif>Other</option>
                             </select>
                         </div>
                         <div class="col-span-1 md:col-span-3">
-                            <label class="block text-sm font-medium text-gray-700">Comments</label>
+                            <label class="block text-sm font-medium text-gray-700">Exyte Technical Discussion / Open Points in clarification with Supplier Delivery Remarks</label>
                             <textarea name="comments" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">{{ old('comments', $expeditingForm->comments) }}</textarea>
                         </div>
                     </div>

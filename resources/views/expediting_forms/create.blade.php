@@ -57,14 +57,17 @@
 
     <div class="w-full px-2 md:px-8 mt-6 font-sans">
         <div class="bg-gradient-to-br from-[#e6eef4] to-white p-4 md:p-8 rounded-2xl shadow-2xl w-full border border-[#01426a22]">
-            <form method="POST" action="{{ route('expediting_forms.store') }}" class="space-y-8 w-full">
+            <form method="POST" action="{{ isset($isEdit) && $isEdit ? route('expediting_forms.update', $expeditingForm->id) : route('expediting_forms.store') }}" class="space-y-8 w-full">
                 @csrf
+                @if(isset($isEdit) && $isEdit)
+                    @method('PUT')
+                @endif
                 <div class="mb-6">
                     <h3 class="text-lg md:text-2xl font-bold text-[#01426a] mb-2 tracking-wide">Context Information</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full">
     <div>
         <label for="work_package" class="block text-sm font-medium text-gray-700">Work package</label>
-        <input type="text" name="work_package" id="work_package" value="{{ old('work_package') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans" required>
+        <input type="text" name="work_package" id="work_package" value="{{ old('work_package', isset($expeditingForm) ? $expeditingForm->work_package : '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans" required>
         @error('work_package')
             <div class="text-red-600 text-xs mt-1">{{ $message }}</div>
         @enderror
@@ -74,8 +77,8 @@
         <div class="locked-wrapper">
             <select name="lli" id="lli" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
                 <option value="">Select</option>
-                <option value="1" @if(old('lli')==='1') selected @endif>Yes</option>
-                <option value="0" @if(old('lli')==='0') selected @endif>No</option>
+                <option value="1" @if(old('lli', isset($expeditingForm) ? (string)$expeditingForm->lli : '')==='1') selected @endif>Yes</option>
+                <option value="0" @if(old('lli', isset($expeditingForm) ? (string)$expeditingForm->lli : '')==='0') selected @endif>No</option>
             </select>
         </div>
         @error('lli')
@@ -87,9 +90,9 @@
         <div class="locked-wrapper">
             <select name="expediting_category" id="expediting_category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans" required>
                 <option value="">Select</option>
-                <option value="Low" @if(old('expediting_category')==='Low') selected @endif>Low</option>
-                <option value="Middle" @if(old('expediting_category')==='Middle') selected @endif>Middle</option>
-                <option value="High" @if(old('expediting_category')==='High') selected @endif>High</option>
+                <option value="Low" @if(old('expediting_category', isset($expeditingForm) ? $expeditingForm->expediting_category : '')==='Low') selected @endif>Low</option>
+                <option value="Middle" @if(old('expediting_category', isset($expeditingForm) ? $expeditingForm->expediting_category : '')==='Middle') selected @endif>Middle</option>
+                <option value="High" @if(old('expediting_category', isset($expeditingForm) ? $expeditingForm->expediting_category : '')==='High') selected @endif>High</option>
             </select>
         </div>
         @error('expediting_category')
@@ -98,7 +101,7 @@
     </div>
     <div>
         <label for="workpackage_name" class="block text-sm font-medium text-gray-700">Workpackage name</label>
-        <input type="text" name="workpackage_name" id="workpackage_name" value="{{ old('workpackage_name') }}" list="workpackage_name_list" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans" required>
+        <input type="text" name="workpackage_name" id="workpackage_name" value="{{ old('workpackage_name', isset($expeditingForm) ? $expeditingForm->workpackage_name : '') }}" list="workpackage_name_list" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans" required>
         <datalist id="workpackage_name_list">
             @foreach($workpackageNames as $name)
                 @if($name)
@@ -116,7 +119,7 @@
             <option value="">Select</option>
             @if(isset($suppliers) && count($suppliers))
                 @foreach($suppliers as $supplier)
-                    <option value="{{ $supplier->name }}" @if(old('supplier')===$supplier->name) selected @endif>{{ $supplier->name }} ({{ $supplier->email }})</option>
+                    <option value="{{ $supplier->name }}" @if(old('supplier', isset($expeditingForm) ? $expeditingForm->supplier : '')===$supplier->name) selected @endif>{{ $supplier->name }} ({{ $supplier->email }})</option>
                 @endforeach
             @endif
         </select>
@@ -127,9 +130,16 @@
     <div>
         <label for="order_date" class="block text-sm font-medium text-gray-700">Order Date</label>
         <div class="locked-wrapper">
-            <input type="date" name="order_date" id="order_date" value="{{ old('order_date') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
+            <input type="date" name="order_date" id="order_date" value="{{ old('order_date', isset($expeditingForm) ? $expeditingForm->order_date : '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
         </div>
         @error('order_date')
+            <div class="text-red-600 text-xs mt-1">{{ $message }}</div>
+        @enderror
+    </div>
+    <div>
+        <label for="forecast_delivery_to_site" class="block text-sm font-medium text-gray-700">Forecast Delivery to Site<br><span class="text-xs">Time schedule date (site need date)</span></label>
+        <input type="date" name="forecast_delivery_to_site" id="forecast_delivery_to_site" value="{{ old('forecast_delivery_to_site', isset($expeditingForm) ? $expeditingForm->forecast_delivery_to_site : '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
+        @error('forecast_delivery_to_site')
             <div class="text-red-600 text-xs mt-1">{{ $message }}</div>
         @enderror
     </div>
@@ -138,8 +148,8 @@
         <div class="locked-wrapper">
             <select name="contract_data_available_dmcs" id="contract_data_available_dmcs" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
                 <option value="">Select</option>
-                <option value="1" @if(old('contract_data_available_dmcs')==='1') selected @endif>Yes</option>
-                <option value="0" @if(old('contract_data_available_dmcs')==='0') selected @endif>No</option>
+                <option value="1" @if(old('contract_data_available_dmcs', isset($expeditingForm) ? (string)$expeditingForm->contract_data_available_dmcs : '')==='1') selected @endif>Yes</option>
+                <option value="0" @if(old('contract_data_available_dmcs', isset($expeditingForm) ? (string)$expeditingForm->contract_data_available_dmcs : '')==='0') selected @endif>No</option>
             </select>
         </div>
         @error('contract_data_available_dmcs')
@@ -148,7 +158,7 @@
     </div>
     <div>
         <label for="po_number" class="block text-sm font-medium text-gray-700">PO Number</label>
-        <input type="text" name="po_number" id="po_number" value="{{ old('po_number') }}" list="po_number_list" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
+        <input type="text" name="po_number" id="po_number" value="{{ old('po_number', isset($expeditingForm) ? (optional($expeditingForm->context)->po_number ?? $expeditingForm->po_number) : '') }}" list="po_number_list" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
         <datalist id="po_number_list">
             @foreach($poNumbers as $po)
                 @if($po)
@@ -165,8 +175,8 @@
         <div class="locked-wrapper">
             <select name="incoterms" id="incoterms" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
                 <option value="">Select</option>
-                <option value="DAP" @if(old('incoterms')==='DAP') selected @endif>DAP</option>
-                <option value="Not Available" @if(old('incoterms')==='Not Available') selected @endif>Not Available</option>
+                <option value="DAP" @if(old('incoterms', isset($expeditingForm) ? $expeditingForm->incoterms : '')==='DAP') selected @endif>DAP</option>
+                <option value="Not Available" @if(old('incoterms', isset($expeditingForm) ? $expeditingForm->incoterms : '')==='Not Available') selected @endif>Not Available</option>
             </select>
         </div>
         @error('incoterms')
@@ -180,7 +190,7 @@
                 <option value="">Select</option>
                 @if(isset($expeditors) && count($expeditors))
                     @foreach($expeditors as $expeditor)
-                        <option value="{{ $expeditor->name }}" @if(old('exyte_procurement_contract_manager')===$expeditor->name) selected @endif>{{ $expeditor->name }} ({{ $expeditor->email }})</option>
+                        <option value="{{ $expeditor->name }}" @if(old('exyte_procurement_contract_manager', isset($expeditingForm) ? $expeditingForm->exyte_procurement_contract_manager : '')===$expeditor->name) selected @endif>{{ $expeditor->name }} ({{ $expeditor->email }})</option>
                     @endforeach
                 @endif
             </select>
@@ -208,9 +218,9 @@
         <div class="locked-wrapper">
             <select name="kickoff_status" id="kickoff_status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
                 <option value="">Select</option>
-                <option value="Yes" @if(old('kickoff_status')==='Yes') selected @endif>Yes</option>
-                <option value="No" @if(old('kickoff_status')==='No') selected @endif>No</option>
-                <option value="Other" @if(old('kickoff_status')==='Other') selected @endif>Other</option>
+                <option value="Yes" @if(old('kickoff_status', isset($expeditingForm) ? $expeditingForm->kickoff_status : '')==='Yes') selected @endif>Yes</option>
+                <option value="No" @if(old('kickoff_status', isset($expeditingForm) ? $expeditingForm->kickoff_status : '')==='No') selected @endif>No</option>
+                <option value="Other" @if(old('kickoff_status', isset($expeditingForm) ? $expeditingForm->kickoff_status : '')==='Other') selected @endif>Other</option>
             </select>
         </div>
         @error('kickoff_status')
@@ -246,16 +256,45 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="hover:bg-[#e6eef4] transition">
-                                    <td class="border px-3 py-2"><input type="text" name="executions[0][work_package]" class="w-full rounded border-[#01426a55] py-1 px-2 text-xs md:text-sm focus:ring-2 focus:ring-[#01426a33] focus:border-[#01426a] transition" required></td>
-                                    <td class="border px-3 py-2"><input type="text" name="executions[0][workstream_building]" class="w-full rounded border-[#01426a55] py-1 px-2 text-xs md:text-sm focus:ring-2 focus:ring-[#01426a33] focus:border-[#01426a] transition" required></td>
-                                    <td class="border px-3 py-2"><input type="text" name="executions[0][expediting_contact]" class="w-full rounded border-[#01426a55] py-1 px-2 text-xs md:text-sm focus:ring-2 focus:ring-[#01426a33] focus:border-[#01426a] transition" required></td>
-                                    <td class="border px-3 py-2 text-center">
-                                        <button type="button" class="remove-row bg-[#fbe9e7] hover:bg-[#ff5252] hover:text-white text-[#d32f2f] font-bold text-2xl rounded-full w-10 h-10 flex items-center justify-center shadow transition focus:outline-none focus:ring-2 focus:ring-[#01426a33]" title="Remove">
-                                            <span class="material-icons">delete</span>
-                                        </button>
-                                    </td>
-                                </tr>
+                                @php
+                                    $executions = [];
+                                    if(isset($isEdit) && $isEdit && isset($expeditingForm)) {
+                                        // For edit, load all executions for the same context
+                                        $executions = \App\Models\ExpeditingForm::where('context_id', $expeditingForm->context_id)->get();
+                                    }
+                                @endphp
+                                @if(isset($isEdit) && $isEdit && count($executions))
+                                    @foreach($executions as $i => $exec)
+                                    <tr class="hover:bg-[#e6eef4] transition">
+                                        <td class="border px-3 py-2">
+                                            <input type="hidden" name="executions[{{ $i }}][id]" value="{{ $exec->id }}">
+                                            <input type="text" name="executions[{{ $i }}][work_package]" value="{{ old('executions.'.$i.'.work_package', $exec->work_package) }}" class="w-full rounded border-[#01426a55] py-1 px-2 text-xs md:text-sm focus:ring-2 focus:ring-[#01426a33] focus:border-[#01426a] transition" required>
+                                        </td>
+                                        <td class="border px-3 py-2">
+                                            <input type="text" name="executions[{{ $i }}][workstream_building]" value="{{ old('executions.'.$i.'.workstream_building', $exec->workstream_building) }}" class="w-full rounded border-[#01426a55] py-1 px-2 text-xs md:text-sm focus:ring-2 focus:ring-[#01426a33] focus:border-[#01426a] transition" required>
+                                        </td>
+                                        <td class="border px-3 py-2">
+                                            <input type="text" name="executions[{{ $i }}][expediting_contact]" value="{{ old('executions.'.$i.'.expediting_contact', $exec->expediting_contact) }}" class="w-full rounded border-[#01426a55] py-1 px-2 text-xs md:text-sm focus:ring-2 focus:ring-[#01426a33] focus:border-[#01426a] transition" required>
+                                        </td>
+                                        <td class="border px-3 py-2 text-center">
+                                            <button type="button" class="remove-row bg-[#fbe9e7] hover:bg-[#ff5252] hover:text-white text-[#d32f2f] font-bold text-2xl rounded-full w-10 h-10 flex items-center justify-center shadow transition focus:outline-none focus:ring-2 focus:ring-[#01426a33]" title="Remove">
+                                                <span class="material-icons">delete</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                @else
+                                    <tr class="hover:bg-[#e6eef4] transition">
+                                        <td class="border px-3 py-2"><input type="text" name="executions[0][work_package]" class="w-full rounded border-[#01426a55] py-1 px-2 text-xs md:text-sm focus:ring-2 focus:ring-[#01426a33] focus:border-[#01426a] transition" required></td>
+                                        <td class="border px-3 py-2"><input type="text" name="executions[0][workstream_building]" class="w-full rounded border-[#01426a55] py-1 px-2 text-xs md:text-sm focus:ring-2 focus:ring-[#01426a33] focus:border-[#01426a] transition" required></td>
+                                        <td class="border px-3 py-2"><input type="text" name="executions[0][expediting_contact]" class="w-full rounded border-[#01426a55] py-1 px-2 text-xs md:text-sm focus:ring-2 focus:ring-[#01426a33] focus:border-[#01426a] transition" required></td>
+                                        <td class="border px-3 py-2 text-center">
+                                            <button type="button" class="remove-row bg-[#fbe9e7] hover:bg-[#ff5252] hover:text-white text-[#d32f2f] font-bold text-2xl rounded-full w-10 h-10 flex items-center justify-center shadow transition focus:outline-none focus:ring-2 focus:ring-[#01426a33]" title="Remove">
+                                                <span class="material-icons">delete</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endif
                             </tbody>
                         </table>
                         <button type="button" id="add-row" class="mt-4 ml-2 px-5 py-2 bg-gradient-to-r from-[#01426a] to-[#357ab7] text-white rounded-lg shadow hover:from-[#01426a] hover:to-[#012a40] transition font-semibold text-sm flex items-center gap-2"><span class="material-icons align-middle">add</span>Add Row</button>

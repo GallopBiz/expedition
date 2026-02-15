@@ -33,6 +33,9 @@
                             {{ __('Expediting Form') }}
                         </x-nav-link>
                         <x-nav-link :href="route('expediting_forms.list')" :active="request()->routeIs('expediting_forms.list')">
+                            {{ __('Work Package List') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('expediting_forms.expediting_list')" :active="request()->routeIs('expediting_forms.expediting_list')">
                             {{ __('Expediting List') }}
                         </x-nav-link>
                     @endif
@@ -116,6 +119,9 @@
                     {{ __('Expediting Form') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('expediting_forms.list')" :active="request()->routeIs('expediting_forms.list')">
+                    {{ __('Work Package List') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('expediting_forms.expediting_list')" :active="request()->routeIs('expediting_forms.expediting_list')">
                     {{ __('Expediting List') }}
                 </x-responsive-nav-link>
             @endif

@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->string('customer_procurement_contact')->nullable();
             $table->string('kickoff_status')->nullable();
             $table->string('technical_workpackage_owner')->nullable();
+            $table->date('forecast_delivery_to_site')->nullable();
             $table->timestamps();
             $table->unique(['supplier', 'workpackage_name', 'po_number'], 'unique_context');
         });

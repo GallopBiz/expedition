@@ -52,7 +52,7 @@ class ExpeditingFormController extends Controller
      */
     public function supplierUpdate(Request $request, ExpeditingForm $expeditingForm)
     {
-        // Track changes for 'actual_delivery_to_site_supplier' only
+        // Track changes for 'actual_delivery_to_site_supplier'
         $oldActualDelivery = $expeditingForm->actual_delivery_to_site_supplier;
         $newActualDelivery = $request->input('actual_delivery_to_site_supplier');
         if ($oldActualDelivery != $newActualDelivery) {
@@ -63,6 +63,23 @@ class ExpeditingFormController extends Controller
                 'changed_by' => auth()->check() ? auth()->user()->email : ($expeditingForm->supplier ?? 'guest'),
                 'changed_at' => now(),
             ]);
+        }
+
+        // Track changes for 'forecast_delivery_to_site'
+        $oldForecastDelivery = $expeditingForm->forecast_delivery_to_site;
+        $newForecastDelivery = $request->input('forecast_delivery_to_site');
+        if ($oldForecastDelivery != $newForecastDelivery) {
+            // Prevent duplicate consecutive entries for the same new value
+            $lastHistory = $expeditingForm->forecastDeliveryHistories()->orderByDesc('changed_at')->first();
+            if (!$lastHistory || $lastHistory->new_value != $newForecastDelivery) {
+                \App\Models\ExpeditingFormForecastDeliveryHistory::create([
+                    'expediting_form_id' => $expeditingForm->id,
+                    'old_value' => $oldForecastDelivery,
+                    'new_value' => $newForecastDelivery,
+                    'changed_by' => auth()->check() ? auth()->user()->email : ($expeditingForm->supplier ?? 'guest'),
+                    'changed_at' => now(),
+                ]);
+            }
         }
         // ...existing code...
         $editableFields = [
@@ -110,7 +127,7 @@ class ExpeditingFormController extends Controller
             'manufacturing_duration' => 'nullable|numeric',
             'ready_for_shipment' => 'nullable|in:Yes,No',
             'storage_at_supplier' => 'nullable|in:Yes,No',
-            'delivered' => 'nullable|in:Yes,No',
+            'delivered' => 'nullable|in:Yes,No,Delay- FAT Issue,Other',
             'comments' => 'nullable|string',
         ]);
         // ...existing code...
@@ -178,8 +195,85 @@ class ExpeditingFormController extends Controller
     // Show all submitted expediting forms in a list.
     public function list()
     {
-        $expeditingForms = ExpeditingForm::orderByDesc('created_at')->get();
-        return view('expediting_forms.list', compact('expeditingForms'));
+        $query = ExpeditingForm::query();
+
+        // Filter: Expediting Category
+        if (request()->filled('filter_category')) {
+            $query->where(function($q) {
+                $q->where('expediting_category', request('filter_category'))
+                  ->orWhereHas('context', function($cq) {
+                      $cq->where('expediting_category', request('filter_category'));
+                  });
+            });
+        }
+
+        // Filter: Supplier
+        if (request()->filled('filter_supplier')) {
+            $query->where(function($q) {
+                $q->where('supplier', 'like', '%'.request('filter_supplier').'%')
+                  ->orWhereHas('context', function($cq) {
+                      $cq->where('supplier', 'like', '%'.request('filter_supplier').'%');
+                  });
+            });
+        }
+        
+            // Filter: Delivered
+            if (request()->filled('filter_delivered')) {
+                $query->where('delivered', request('filter_delivered'));
+            }
+
+            // Filter: Sub Supplier
+            if (request()->filled('filter_sub_supplier')) {
+                $query->where('sub_supplier', 'like', '%'.request('filter_sub_supplier').'%');
+            }
+
+            // Search: Work Package
+            if (request()->filled('search_work_package')) {
+                $query->where('work_package', 'like', '%'.request('search_work_package').'%');
+            }
+
+            // Search: Equipment Type / Tag Number
+            if (request()->filled('search_equipment_type')) {
+                $query->where('equipment_type_tag_number', 'like', '%'.request('search_equipment_type').'%');
+            }
+
+        // Filter: Order Date (from/to)
+        if (request()->filled('filter_order_date_from') || request()->filled('filter_order_date_to')) {
+            $query->whereHas('context', function($cq) {
+                if (request()->filled('filter_order_date_from')) {
+                    $cq->whereDate('order_date', '>=', request('filter_order_date_from'));
+                }
+                if (request()->filled('filter_order_date_to')) {
+                    $cq->whereDate('order_date', '<=', request('filter_order_date_to'));
+                }
+            });
+        }
+
+        // Search: Workpackage Name
+        if (request()->filled('search_workpackage_name')) {
+            $query->where(function($q) {
+                $q->where('workpackage_name', 'like', '%'.request('search_workpackage_name').'%')
+                  ->orWhereHas('context', function($cq) {
+                      $cq->where('workpackage_name', 'like', '%'.request('search_workpackage_name').'%');
+                  });
+            });
+        }
+
+        // Search: PO Number
+        if (request()->filled('search_po_number')) {
+            $query->where(function($q) {
+                $q->where('po_number', 'like', '%'.request('search_po_number').'%')
+                  ->orWhereHas('context', function($cq) {
+                      $cq->where('po_number', 'like', '%'.request('search_po_number').'%');
+                  });
+            });
+        }
+
+        $expeditingForms = $query->orderByDesc('created_at')->get();
+
+        // For supplier dropdown
+        $supplierList = ExpeditingForm::distinct()->pluck('supplier')->filter()->unique();
+        return view('expediting_forms.list', compact('expeditingForms', 'supplierList'));
     }
 
     /**
@@ -223,6 +317,7 @@ class ExpeditingFormController extends Controller
             'customer_procurement_contact' => 'nullable',
             'kickoff_status' => 'nullable',
             'technical_workpackage_owner' => 'nullable',
+            'forecast_delivery_to_site' => 'nullable|date',
             // Execution lines
             'executions' => 'required|array|min:1',
             'executions.*.work_package' => 'required|string|max:255',
@@ -247,6 +342,7 @@ class ExpeditingFormController extends Controller
                 'customer_procurement_contact' => $validated['customer_procurement_contact'] ?? null,
                 'kickoff_status' => $validated['kickoff_status'] ?? null,
                 'technical_workpackage_owner' => $validated['technical_workpackage_owner'] ?? null,
+                'forecast_delivery_to_site' => $validated['forecast_delivery_to_site'] ?? null,
             ]
         );
 
@@ -278,6 +374,7 @@ class ExpeditingFormController extends Controller
                 'customer_procurement_contact' => $context->customer_procurement_contact,
                 'kickoff_status' => $context->kickoff_status,
                 'technical_workpackage_owner' => $context->technical_workpackage_owner,
+                'forecast_delivery_to_site' => $context->forecast_delivery_to_site,
             ]);
         }
 
@@ -301,7 +398,22 @@ class ExpeditingFormController extends Controller
      */
     public function edit(ExpeditingForm $expeditingForm)
     {
-        //
+        $suppliers = \App\Models\User::where('role', 'Supplier')->get(['id', 'name', 'email']);
+        $expeditors = \App\Models\User::where('role', 'Expeditor')->get(['id', 'name', 'email']);
+        $workpackageNames = \App\Models\ExpeditingContext::distinct()->pluck('workpackage_name');
+        $poNumbers = \App\Models\ExpeditingContext::distinct()->pluck('po_number');
+        $customerContacts = \App\Models\ExpeditingContext::distinct()->pluck('customer_procurement_contact');
+        $technicalOwners = \App\Models\ExpeditingContext::distinct()->pluck('technical_workpackage_owner');
+        return view('expediting_forms.create', [
+            'expeditingForm' => $expeditingForm,
+            'suppliers' => $suppliers,
+            'expeditors' => $expeditors,
+            'workpackageNames' => $workpackageNames,
+            'poNumbers' => $poNumbers,
+            'customerContacts' => $customerContacts,
+            'technicalOwners' => $technicalOwners,
+            'isEdit' => true,
+        ]);
     }
 
     /**
@@ -309,7 +421,89 @@ class ExpeditingFormController extends Controller
      */
     public function update(Request $request, ExpeditingForm $expeditingForm)
     {
-        //
+        $validated = $request->validate([
+            'work_package' => 'required|string|max:255',
+            'workstream_building' => 'nullable|string|max:255',
+            'expediting_contact' => 'nullable|string|max:255',
+            'expediting_category' => 'nullable|string|max:255',
+            'workpackage_name' => 'nullable|string|max:255',
+            'supplier' => 'nullable|string|max:255',
+            'order_date' => 'nullable|date',
+            'contract_data_available_dmcs' => 'nullable',
+            'po_number' => 'nullable|string|max:255',
+            'incoterms' => 'nullable|string|max:255',
+            'exyte_procurement_contract_manager' => 'nullable|string|max:255',
+            'customer_procurement_contact' => 'nullable|string|max:255',
+            'kickoff_status' => 'nullable|string|max:255',
+            'technical_workpackage_owner' => 'nullable|string|max:255',
+            'forecast_delivery_to_site' => 'nullable|date',
+            'lli' => 'nullable',
+            'executions' => 'required|array|min:1',
+            'executions.*.work_package' => 'required|string|max:255',
+            'executions.*.workstream_building' => 'required|string|max:255',
+            'executions.*.expediting_contact' => 'required|string|max:255',
+            'executions.*.id' => 'nullable|integer|exists:expediting_forms,id',
+        ]);
+
+        // Track changes for 'forecast_delivery_to_site' (history)
+        $oldForecastDelivery = $expeditingForm->forecast_delivery_to_site;
+        $newForecastDelivery = $validated['forecast_delivery_to_site'] ?? null;
+        if ($oldForecastDelivery != $newForecastDelivery) {
+            \App\Models\ExpeditingFormForecastDeliveryHistory::create([
+                'expediting_form_id' => $expeditingForm->id,
+                'old_value' => $oldForecastDelivery,
+                'new_value' => $newForecastDelivery,
+                'changed_by' => auth()->check() ? auth()->user()->email : 'system',
+                'changed_at' => now(),
+            ]);
+        }
+        // Update context fields for all executions in this context
+        $contextId = $expeditingForm->context_id;
+        $contextFields = [
+            'expediting_category', 'workpackage_name', 'supplier', 'order_date', 'contract_data_available_dmcs',
+            'po_number', 'incoterms', 'exyte_procurement_contract_manager', 'customer_procurement_contact',
+            'kickoff_status', 'technical_workpackage_owner', 'forecast_delivery_to_site', 'lli'
+        ];
+        $contextData = [];
+        foreach ($contextFields as $field) {
+            $contextData[$field] = $validated[$field] ?? null;
+        }
+        \App\Models\ExpeditingContext::where('id', $contextId)->update($contextData);
+
+        // Get all existing executions for this context
+        $existingExecutions = \App\Models\ExpeditingForm::where('context_id', $contextId)->get();
+        $existingIds = $existingExecutions->pluck('id')->toArray();
+        $submittedIds = collect($validated['executions'])->pluck('id')->filter()->map(fn($id) => (int)$id)->toArray();
+
+        // Delete removed executions
+        $toDelete = array_diff($existingIds, $submittedIds);
+        if (count($toDelete)) {
+            \App\Models\ExpeditingForm::whereIn('id', $toDelete)->delete();
+        }
+
+        // Update or create executions
+        foreach ($validated['executions'] as $exec) {
+            $data = [
+                'context_id' => $contextId,
+                'work_package' => $exec['work_package'],
+                'workstream_building' => $exec['workstream_building'],
+                'expediting_contact' => $exec['expediting_contact'],
+            ];
+            // Add context fields to each execution
+            foreach ($contextFields as $field) {
+                $data[$field] = $contextData[$field];
+            }
+            if (!empty($exec['id'])) {
+                // Update existing
+                \App\Models\ExpeditingForm::where('id', $exec['id'])->update($data);
+            } else {
+                // Create new
+                $data['created_by'] = auth()->user() ? auth()->user()->name : 'system';
+                \App\Models\ExpeditingForm::create($data);
+            }
+        }
+
+        return redirect()->route('expediting_forms.list')->with('success', 'Record updated successfully!');
     }
 
     /**
@@ -317,7 +511,26 @@ class ExpeditingFormController extends Controller
      */
     public function destroy(ExpeditingForm $expeditingForm)
     {
-        //
+        // Check for assigned values (supplier input columns)
+        $blockedFields = [
+            'detailed_scope_of_delivery', 'quantity', 'design_status', 'end_of_manufacturing_supplier',
+            'manufacturing_status', 'fat_date_scheduled_baseline', 'fat_date_actual', 'fat_status',
+            'ready_for_shipment', 'contractual_delivery_to_site_date', 'forecast_delivery_to_site',
+            'actual_delivery_to_site_supplier', 'storage_requirement', 'delivery_postponement_due_to_site_readiness',
+            'exyte_technical_discussion'
+        ];
+        $hasAssigned = false;
+        foreach ($blockedFields as $field) {
+            if (!empty($expeditingForm->$field)) {
+                $hasAssigned = true;
+                break;
+            }
+        }
+        if ($hasAssigned) {
+            return redirect()->route('expediting_forms.list')->with('error', 'Cannot delete: This work package has assigned values in expediting list.');
+        }
+        $expeditingForm->delete();
+        return redirect()->route('expediting_forms.list')->with('success', 'Work package deleted successfully!');
     }
 
     /**
@@ -354,5 +567,88 @@ class ExpeditingFormController extends Controller
             return response()->json(['exists' => false, 'data' => null]);
         }
     }
+        // Show all submitted expediting forms in a detailed expediting list (with supplier inputs)
+    public function expeditingList(Request $request)
+    {
+        $query = ExpeditingForm::query();
+        // Filter: Delivered
+        if ($request->filled('filter_delivered')) {
+            $query->where('delivered', $request->filter_delivered);
+        }
+
+        // Filter: Expediting Category
+        if ($request->filled('filter_category')) {
+            $query->where(function($q) use ($request) {
+                $q->where('expediting_category', $request->filter_category)
+                  ->orWhereHas('context', function($cq) use ($request) {
+                      $cq->where('expediting_category', $request->filter_category);
+                  });
+            });
+        }
+
+        // Filter: Supplier
+        if ($request->filled('filter_supplier')) {
+            $query->where(function($q) use ($request) {
+                $q->where('supplier', 'like', '%'.$request->filter_supplier.'%')
+                  ->orWhereHas('context', function($cq) use ($request) {
+                      $cq->where('supplier', 'like', '%'.$request->filter_supplier.'%');
+                  });
+            });
+        }
+
+        // Filter: Kick-off Status
+        if ($request->filled('filter_kickoff')) {
+            $query->whereHas('context', function($cq) use ($request) {
+                $cq->where('kickoff_status', 'like', '%'.$request->filter_kickoff.'%');
+            });
+        }
+
+
+        // Filter: Order Date (from/to)
+        if ($request->filled('filter_order_date_from') || $request->filled('filter_order_date_to')) {
+            $query->whereHas('context', function($cq) use ($request) {
+                if ($request->filled('filter_order_date_from')) {
+                    $cq->whereDate('order_date', '>=', $request->filter_order_date_from);
+                }
+                if ($request->filled('filter_order_date_to')) {
+                    $cq->whereDate('order_date', '<=', $request->filter_order_date_to);
+                }
+            });
+        }
+
+        // Filter: Actual Delivery to site Supplier (from/to)
+        if ($request->filled('filter_actual_delivery_from')) {
+            $query->whereDate('actual_delivery_to_site_supplier', '>=', $request->filter_actual_delivery_from);
+        }
+        if ($request->filled('filter_actual_delivery_to')) {
+            $query->whereDate('actual_delivery_to_site_supplier', '<=', $request->filter_actual_delivery_to);
+        }
+
+        // Search: PO Number
+        if ($request->filled('search_po_number')) {
+            $query->where(function($q) use ($request) {
+                $q->where('po_number', 'like', '%'.$request->search_po_number.'%')
+                  ->orWhereHas('context', function($cq) use ($request) {
+                      $cq->where('po_number', 'like', '%'.$request->search_po_number.'%');
+                  });
+            });
+        }
+
+        // Search: Supplier (again, for search box)
+        if ($request->filled('search_supplier')) {
+            $query->where(function($q) use ($request) {
+                $q->where('supplier', 'like', '%'.$request->search_supplier.'%')
+                  ->orWhereHas('context', function($cq) use ($request) {
+                      $cq->where('supplier', 'like', '%'.$request->search_supplier.'%');
+                  });
+            });
+        }
+
+        $expeditingForms = $query->orderByDesc('created_at')->get();
+        // Get unique supplier names for dropdown
+        $supplierList = ExpeditingForm::distinct()->orderBy('supplier')->pluck('supplier');
+        return view('expediting_forms.expediting_list', compact('expeditingForms', 'supplierList'));
+    }
+
 
 }

@@ -10,6 +10,11 @@ class ExpeditingForm extends Model
     {
         return $this->hasMany(ExpeditingFormActualDeliveryHistory::class, 'expediting_form_id');
     }
+
+    public function forecastDeliveryHistories()
+    {
+        return $this->hasMany(ExpeditingFormForecastDeliveryHistory::class, 'expediting_form_id');
+    }
     protected $fillable = [
         'context_id',
         'work_package',
@@ -36,6 +41,7 @@ class ExpeditingForm extends Model
         'fat_date_actual',
         'contractual_delivery_to_site_date',
         'actual_delivery_to_site_supplier',
+        'forecast_delivery_to_site',
         'manufacturing_duration',
         'ready_for_shipment',
         'storage_at_supplier',
