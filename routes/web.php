@@ -42,6 +42,7 @@ Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
     Route::post('/expediting-forms', [ExpeditingFormController::class, 'store'])->name('expediting_forms.store');
     Route::post('/expediting-forms/context-check', [ExpeditingFormController::class, 'checkContext'])->name('expediting_forms.context_check');
     Route::get('/expediting-forms/list', [ExpeditingFormController::class, 'list'])->name('expediting_forms.list');
+    Route::get('/expediting-forms/expediting-list', [ExpeditingFormController::class, 'expeditingList'])->name('expediting_forms.expediting_list');
     Route::post('/expediting-forms/{expeditingForm}/send-email', [ExpeditingFormController::class, 'sendEmail'])->name('expediting_forms.send_email');
     Route::get('/expediting-forms/{expeditingForm}/edit', [ExpeditingFormController::class, 'edit'])->name('expediting_forms.edit');
     Route::put('/expediting-forms/{expeditingForm}', [ExpeditingFormController::class, 'update'])->name('expediting_forms.update');
