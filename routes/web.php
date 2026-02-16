@@ -1,4 +1,3 @@
-
 <?php
 // Work Packages List (all roles)
 Route::get('/work-packages', function () {
@@ -12,9 +11,9 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -49,15 +48,20 @@ Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
     Route::delete('/expediting-forms/{expeditingForm}', [ExpeditingFormController::class, 'destroy'])->name('expediting_forms.destroy');
 });
 
-// Supplier auto-login link (signed, expires in 48 hours)
-// use App\Http\Controllers\ExpeditingFormController;
+// Restore direct dashboard view route
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/supplier/expediting-form/{expeditingForm}/access', [ExpeditingFormController::class, 'supplierAccess'])
-    ->name('supplier.expedite.access')
-    ->middleware(['signed']);
-Route::post('/supplier/expediting-form/{expeditingForm}/access', [ExpeditingFormController::class, 'supplierUpdate'])
-    ->name('supplier.expedite.update')
-    ->middleware(['signed']);
+// Clean supplier routes: only inside web middleware group
+Route::middleware(['web'])->group(function () {
+    Route::get('/supplier/expediting-form/{expeditingForm}/access', [ExpeditingFormController::class, 'supplierAccess'])
+        ->name('supplier.expedite.access')
+        ->middleware(['signed']);
+    Route::post('/supplier/expediting-form/{expeditingForm}/access', [ExpeditingFormController::class, 'supplierUpdate'])
+        ->name('supplier.expedite.update')
+        ->middleware(['signed']);
+});
 
 require __DIR__.'/auth.php';
 
