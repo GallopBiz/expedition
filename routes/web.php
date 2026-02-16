@@ -6,6 +6,7 @@ Route::get('/work-packages', function () {
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -50,6 +51,9 @@ Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
 
 // Restore direct dashboard view route
 Route::get('/dashboard', function () {
+    if (Auth::check() && Auth::user()->role === 'Supplier') {
+        return view('supplier-dashboard');
+    }
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
