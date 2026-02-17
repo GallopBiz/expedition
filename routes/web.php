@@ -1,12 +1,23 @@
 <?php
+
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ExpeditingFormController;
+use App\Http\Controllers\ExpeditingCardController;
+
+// Notification routes
+Route::middleware(['auth'])->group(function () {
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.readAll');
+    Route::post('/notifications/read/{id}', [NotificationController::class, 'markRead'])->name('notifications.read');
+});
+
 // Work Packages List (all roles)
 Route::get('/work-packages', function () {
     return view('work_packages');
 })->name('work_packages');
-
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -16,12 +27,13 @@ Route::get('/', function () {
 //     return view('dashboard');
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-use App\Http\Controllers\UserController;
+
 // User management routes for Manager and Expeditor
 Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
@@ -32,9 +44,6 @@ Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 });
-
-
-use App\Http\Controllers\ExpeditingFormController;
 
 // Expediting form routes for Manager and Expeditor
 Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
@@ -49,6 +58,16 @@ Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
     Route::delete('/expediting-forms/{expeditingForm}', [ExpeditingFormController::class, 'destroy'])->name('expediting_forms.destroy');
 });
 
+// Language switcher route
+Route::post('/language-switch', function (\Illuminate\Http\Request $request) {
+    $lang = $request->input('lang', 'en');
+    if (in_array($lang, ['en', 'de'])) { // Add more supported languages here
+        session(['locale' => $lang]);
+        app()->setLocale($lang);
+    }
+    return back();
+})->name('language.switch');
+
 // Restore direct dashboard view route
 Route::get('/dashboard', function () {
     if (Auth::check() && Auth::user()->role === 'Supplier') {
@@ -58,7 +77,6 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Expediting Cards Layout (new, do not touch old list)
-use App\Http\Controllers\ExpeditingCardController;
 Route::get('/expediting-forms/cards', [ExpeditingCardController::class, 'index'])->name('expediting_forms.cards');
 
 // Clean supplier routes: only inside web middleware group
