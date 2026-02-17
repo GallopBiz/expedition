@@ -312,7 +312,7 @@ class ExpeditingFormController extends Controller
             // Context fields
             'workpackage_name' => 'required|string|max:255',
             'supplier' => 'required|string|max:255',
-            'po_number' => 'required|string|max:255',
+            'po_number' => 'nullable|string|max:255',
             'lli' => 'nullable',
             'expediting_category' => 'nullable',
             'order_date' => 'nullable|date',
@@ -320,8 +320,8 @@ class ExpeditingFormController extends Controller
             'incoterms' => 'nullable',
             'exyte_procurement_contract_manager' => 'nullable',
             'customer_procurement_contact' => 'nullable',
-            'kickoff_status' => 'nullable',
-            'technical_workpackage_owner' => 'nullable',
+            'kickoff_status' => 'nullable|string|max:255',
+            'technical_workpackage_owner' => 'nullable|string|max:255',
             'forecast_delivery_to_site' => 'nullable|date',
             // Execution lines
             'executions' => 'required|array|min:1',
@@ -329,6 +329,11 @@ class ExpeditingFormController extends Controller
             'executions.*.workstream_building' => 'required|string|max:255',
             'executions.*.expediting_contact' => 'required|string|max:255',
         ]);
+
+        // Ensure empty PO Number is saved as empty string, not null or '?'
+        if (!isset($validated['po_number']) || $validated['po_number'] === null || $validated['po_number'] === '?') {
+            $validated['po_number'] = '';
+        }
 
         // Find or create context
         $context = ExpeditingContext::firstOrCreate(

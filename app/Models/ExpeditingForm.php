@@ -49,6 +49,10 @@ class ExpeditingForm extends Model
         'comments',
     ];
 
+    protected $casts = [
+        'delivered' => 'boolean',
+    ];
+
     public function emailLogs()
     {
         return $this->hasMany(ExpeditingFormEmailLog::class, 'expediting_form_id');

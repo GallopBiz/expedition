@@ -201,7 +201,7 @@
     </div>
     <div>
         <label for="customer_procurement_contact" class="block text-sm font-medium text-gray-700">Customer Procurement Contact</label>
-        <input type="text" name="customer_procurement_contact" id="customer_procurement_contact" value="{{ old('customer_procurement_contact') }}" list="customer_procurement_contact_list" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
+        <input type="text" name="customer_procurement_contact" id="customer_procurement_contact" value="{{ old('customer_procurement_contact', isset($expeditingForm) ? $expeditingForm->customer_procurement_contact : '') }}" list="customer_procurement_contact_list" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
         <datalist id="customer_procurement_contact_list">
             @foreach($customerContacts as $contact)
                 @if($contact)
@@ -215,13 +215,34 @@
     </div>
     <div>
         <label for="kickoff_status" class="block text-sm font-medium text-gray-700">Kick-off Status</label>
-        <div class="locked-wrapper">
-            <select name="kickoff_status" id="kickoff_status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
-                <option value="">Select</option>
-                <option value="Yes" @if(old('kickoff_status', isset($expeditingForm) ? $expeditingForm->kickoff_status : '')==='Yes') selected @endif>Yes</option>
-                <option value="No" @if(old('kickoff_status', isset($expeditingForm) ? $expeditingForm->kickoff_status : '')==='No') selected @endif>No</option>
-                <option value="Other" @if(old('kickoff_status', isset($expeditingForm) ? $expeditingForm->kickoff_status : '')==='Other') selected @endif>Other</option>
-            </select>
+        <div class="flex items-center mt-1">
+            <input type="hidden" name="kickoff_status" value="No">
+            <label class="relative inline-flex items-center cursor-pointer" style="position:relative;">
+                @php
+                    $kickoffValue = old('kickoff_status', isset($expeditingForm) ? $expeditingForm->kickoff_status : '');
+                    $kickoffChecked = ($kickoffValue === 'Yes' || $kickoffValue === 1 || $kickoffValue === true || $kickoffValue === '1');
+                @endphp
+                <input type="checkbox" name="kickoff_status" id="kickoff_status" value="Yes" @if($kickoffChecked) checked @endif style="display:none;" onchange="this.nextElementSibling.style.background = this.checked ? '#01426a' : '#e5e7eb'; this.nextElementSibling.nextElementSibling.style.transform = this.checked ? 'translateX(20px)' : 'translateX(0)';">
+                <span id="kickoff_status_bg" style="width:44px;height:24px;background:{{ $kickoffChecked ? '#01426a' : '#e5e7eb' }};border-radius:999px;display:inline-block;transition:background .2s;position:relative;"></span>
+                <span id="kickoff_status_knob" style="width:20px;height:20px;background:#fff;border-radius:999px;position:absolute;top:2px;left:2px;transition:transform .2s;{{ $kickoffChecked ? 'transform:translateX(20px);' : '' }}"></span>
+            </label>
+            <span class="ml-3 text-sm">On/Off</span>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var cb = document.getElementById('kickoff_status');
+                    var bg = document.getElementById('kickoff_status_bg');
+                    var knob = document.getElementById('kickoff_status_knob');
+                    if(cb && bg && knob) {
+                        if(cb.checked) {
+                            bg.style.background = '#01426a';
+                            knob.style.transform = 'translateX(20px)';
+                        } else {
+                            bg.style.background = '#e5e7eb';
+                            knob.style.transform = 'translateX(0)';
+                        }
+                    }
+                });
+            </script>
         </div>
         @error('kickoff_status')
             <div class="text-red-600 text-xs mt-1">{{ $message }}</div>
@@ -229,7 +250,7 @@
     </div>
     <div>
         <label for="technical_workpackage_owner" class="block text-sm font-medium text-gray-700">Technical Workpackage Owner</label>
-        <input type="text" name="technical_workpackage_owner" id="technical_workpackage_owner" value="{{ old('technical_workpackage_owner') }}" list="technical_workpackage_owner_list" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
+        <input type="text" name="technical_workpackage_owner" id="technical_workpackage_owner" value="{{ old('technical_workpackage_owner', isset($expeditingForm) ? $expeditingForm->technical_workpackage_owner : '') }}" list="technical_workpackage_owner_list" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
         <datalist id="technical_workpackage_owner_list">
             @foreach($technicalOwners as $owner)
                 @if($owner)
