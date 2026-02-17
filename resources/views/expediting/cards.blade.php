@@ -25,7 +25,7 @@
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg-page); color: var(--text-dark); min-height: 100vh; }
-  main { max-width: 1120px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  main { max-width: 1240px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
   .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
   @media (max-width: 960px) { .card-grid { grid-template-columns: repeat(2,1fr); } }
   @media (max-width: 520px) { .card-grid { grid-template-columns: 1fr; } }
@@ -130,6 +130,37 @@
   .btn-view:hover { background: #003a54; }
 </style>
 <main>
+  <div class="card-filters" style="display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;align-items:center;justify-content:center;background:#f7f8fa;border-radius:12px;padding:1.2rem 1rem;box-shadow:0 2px 8px rgba(60,181,70,.07);">
+    <form method="GET" action="" style="display:flex;flex-wrap:wrap;gap:1.2rem;align-items:center;width:100%;justify-content:center;">
+      <div style="display:flex;flex-direction:column;min-width:160px;">
+        <label for="supplier_name" style="font-size:.92rem;font-weight:600;margin-bottom:.3em;color:#01426a;">Supplier Name</label>
+        <input type="text" name="supplier_name" id="supplier_name" value="{{ request('supplier_name') }}" style="padding:.45em .9em;border-radius:8px;border:1.5px solid #b3c9db;background:#fff;min-width:120px;font-size:.98rem;">
+      </div>
+      <div style="display:flex;flex-direction:column;min-width:160px;">
+        <label for="expediting_category" style="font-size:.92rem;font-weight:600;margin-bottom:.3em;color:#01426a;">Expediting Category</label>
+        <select name="expediting_category" id="expediting_category" style="padding:.45em .9em;border-radius:8px;border:1.5px solid #b3c9db;background:#fff;min-width:120px;font-size:.98rem;">
+          <option value="">All</option>
+          <option value="Low" {{ request('expediting_category')=='Low'?'selected':'' }}>Low</option>
+          <option value="Medium" {{ request('expediting_category')=='Medium'?'selected':'' }}>Medium</option>
+          <option value="High" {{ request('expediting_category')=='High'?'selected':'' }}>High</option>
+        </select>
+      </div>
+      <div style="display:flex;flex-direction:column;min-width:160px;">
+        <label for="delivered" style="font-size:.92rem;font-weight:600;margin-bottom:.3em;color:#01426a;">Delivered</label>
+        <select name="delivered" id="delivered" style="padding:.45em .9em;border-radius:8px;border:1.5px solid #b3c9db;background:#fff;min-width:120px;font-size:.98rem;">
+          <option value="">All</option>
+          <option value="Yes" {{ request('delivered')=='Yes'?'selected':'' }}>Yes</option>
+          <option value="No" {{ request('delivered')=='No'?'selected':'' }}>No</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:220px;display:flex;flex-direction:column;">
+        <label for="search" style="font-size:.92rem;font-weight:600;margin-bottom:.3em;color:#01426a;">Search</label>
+        <input type="text" name="search" id="search" value="{{ request('search') }}" placeholder="Work Package Name/Number, Equipment Type/Tag" style="padding:.45em .9em;border-radius:8px;border:1.5px solid #b3c9db;background:#fff;width:100%;font-size:.98rem;">
+      </div>
+      <button type="submit" style="padding:.6em 2em;border-radius:8px;background:#01426a;color:#fff;font-weight:600;border:none;font-size:1.05rem;box-shadow:0 2px 8px rgba(60,181,70,.07);margin-top:0;">Filter/Search</button>
+      <a href="{{ url()->current() }}" style="padding:.6em 2em;border-radius:8px;background:#b3c9db;color:#01426a;font-weight:600;border:none;font-size:1.05rem;box-shadow:0 2px 8px rgba(60,181,70,.07);text-decoration:none;display:inline-block;margin-top:0;">Reset</a>
+    </form>
+  </div>
   <div class="card-grid">
     @foreach($expeditingForms as $form)
     <div class="card">
@@ -264,9 +295,12 @@
         </div>
       </div>
       <div class="card-actions">
-        @php $delivered = $form->delivered ?? false; @endphp
-        <span class="badge-delivered {{ $delivered ? 'badge-delivered-yes' : 'badge-delivered-no' }}">
-          Delivered {{ $delivered ? 'Yes' : 'No' }}
+        @php
+          $delivered = $form->delivered;
+          $isDelivered = ($delivered === true || $delivered === 1 || $delivered === 'Yes');
+        @endphp
+        <span class="badge-delivered {{ $isDelivered ? 'badge-delivered-yes' : 'badge-delivered-no' }}">
+          Delivered {{ $isDelivered ? 'Yes' : 'No' }}
         </span>
         <a href="{{ route('expediting_forms.edit', $form->id) }}" class="action-btn btn-view">Manage</a>
       </div>
