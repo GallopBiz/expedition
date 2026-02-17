@@ -273,7 +273,12 @@ class ExpeditingFormController extends Controller
 
         // For supplier dropdown
         $supplierList = ExpeditingForm::distinct()->pluck('supplier')->filter()->unique();
-        return view('expediting_forms.list', compact('expeditingForms', 'supplierList'));
+            // Attach supplier email to each form for card display
+            foreach ($expeditingForms as $form) {
+                $supplierUser = \App\Models\User::where('role', 'Supplier')->where('name', $form->supplier)->first();
+                $form->supplier_email = $supplierUser ? $supplierUser->email : null;
+            }
+            return view('expediting_forms.list', compact('expeditingForms', 'supplierList'));
     }
 
     /**
