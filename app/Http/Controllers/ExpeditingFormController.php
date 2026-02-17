@@ -154,6 +154,19 @@ class ExpeditingFormController extends Controller
         $expeditingForm->fill(array_intersect_key($validated, array_flip($editableFields)));
         $expeditingForm->email_link_submitted = true;
         $expeditingForm->save();
+
+        // Notify all managers
+        $managers = \App\Models\User::where('role', 'Manager')->get();
+        foreach ($managers as $manager) {
+            \App\Models\Notification::create([
+                'user_id' => $manager->id,
+                'title' => 'Supplier Form Submitted',
+                'body' => 'A supplier has submitted a form for Work Package: ' . $expeditingForm->work_package,
+                'url' => route('expediting_forms.cards', ['#workpackage-' . $expeditingForm->id]),
+                'read' => false,
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Form updated successfully.');
     }
 
@@ -511,6 +524,23 @@ class ExpeditingFormController extends Controller
                 $data['created_by'] = auth()->user() ? auth()->user()->name : 'system';
                 \App\Models\ExpeditingForm::create($data);
             }
+        }
+
+        // Notify the related supplier (if exists)
+        $supplier = null;
+        if (!empty($contextData['supplier'])) {
+            $supplier = \App\Models\User::where('email', $contextData['supplier'])
+                ->orWhere('name', $contextData['supplier'])
+                ->first();
+        }
+        if ($supplier) {
+            \App\Models\Notification::create([
+                'user_id' => $supplier->id,
+                'title' => 'Work Package Updated',
+                'body' => 'Your work package "' . ($contextData['workpackage_name'] ?? $expeditingForm->work_package) . '" has been updated by a Manager/Expeditor.',
+                'url' => route('expediting_forms.cards', ['#workpackage-' . $expeditingForm->id]),
+                'read' => false,
+            ]);
         }
 
         return redirect()->route('expediting_forms.list')->with('success', 'Record updated successfully!');
