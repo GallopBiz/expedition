@@ -41,7 +41,11 @@
                     @endif
                 </div>
             </div>
-
+        @if(Auth::user() && (Auth::user()->role === 'Manager' || Auth::user()->role === 'Expeditor'))
+                        <x-nav-link :href="route('expediting_forms.cards')" :active="request()->routeIs('expediting_forms.cards')">
+                            {{ __('Work Package Cards') }}
+                        </x-nav-link>
+                    @endif
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">

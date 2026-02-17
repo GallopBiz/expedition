@@ -57,6 +57,10 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Expediting Cards Layout (new, do not touch old list)
+use App\Http\Controllers\ExpeditingCardController;
+Route::get('/expediting-forms/cards', [ExpeditingCardController::class, 'index'])->name('expediting_forms.cards');
+
 // Clean supplier routes: only inside web middleware group
 Route::middleware(['web'])->group(function () {
     Route::get('/supplier/expediting-form/{expeditingForm}/access', [ExpeditingFormController::class, 'supplierAccess'])
