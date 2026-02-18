@@ -57,6 +57,11 @@
 
     <div class="w-full px-2 md:px-8 mt-6 font-sans">
         <div class="bg-gradient-to-br from-[#e6eef4] to-white p-4 md:p-8 rounded-2xl shadow-2xl w-full border border-[#01426a22]">
+            @if(session('success'))
+                <div class="mb-4 p-3 rounded bg-green-100 text-green-800 border border-green-300 font-semibold">
+                    {{ session('success') }}
+                </div>
+            @endif
             <form method="POST" action="{{ isset($isEdit) && $isEdit ? route('expediting_forms.update', $expeditingForm->id) : route('expediting_forms.store') }}" class="space-y-8 w-full">
                 @csrf
                 @if(isset($isEdit) && $isEdit)
@@ -130,7 +135,7 @@
     <div>
         <label for="order_date" class="block text-sm font-medium text-gray-700">Order Date</label>
         <div class="locked-wrapper">
-            <input type="date" name="order_date" id="order_date" value="{{ old('order_date', isset($expeditingForm) ? $expeditingForm->order_date : '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
+            <input type="date" name="order_date" id="order_date" value="{{ old('order_date', isset($expeditingForm) ? (optional($expeditingForm->context)->order_date ?? $expeditingForm->order_date) : '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
         </div>
         @error('order_date')
             <div class="text-red-600 text-xs mt-1">{{ $message }}</div>
@@ -138,19 +143,59 @@
     </div>
     <div>
         <label for="forecast_delivery_to_site" class="block text-sm font-medium text-gray-700">Forecast Delivery to Site<br><span class="text-xs">Time schedule date (site need date)</span></label>
-        <input type="date" name="forecast_delivery_to_site" id="forecast_delivery_to_site" value="{{ old('forecast_delivery_to_site', isset($expeditingForm) ? $expeditingForm->forecast_delivery_to_site : '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
+        @php
+            $forecastValue = old('forecast_delivery_to_site');
+            // On first form load (create), always use DB value if present
+            if ($forecastValue === null) {
+                $forecastValue = isset($expeditingForm) ? $expeditingForm->forecast_delivery_to_site : '';
+            }
+            // On edit, prefer latest history, then context, then DB value
+            if (isset($expeditingForm) && $expeditingForm->exists) {
+                $latestHistory = $expeditingForm->forecastDeliveryHistories()->orderByDesc('changed_at')->first();
+                if ($latestHistory && !empty($latestHistory->new_value)) {
+                    $forecastValue = $latestHistory->new_value;
+                } elseif (!empty(optional($expeditingForm->context)->forecast_delivery_to_site)) {
+                    $forecastValue = optional($expeditingForm->context)->forecast_delivery_to_site;
+                } elseif (!empty($expeditingForm->forecast_delivery_to_site)) {
+                    $forecastValue = $expeditingForm->forecast_delivery_to_site;
+                }
+            }
+        @endphp
+        <input type="date" name="forecast_delivery_to_site" id="forecast_delivery_to_site" value="{{ $forecastValue }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
         @error('forecast_delivery_to_site')
             <div class="text-red-600 text-xs mt-1">{{ $message }}</div>
         @enderror
     </div>
     <div>
         <label for="contract_data_available_dmcs" class="block text-sm font-medium text-gray-700">Contract Data Available (DMCS)</label>
-        <div class="locked-wrapper">
-            <select name="contract_data_available_dmcs" id="contract_data_available_dmcs" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
-                <option value="">Select</option>
-                <option value="1" @if(old('contract_data_available_dmcs', isset($expeditingForm) ? (string)$expeditingForm->contract_data_available_dmcs : '')==='1') selected @endif>Yes</option>
-                <option value="0" @if(old('contract_data_available_dmcs', isset($expeditingForm) ? (string)$expeditingForm->contract_data_available_dmcs : '')==='0') selected @endif>No</option>
-            </select>
+        <div class="flex items-center mt-1">
+            <input type="hidden" name="contract_data_available_dmcs" value="0">
+            <label class="relative inline-flex items-center cursor-pointer" style="position:relative;">
+                @php
+                    $dmcsValue = old('contract_data_available_dmcs', isset($expeditingForm) ? (optional($expeditingForm->context)->contract_data_available_dmcs ?? $expeditingForm->contract_data_available_dmcs) : '');
+                    $dmcsChecked = ($dmcsValue === '1' || $dmcsValue === 1 || $dmcsValue === true);
+                @endphp
+                <input type="checkbox" name="contract_data_available_dmcs" id="contract_data_available_dmcs" value="1" @if($dmcsChecked) checked @endif style="display:none;" onchange="this.nextElementSibling.style.background = this.checked ? '#01426a' : '#e5e7eb'; this.nextElementSibling.nextElementSibling.style.transform = this.checked ? 'translateX(20px)' : 'translateX(0)';">
+                <span id="dmcs_status_bg" style="width:44px;height:24px;background:{{ $dmcsChecked ? '#01426a' : '#e5e7eb' }};border-radius:999px;display:inline-block;transition:background .2s;position:relative;"></span>
+                <span id="dmcs_status_knob" style="width:20px;height:20px;background:#fff;border-radius:999px;position:absolute;top:2px;left:2px;transition:transform .2s;{{ $dmcsChecked ? 'transform:translateX(20px);' : '' }}"></span>
+            </label>
+            <span class="ml-3 text-sm">Yes/No</span>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var cb = document.getElementById('contract_data_available_dmcs');
+                    var bg = document.getElementById('dmcs_status_bg');
+                    var knob = document.getElementById('dmcs_status_knob');
+                    if(cb && bg && knob) {
+                        if(cb.checked) {
+                            bg.style.background = '#01426a';
+                            knob.style.transform = 'translateX(20px)';
+                        } else {
+                            bg.style.background = '#e5e7eb';
+                            knob.style.transform = 'translateX(0)';
+                        }
+                    }
+                });
+            </script>
         </div>
         @error('contract_data_available_dmcs')
             <div class="text-red-600 text-xs mt-1">{{ $message }}</div>
@@ -173,10 +218,13 @@
     <div>
         <label for="incoterms" class="block text-sm font-medium text-gray-700">Incoterms</label>
         <div class="locked-wrapper">
+            @php
+                $incotermsValue = old('incoterms', isset($expeditingForm) ? (optional($expeditingForm->context)->incoterms ?? $expeditingForm->incoterms) : '');
+            @endphp
             <select name="incoterms" id="incoterms" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
                 <option value="">Select</option>
-                <option value="DAP" @if(old('incoterms', isset($expeditingForm) ? $expeditingForm->incoterms : '')==='DAP') selected @endif>DAP</option>
-                <option value="Not Available" @if(old('incoterms', isset($expeditingForm) ? $expeditingForm->incoterms : '')==='Not Available') selected @endif>Not Available</option>
+                <option value="DAP" @if($incotermsValue==='DAP') selected @endif>DAP</option>
+                <option value="Not Available" @if($incotermsValue==='Not Available') selected @endif>Not Available</option>
             </select>
         </div>
         @error('incoterms')
@@ -186,11 +234,14 @@
     <div>
         <label for="exyte_procurement_contract_manager" class="block text-sm font-medium text-gray-700">Exyte Procurement Contract Manager</label>
         <div class="locked-wrapper">
+            @php
+                $epcmValue = old('exyte_procurement_contract_manager', isset($expeditingForm) ? (optional($expeditingForm->context)->exyte_procurement_contract_manager ?? $expeditingForm->exyte_procurement_contract_manager) : '');
+            @endphp
             <select name="exyte_procurement_contract_manager" id="exyte_procurement_contract_manager" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
                 <option value="">Select</option>
                 @if(isset($expeditors) && count($expeditors))
                     @foreach($expeditors as $expeditor)
-                        <option value="{{ $expeditor->name }}" @if(old('exyte_procurement_contract_manager', isset($expeditingForm) ? $expeditingForm->exyte_procurement_contract_manager : '')===$expeditor->name) selected @endif>{{ $expeditor->name }} ({{ $expeditor->email }})</option>
+                        <option value="{{ $expeditor->name }}" @if($epcmValue===$expeditor->name) selected @endif>{{ $expeditor->name }} ({{ $expeditor->email }})</option>
                     @endforeach
                 @endif
             </select>
@@ -201,7 +252,7 @@
     </div>
     <div>
         <label for="customer_procurement_contact" class="block text-sm font-medium text-gray-700">Customer Procurement Contact</label>
-        <input type="text" name="customer_procurement_contact" id="customer_procurement_contact" value="{{ old('customer_procurement_contact', isset($expeditingForm) ? $expeditingForm->customer_procurement_contact : '') }}" list="customer_procurement_contact_list" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
+        <input type="text" name="customer_procurement_contact" id="customer_procurement_contact" value="{{ old('customer_procurement_contact', isset($expeditingForm) ? (optional($expeditingForm->context)->customer_procurement_contact ?? $expeditingForm->customer_procurement_contact) : '') }}" list="customer_procurement_contact_list" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
         <datalist id="customer_procurement_contact_list">
             @foreach($customerContacts as $contact)
                 @if($contact)
@@ -250,7 +301,7 @@
     </div>
     <div>
         <label for="technical_workpackage_owner" class="block text-sm font-medium text-gray-700">Technical Workpackage Owner</label>
-        <input type="text" name="technical_workpackage_owner" id="technical_workpackage_owner" value="{{ old('technical_workpackage_owner', isset($expeditingForm) ? $expeditingForm->technical_workpackage_owner : '') }}" list="technical_workpackage_owner_list" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
+        <input type="text" name="technical_workpackage_owner" id="technical_workpackage_owner" value="{{ old('technical_workpackage_owner', isset($expeditingForm) ? (optional($expeditingForm->context)->technical_workpackage_owner ?? $expeditingForm->technical_workpackage_owner) : '') }}" list="technical_workpackage_owner_list" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
         <datalist id="technical_workpackage_owner_list">
             @foreach($technicalOwners as $owner)
                 @if($owner)

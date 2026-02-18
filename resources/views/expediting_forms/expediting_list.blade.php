@@ -136,15 +136,19 @@ function resetExpeditingFilters() {
                             <td class="border px-3 py-2 whitespace-nowrap">{{ optional($form->context)->order_date ? \Carbon\Carbon::parse(optional($form->context)->order_date)->format('d-m-Y') : '' }}</td>
                             <td class="border px-3 py-2">
                                 @php
-                                    $dmcs = optional($form->context)->contract_data_available_dmcs ?? '';
+                                    $dmcsRaw = optional($form->context)->contract_data_available_dmcs ?? $form->contract_data_available_dmcs ?? '';
+                                    $isYes = ($dmcsRaw === 1 || $dmcsRaw === '1' || $dmcsRaw === true);
+                                    $isNo = ($dmcsRaw === 0 || $dmcsRaw === '0' || $dmcsRaw === false);
                                 @endphp
-                                @if($dmcs === '1' || $dmcs === 1)
-                                    Yes
-                                @elseif($dmcs === '0' || $dmcs === 0)
-                                    No
-                                @else
-                                    {{ $dmcs }}
-                                @endif
+                                <span class="inline-flex items-center">
+                                    <span class="relative inline-block w-11 mr-2 align-middle select-none transition duration-200 ease-in">
+                                        <span class="block w-6 h-6 rounded-full bg-white border border-gray-300 shadow transform transition-transform duration-200 ease-in-out" style="position:absolute;top:1px;left:{{ $isYes ? '22px' : '1px' }};"></span>
+                                        <span class="block h-6 rounded-full {{ $isYes ? 'bg-green-400' : 'bg-gray-300' }}"></span>
+                                    </span>
+                                    <span class="text-xs font-semibold {{ $isYes ? 'text-green-700' : ($isNo ? 'text-gray-500' : '') }}">
+                                        {{ $isYes ? 'Yes' : ($isNo ? 'No' : '') }}
+                                    </span>
+                                </span>
                             </td>
                             <td class="border px-3 py-2">{{ optional($form->context)->po_number ?? $form->po_number }}</td>
                             <td class="border px-3 py-2">{{ optional($form->context)->incoterms ?? '' }}</td>
