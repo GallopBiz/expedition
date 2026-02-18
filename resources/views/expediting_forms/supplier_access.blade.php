@@ -14,38 +14,11 @@
 
 
 
-        <!-- Email log always last -->
-        @if(isset($emailLogs) && $emailLogs->count())
-            <div class="mt-8 bg-white rounded-xl shadow border border-gray-100 p-4">
-                <h3 class="text-xs font-bold text-[#01426a] mb-2 tracking-wide">Email Log</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full text-xs border border-gray-200">
-                        <thead class="bg-[#f8fafc] text-[#01426a]">
-                            <tr>
-                                <th class="px-1 py-1 border border-gray-200">To</th>
-                                <th class="px-1 py-1 border border-gray-200">By</th>
-                                <th class="px-1 py-1 border border-gray-200">At</th>
-                                <th class="px-1 py-1 border border-gray-200">Subject</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($emailLogs as $log)
-                                <tr>
-                                    <td class="px-1 py-1 border border-gray-200">{{ $log->recipient_email }}</td>
-                                    <td class="px-1 py-1 border border-gray-200">{{ $log->sent_by }}</td>
-                                    <td class="px-1 py-1 border border-gray-200">{{ $log->sent_at }}</td>
-                                    <td class="px-1 py-1 border border-gray-200">{{ $log->subject }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        @endif
         <div class="bg-gradient-to-br from-[#e6eef4] to-white p-4 md:p-8 rounded-2xl shadow-2xl w-full border border-[#01426a22]">
             @if(session('success'))
                 <div class="mb-4 p-2 bg-green-100 text-green-800 rounded">{{ session('success') }}</div>
             @endif
+            
             @if($errors->any())
                 <div class="mb-4 p-2 bg-red-100 text-red-800 rounded">
                     <ul class="list-disc pl-5">
@@ -266,6 +239,33 @@
                     <button type="submit" class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-[#01426a] to-[#357ab7] border border-transparent rounded-xl font-bold text-sm md:text-base text-white uppercase tracking-widest shadow hover:from-[#01426a] hover:to-[#012a40] focus:outline-none focus:ring-2 focus:ring-[#01426a33] active:bg-[#012a40] transition gap-2">Submit</button>
                 </div>
             </form>
+            @if(isset($emailLogs) && $emailLogs->count())
+                <div class="mt-8 bg-white rounded-xl shadow border border-gray-100 p-4">
+                    <h3 class="text-xs font-bold text-[#01426a] mb-2 tracking-wide">Email Log</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-xs border border-gray-200">
+                            <thead class="bg-[#f8fafc] text-[#01426a]">
+                                <tr>
+                                    <th class="px-1 py-1 border border-gray-200">To</th>
+                                    <th class="px-1 py-1 border border-gray-200">By</th>
+                                    <th class="px-1 py-1 border border-gray-200">At</th>
+                                    <th class="px-1 py-1 border border-gray-200">Subject</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($emailLogs as $log)
+                                    <tr>
+                                        <td class="px-1 py-1 border border-gray-200">{{ $log->recipient_email }}</td>
+                                        <td class="px-1 py-1 border border-gray-200">{{ $log->sent_by }}</td>
+                                        <td class="px-1 py-1 border border-gray-200">{{ $log->sent_at }}</td>
+                                        <td class="px-1 py-1 border border-gray-200">{{ $log->subject }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
             @endif
         </div>
     </div>

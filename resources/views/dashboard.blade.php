@@ -8,6 +8,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+                    <!-- Track report link removed -->
                     <h3 class="text-lg font-bold mb-4 text-[#01426a]">Dashboard Analytics</h3>
                     @php
                         $showDummy = ($totalWP ?? 0) === 0 && ($wpWithPO ?? 0) === 0 && ($wpWithoutPO ?? 0) === 0 && ($deliveredWP ?? 0) === 0;

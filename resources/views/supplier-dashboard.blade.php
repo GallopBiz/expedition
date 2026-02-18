@@ -12,6 +12,7 @@
                         <h3 class="text-lg font-bold mb-2 text-yellow-800">Welcome Supplier</h3>
                         <p class="text-sm text-yellow-700">This dashboard is customized for your supplier account. Please check your assigned work packages and notifications.</p>
                     </div>
+
                     <h3 class="text-lg font-bold mb-4 text-[#01426a]">Dashboard Analytics</h3>
                     @php
                         $showDummy = ($totalWP ?? 0) === 0 && ($wpWithPO ?? 0) === 0 && ($wpWithoutPO ?? 0) === 0 && ($deliveredWP ?? 0) === 0;
