@@ -221,12 +221,20 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Delivered</label>
+                            @php
+                                $deliveredValue = old('delivered', $expeditingForm->delivered);
+                                if ($deliveredValue === 1 || $deliveredValue === '1') {
+                                    $deliveredValue = 'Yes';
+                                } elseif ($deliveredValue === 0 || $deliveredValue === '0') {
+                                    $deliveredValue = 'No';
+                                }
+                            @endphp
                             <select name="delivered" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                                 <option value="">Select</option>
-                                <option value="Yes" @if(old('delivered', $expeditingForm->delivered)==='Yes') selected @endif>Yes</option>
-                                <option value="No" @if(old('delivered', $expeditingForm->delivered)==='No') selected @endif>No</option>
-                                <option value="Delay- FAT Issue" @if(old('delivered', $expeditingForm->delivered)==='Delay- FAT Issue') selected @endif>Delay- FAT Issue</option>
-                                <option value="Other" @if(old('delivered', $expeditingForm->delivered)==='Other') selected @endif>Other</option>
+                                <option value="Yes" @if($deliveredValue==='Yes') selected @endif>Yes</option>
+                                <option value="No" @if($deliveredValue==='No') selected @endif>No</option>
+                                <option value="Delay- FAT Issue" @if($deliveredValue==='Delay- FAT Issue') selected @endif>Delay- FAT Issue</option>
+                                <option value="Other" @if($deliveredValue==='Other') selected @endif>Other</option>
                             </select>
                         </div>
                         <div class="col-span-1 md:col-span-3">

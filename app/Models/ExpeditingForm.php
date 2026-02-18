@@ -49,9 +49,19 @@ class ExpeditingForm extends Model
         'comments',
     ];
 
-    protected $casts = [
-        'delivered' => 'boolean',
-    ];
+
+    // Remove boolean cast for delivered
+
+    // Accessor to always return Yes/No/other string for delivered
+    public function getDeliveredAttribute($value)
+    {
+        if ($value === 1 || $value === '1') {
+            return 'Yes';
+        } elseif ($value === 0 || $value === '0') {
+            return 'No';
+        }
+        return $value;
+    }
 
     public function emailLogs()
     {
