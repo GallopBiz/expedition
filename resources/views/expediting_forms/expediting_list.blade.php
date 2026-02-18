@@ -134,7 +134,18 @@ function resetExpeditingFilters() {
                             <td class="border px-3 py-2">{{ optional($form->context)->workpackage_name ?? $form->workpackage_name }}</td>
                             <td class="border px-3 py-2">{{ optional($form->context)->supplier ?? $form->supplier }}</td>
                             <td class="border px-3 py-2 whitespace-nowrap">{{ optional($form->context)->order_date ? \Carbon\Carbon::parse(optional($form->context)->order_date)->format('d-m-Y') : '' }}</td>
-                            <td class="border px-3 py-2">{{ optional($form->context)->contract_data_available_dmcs ?? '' }}</td>
+                            <td class="border px-3 py-2">
+                                @php
+                                    $dmcs = optional($form->context)->contract_data_available_dmcs ?? '';
+                                @endphp
+                                @if($dmcs === '1' || $dmcs === 1)
+                                    Yes
+                                @elseif($dmcs === '0' || $dmcs === 0)
+                                    No
+                                @else
+                                    {{ $dmcs }}
+                                @endif
+                            </td>
                             <td class="border px-3 py-2">{{ optional($form->context)->po_number ?? $form->po_number }}</td>
                             <td class="border px-3 py-2">{{ optional($form->context)->incoterms ?? '' }}</td>
                             <td class="border px-3 py-2">{{ optional($form->context)->exyte_procurement_contract_manager ?? '' }}</td>
