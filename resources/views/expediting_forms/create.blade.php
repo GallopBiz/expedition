@@ -57,6 +57,12 @@
 
     <div class="w-full px-2 md:px-8 mt-6 font-sans">
         <div class="bg-gradient-to-br from-[#e6eef4] to-white p-4 md:p-8 rounded-2xl shadow-2xl w-full border border-[#01426a22]">
+            <div class="mb-4 flex items-center">
+                <a href="{{ url('/expediting-forms/list') }}" class="inline-flex items-center px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-full shadow transition text-xs font-semibold">
+                    <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 mr-1' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 19l-7-7 7-7' /></svg>
+                    Back
+                </a>
+            </div>
             @if(session('success'))
                 <div class="mb-4 p-3 rounded bg-green-100 text-green-800 border border-green-300 font-semibold">
                     {{ session('success') }}

@@ -1,6 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+<main>
+  <div class="mb-4 flex items-center">
+    <a href="{{ url('/expediting-forms/create') }}" class="inline-flex items-center px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-full shadow transition text-xs font-semibold">
+      <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 mr-1' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 19l-7-7 7-7' /></svg>
+      Back
+    </a>
+  </div>
+  <!-- main content continues below -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
