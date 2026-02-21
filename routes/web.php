@@ -1,4 +1,10 @@
+
 <?php
+
+// Supplier Expedition Form V2 (for comparison/testing)
+Route::middleware(['auth', 'role:Supplier'])->group(function () {
+    Route::get('/supplier/expedition-v2', [\App\Http\Controllers\SupplierExpeditionV2Controller::class, 'show'])->name('supplier.expedition_v2');
+});
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
