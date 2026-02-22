@@ -15,6 +15,56 @@ use App\Models\ExpeditingForm;
 class ExpeditingFormController extends Controller
 {
     /**
+     * Show the new modern supplier expedition form (for suppliers)
+     */
+    public function supplierExpeditionModern(Request $request)
+    {
+        // Get the logged-in supplier's name or email
+        $supplier = auth()->user()->name ?? auth()->user()->email;
+
+        // Group by parent workpackage_name, fetch all children for this supplier
+        $parentGroups = ExpeditingForm::where('supplier', $supplier)
+            ->orderBy('workpackage_name')
+            ->get()
+            ->groupBy('workpackage_name');
+
+        // Optionally, fetch parent context for each group (for parent-level details)
+        $parentContexts = [];
+        foreach ($parentGroups as $parentName => $children) {
+            $parentContexts[$parentName] = $children->first()->context ?? null;
+        }
+
+        return view('expediting_forms.supplier_access_modern', [
+            'parentGroups' => $parentGroups,
+            'parentContexts' => $parentContexts,
+        ]);
+    }
+
+    /**
+     * Handle submission of the new modern supplier expedition form (for suppliers)
+     */
+    public function supplierExpeditionModernSubmit(Request $request)
+    {
+        // Validate and save the form data (customize as needed)
+        $validated = $request->validate([
+            'supplier_name' => 'required|string|max:255',
+            'po_number' => 'required|string|max:255',
+            'work_package' => 'required|string|max:255',
+            'material_desc' => 'required|string|max:255',
+            'delivery_location' => 'required|string|max:255',
+            'po_date' => 'required|date',
+            'planned_delivery' => 'required|date',
+            'forecast_delivery' => 'nullable|date',
+            'actual_delivery' => 'nullable|date',
+            'comments' => 'nullable|string|max:1000',
+        ]);
+
+        // Save to a new table/model or log as needed (for demo, just flash success)
+        // Example: SupplierExpeditionModern::create($validated);
+
+        return redirect()->back()->with('success', 'Supplier expedition form submitted successfully!');
+    }
+    /**
      * Allow supplier to access their expediting form via secure link.
      */
     public function supplierAccess(Request $request, ExpeditingForm $expeditingForm)

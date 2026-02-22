@@ -1,0 +1,37 @@
+/* Expedition V2 Reference CSS */
+:root {
+  --bg: #f0f2f7;
+  --surface: #ffffff;
+  --surface2: #f5f7fb;
+  --border: #dde1ec;
+  --border2: #c8cedd;
+  --accent: #0a7c55;
+  --accent-light: #e6f5f0;
+  --accent2: #1a6fb5;
+  --accent2-light: #e8f1fb;
+  --warn: #c8470a;
+  --warn-light: #fdf0ea;
+  --text: #1a1e2e;
+  --muted: #8892a4;
+  --muted2: #5a6278;
+  --shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body, #app, main, .min-h-screen, .bg-gray-100 {
+  background: none !important;
+  min-height: unset !important;
+  height: unset !important;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+/* ...rest of CSS from reference HTML... */
+/* (Copy all CSS from your reference HTML here, except body resets that conflict with layout/app) */

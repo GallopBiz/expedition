@@ -1,4 +1,10 @@
+
 <?php
+
+// Supplier Expedition Form V2 (for comparison/testing)
+Route::middleware(['auth', 'role:Supplier'])->group(function () {
+    Route::get('/supplier/expedition-v2', [\App\Http\Controllers\SupplierExpeditionV2Controller::class, 'show'])->name('supplier.expedition_v2');
+});
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +51,7 @@ Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 });
 
+
 // Expediting form routes for Manager and Expeditor
 Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
     Route::get('/expediting-forms/create', [ExpeditingFormController::class, 'create'])->name('expediting_forms.create');
@@ -56,6 +63,12 @@ Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
     Route::get('/expediting-forms/{expeditingForm}/edit', [ExpeditingFormController::class, 'edit'])->name('expediting_forms.edit');
     Route::put('/expediting-forms/{expeditingForm}', [ExpeditingFormController::class, 'update'])->name('expediting_forms.update');
     Route::delete('/expediting-forms/{expeditingForm}', [ExpeditingFormController::class, 'destroy'])->name('expediting_forms.destroy');
+});
+
+// New modern supplier expedition form (for suppliers)
+Route::middleware(['auth', 'role:Supplier'])->group(function () {
+    Route::get('/supplier/expedition-modern', [ExpeditingFormController::class, 'supplierExpeditionModern'])->name('supplier.expedition_modern');
+    Route::post('/supplier/expedition-modern', [ExpeditingFormController::class, 'supplierExpeditionModernSubmit'])->name('supplier.expedition_modern.submit');
 });
 
 // Language switcher route
