@@ -12,7 +12,7 @@
               background: var(--surface);
               border: 1px solid var(--border);
               border-radius: 16px;
-              width: 100%; max-width: 880px; max-height: 92vh;
+              width: 100%; max-width: 800px; max-height: 92vh;
               overflow-y: auto;
               animation: slideUp 0.25s ease;
               box-shadow: 0 20px 60px rgba(0,0,0,0.14), 0 4px 16px rgba(0,0,0,0.07);
@@ -697,6 +697,26 @@
                   <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
                 </div>
               </div>
+              <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
+                <div class="gauge-ring">
+                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill shipment" id="ringShipment" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="120" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#2563eb;"/><text class="gauge-number" id="gaugeShipmentNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">0%</text></svg>
+                </div>
+                <div>
+                  <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Ready for Shipment</div>
+                  <div class="gauge-value shipment" id="gaugeShipment" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:#2563eb;">0%</div>
+                  <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
+                </div>
+              </div>
+              <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
+                <div class="gauge-ring">
+                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill delivered" id="ringDelivered" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="130" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#01426a;"/><text class="gauge-number" id="gaugeDeliveredNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">0%</text></svg>
+                </div>
+                <div>
+                  <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Delivered</div>
+                  <div class="gauge-value delivered" id="gaugeDelivered" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:#01426a;">0%</div>
+                  <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -716,79 +736,139 @@
     <!-- LEFT: WORK PACKAGE DETAILS -->
     <div class="left-panel">
       <!-- ACCORDION: GENERAL INFO -->
-      <div class="accordion-item">
-        <button class="accordion-trigger open" onclick="toggleAccordion(this)">
+      <div class="accordion-item" id="work-package-accordion">
+        <button class="accordion-trigger" onclick="toggleAccordion(this)">
           <div class="accordion-trigger-left">
-            <div class="panel-dot"></div>
+            <div class="panel-dot" style="background:#2563eb"></div>
             <h2>Work Package</h2>
           </div>
           <div class="accordion-arrow">▼</div>
         </button>
-        <div class="accordion-body open">
+        <div class="accordion-body">
           <div class="field-group">
             <div class="field-label">Work Package No.</div>
-            <input class="field-value" value="441.01" type="text" placeholder="Identifier">
+            <input class="field-value" type="text" placeholder="Identifier" name="identifier">
           </div>
           <div class="field-group">
             <div class="field-label">Work Package Name</div>
-            <input class="field-value" value="MV Switchgear" type="text" placeholder="Name">
-          </div>
-          <div class="field-group">
-            <div class="field-label">Quantity</div>
-            <input class="field-value" value="6" type="number" placeholder="Quantity">
-          </div>
-          <div class="field-group">
-            <div class="field-label">Order Date</div>
-            <input class="field-value" type="date" value="2026-02-21">
-          </div>
-          <div class="field-group">
-            <div class="field-label">Forecast Delivery to Site</div>
-            <input class="field-value" type="date" placeholder="Forecast Delivery to Site">
+            <input class="field-value" type="text" placeholder="Work Package Name" name="work_package_name">
           </div>
           <div class="field-group">
             <div class="field-label">PO Number</div>
-            <input class="field-value" value="4200481385" type="text" placeholder="PO Number">
+            <input class="field-value" type="text" placeholder="PO Number" name="po_number">
           </div>
           <div class="field-group">
-            <div class="field-label">Exyte Procurement Contract Manager</div>
-            <input class="field-value" type="text" placeholder="Exyte Procurement Contract Manager">
+            <div class="field-label">Expediting Category</div>
+            <select class="field-value" name="expediting_category">
+              <option value="">Select Category</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
           </div>
           <div class="field-group">
-            <div class="field-label">Customer Procurement Contact</div>
-            <input class="field-value" type="text" placeholder="Customer Procurement Contact">
+            <div class="field-label">Supplier</div>
+            <select class="field-value" name="supplier">
+              <option value="">Select Supplier</option>
+              @foreach(\App\Models\ExpeditingForm::distinct()->orderBy('supplier')->pluck('supplier') as $supplier)
+                @if($supplier)
+                  <option value="{{ $supplier }}">{{ $supplier }}</option>
+                @endif
+              @endforeach
+            </select>
           </div>
           <div class="field-group">
-            <div class="field-label">Technical Workpackage Owner</div>
-            <input class="field-value" type="text" placeholder="Technical Workpackage Owner">
+            <div class="field-label">Order Date</div>
+            <input class="field-value" type="date" placeholder="Order Date" name="order_date">
           </div>
           <div class="field-group">
             <div class="field-label">Forecast Delivery to Site</div>
-            <input class="field-value" type="date">
+            <input class="field-value" type="date" placeholder="Forecast Delivery to Site" name="forecast_delivery_to_site">
           </div>
           <div class="field-group">
-            <div class="field-label">Actual Delivery to Site</div>
-            <input class="field-value" type="date">
+            <div class="field-label">Incoterms</div>
+            <select class="field-value" name="incoterms">
+              <option value="">No Select</option>
+              <option value="Not Available">Not Available</option>
+              <option value="DAP">DAP</option>
+            </select>
           </div>
           <div class="field-group">
-            <div class="field-group-label">MILESTONES</div>
-            <div class="toggles-row">
-              <div class="toggle-item">
-                <div class="toggle" onclick="this.classList.toggle('on')"></div>
-                <span>COMPLETED</span>
-              </div>
-              <div class="toggle-item">
-                <div class="toggle" onclick="this.classList.toggle('on')"></div>
-                <span>LLI</span>
-              </div>
-              <div class="toggle-item">
-                <div class="toggle" onclick="this.classList.toggle('on')"></div>
-                <span>CONTRACT</span>
-              </div>
-              <div class="toggle-item">
-                <div class="toggle" onclick="this.classList.toggle('on')"></div>
-                <span>KICK OFF</span>
-              </div>
+            <div class="field-label">Exyte Procurement Contract Manager</div>
+            <input class="field-value" type="text" placeholder="Exyte Procurement Contract Manager" name="exyte_procurement_contract_manager">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Customer Procurement Contact</div>
+            <input class="field-value" type="text" placeholder="Customer Procurement Contact" name="customer_procurement_contact">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Technical Workpackage Owner</div>
+            <input class="field-value" type="text" placeholder="Technical Workpackage Owner" name="technical_workpackage_owner">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Expediting Contact</div>
+            <input class="field-value" type="text" placeholder="Expediting Contact" name="expediting_contact">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Workstream/Building</div>
+            <input class="field-value" type="text" placeholder="Workstream/Building" name="workstream_building">
+          </div>
+          <div class="field-group" style="margin-top:24px;">
+            <div class="field-label" style="margin-bottom:8px;">MILESTONES <hr style="margin:0 0 8px 0; border: none; border-top: 1px solid #e0e0e0;"/></div>
+            <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
+              <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
+                <span style="margin-bottom:4px;">COMPLETED</span>
+                <input type="checkbox" name="milestones[]" value="Completed" class="toggle-switch" style="display:none;">
+                <span class="custom-toggle"></span>
+              </label>
+              <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
+                <span style="margin-bottom:4px;">LLI</span>
+                <input type="checkbox" name="milestones[]" value="LLI" class="toggle-switch" style="display:none;">
+                <span class="custom-toggle"></span>
+              </label>
+              <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
+                <span style="margin-bottom:4px;">CONTRACT</span>
+                <input type="checkbox" name="milestones[]" value="Contract" class="toggle-switch" style="display:none;">
+                <span class="custom-toggle"></span>
+              </label>
+              <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
+                <span style="margin-bottom:4px;">KICK OFF</span>
+                <input type="checkbox" name="milestones[]" value="Kick Off" class="toggle-switch" style="display:none;">
+                <span class="custom-toggle"></span>
+              </label>
             </div>
+          </div>
+          <style>
+            .custom-toggle {
+              display: inline-block;
+              width: 40px;
+              height: 22px;
+              background: #e5e7eb; /* light grey */
+              border-radius: 22px;
+              position: relative;
+              transition: background 0.2s;
+              cursor: pointer;
+            }
+            .custom-toggle:before {
+              content: '';
+              position: absolute;
+              left: 3px;
+              top: 3px;
+              width: 16px;
+              height: 16px;
+              background: #fff;
+              border-radius: 50%;
+              transition: transform 0.2s;
+            }
+            input.toggle-switch:checked + .custom-toggle {
+              background: #01426a; /* on color */
+            }
+            input.toggle-switch:checked + .custom-toggle:before {
+              transform: translateX(18px);
+            }
+          </style>
+          <div class="field-group" style="text-align:right; margin-top:12px;">
+            <button id="saveWorkPackage" class="btn btn-primary">Save Work Package</button>
           </div>
         </div>
       </div>
@@ -819,7 +899,6 @@
         <div class="accordion-body">
           <!-- Empty for now -->
         </div>
-      </div>
 	  <!-- DELIVERY TRACKING -->
 <div class="accordion-item">
   <button class="accordion-trigger" onclick="toggleAccordion(this)">
@@ -870,7 +949,9 @@
   </div>
 </div>
     </div>
-    <!-- RIGHT: EQUIPMENT LIST -->
+    
+  </div>
+  <!-- RIGHT: EQUIPMENT LIST -->
     <div class="right-panel">
       <div class="equipment-header">
         <h2><span class="panel-dot" style="margin-right:8px;"></span>Equipment</h2>
@@ -906,7 +987,6 @@
         <!-- Add more equipment rows here as needed -->
       </div>
     </div>
-  </div>
 
   <!-- MODAL -->
 
@@ -927,7 +1007,7 @@
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-    width: 700px;
+    width: 800px;
     max-width: 98vw;
     max-height: 90vh;
     display: flex;
@@ -1220,13 +1300,12 @@
       <div class="modal-section">
         <div class="modal-section-title">Key Dates</div>
         <div class="modal-grid three">
-          <div class="modal-field"><label>Start of Manufacturing</label><input type="date" id="eq-start"></div>
-          <div class="modal-field"><label>End of Manufacturing</label><input type="date" id="eq-end"></div>
-          <div class="modal-field"><label>Contractual Delivery to Site</label><input type="date" id="eq-contractualdate"></div>
-          <div class="modal-field"><label>Estimate Delivery to Site Date</label><input type="date" id="eq-estimatedsite"></div>
-          <div class="modal-field"><label>Needed Delivery to Site</label><input type="date" id="eq-neededsite"></div>
-          <div class="modal-field"><label>FAT Date</label><input type="date" id="eq-fatdate"></div>
-          <div class="modal-field"><label>Actual Delivery (Supplier)</label><input type="date" id="eq-actualdate"></div>
+          <div class="modal-field"><label>Start of Manufacturing</label><input type="date" id="eq-start" name="start_of_manufacturing"></div>
+          <div class="modal-field"><label>End of Manufacturing</label><input type="date" id="eq-end" name="end_of_manufacturing"></div>
+          <div class="modal-field"><label>FAT Date</label><input type="date" id="eq-fatdate" name="fat_date"></div>
+          <div class="modal-field"><label>Contractual Delivery to Site</label><input type="date" id="eq-contractualdate" name="contractual_delivery_to_site"></div>
+          <div class="modal-field"><label>Actual Delivery (Supplier)</label><input type="date" id="eq-actualdate" name="actual_delivery_supplier"></div>
+          <div class="modal-field"><label>Needed Delivery to Site (CM/Scheduling)</label><input type="date" id="eq-neededsite" name="needed_delivery_to_site"></div>
           <div class="modal-field"><label>Manufacturing Duration (weeks)</label><input type="number" id="eq-duration" placeholder="0"></div>
           <div class="modal-field" style="grid-column: 1 / -1; margin-top: 2px;">
             <div id="fatdate-warning" style="display:none; color:#c8470a; background:#fff3e6; border:1px solid #c8470a; border-radius:5px; padding:7px 12px; font-size:13px; font-weight:500;">
@@ -1457,24 +1536,24 @@ const dtData = [
 
 let dtFilterStatus = 'all';
 
-function renderDT(search='') {
+function renderDT(search = '') {
+  search = typeof search === 'string' ? search : '';
   const body = document.getElementById('dtBody');
-  const rows = dtData.filter(r =>
-    (dtFilterStatus === 'all' || r.status === dtFilterStatus) &&
-    r.tag.toLowerCase().includes(search.toLowerCase())
-  );
-
+  const rows = dtData.filter(r => {
+    const tag = typeof r.tag === 'string' ? r.tag : (typeof r.name === 'string' ? r.name : '');
+    return (dtFilterStatus === 'all' || r.status === dtFilterStatus) &&
+      tag.toLowerCase().includes(search.toLowerCase());
+  });
   document.getElementById('dtCount').textContent = rows.length;
   document.getElementById('dtTotal').textContent = dtData.length;
-
   body.innerHTML = rows.map(r => `
     <div class="dt-row ${r.status}">
-      <strong>${r.tag}</strong>
-      <span>${r.mfgS}</span>
-      <span>${r.mfgE}</span>
-      <span>${r.con}</span>
-      <span>${r.est}</span>
-      <span>${r.need}</span>
+      <strong>${typeof r.tag === 'string' ? r.tag : (typeof r.name === 'string' ? r.name : '')}</strong>
+      <span>${r.mfgS || ''}</span>
+      <span>${r.mfgE || ''}</span>
+      <span>${r.con || ''}</span>
+      <span>${r.est || ''}</span>
+      <span>${r.need || ''}</span>
       <div class="dot"></div>
     </div>
   `).join('');

@@ -1,8 +1,7 @@
-
 <?php
 
 // Supplier Expedition Form V2 (for comparison/testing)
-Route::middleware(['auth', 'role:Supplier'])->group(function () {
+Route::middleware(['auth', 'role:Supplier,Manager,Expeditor'])->group(function () {
     Route::get('/supplier/expedition-v2', [\App\Http\Controllers\SupplierExpeditionV2Controller::class, 'show'])->name('supplier.expedition_v2');
 });
 
