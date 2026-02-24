@@ -105,9 +105,72 @@ function saveEquipment() {
     openpoints: document.getElementById('eq-openpoints').value,
     remarks: document.getElementById('eq-remarks').value,
   };
-  if (currentIndex >= 0) equipments[currentIndex] = data; else equipments.push(data);
+  let isUpdate = currentIndex >= 0;
+  if (isUpdate) equipments[currentIndex] = data; else equipments.push(data);
   renderEquipments();
   closeModal();
+  showSavePopup(isUpdate ? 'Data updated successfully!' : 'Data saved successfully!');
+}
+
+// Custom popup for save/update success
+function showSavePopup(message) {
+  let popup = document.getElementById('saveSuccessPopup');
+  if (!popup) {
+    popup = document.createElement('div');
+    popup.id = 'saveSuccessPopup';
+    popup.style.position = 'fixed';
+    popup.style.top = '30px';
+    popup.style.left = '50%';
+    popup.style.transform = 'translateX(-50%)';
+    popup.style.background = '#16a34a';
+    popup.style.color = '#fff';
+    popup.style.padding = '14px 32px';
+    popup.style.borderRadius = '8px';
+    popup.style.fontSize = '16px';
+    popup.style.fontWeight = 'bold';
+    popup.style.boxShadow = '0 2px 12px rgba(0,0,0,0.15)';
+    popup.style.zIndex = '9999';
+    popup.style.opacity = '0';
+    popup.style.transition = 'opacity 0.3s';
+    document.body.appendChild(popup);
+  }
+  popup.textContent = message;
+  popup.style.opacity = '1';
+  setTimeout(() => { popup.style.opacity = '0'; }, 1800);
 }
 function toggleCheck(el) { el.classList.toggle('checked'); }
 renderEquipments();
+
+// Data Table
+const dtData = equipments;
+let dtFilterStatus = 'all';
+function renderDT(search='') {
+  if (typeof search !== 'string') search = '';
+  const body = document.getElementById('dtBody');
+  const rows = dtData.filter(r =>
+    (dtFilterStatus === 'all' || r.status === dtFilterStatus) &&
+    r.tag.toLowerCase().includes(search.toLowerCase())
+  );
+
+  document.getElementById('dtCount').textContent = rows.length;
+  document.getElementById('dtTotal').textContent = dtData.length;
+
+  body.innerHTML = rows.map(r => `
+    <div class="dt-row ${r.status}">
+      <strong>${r.tag}</strong>
+      <span>${r.mfgS}</span>
+      <span>${r.mfgE}</span>
+      <span>${r.con}</span>
+      <span>${r.est}</span>
+      <span>${r.need}</span>
+      <div class="dot"></div>
+    </div>
+  `).join('');
+}
+function dtSetFilter(status, btn) {
+  dtFilterStatus = status;
+  document.querySelectorAll('.dt-filters button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDT(''); // Always call with string
+}
+document.addEventListener('DOMContentLoaded', function() { renderDT(''); });
