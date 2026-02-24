@@ -7,6 +7,13 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ExpeditingFormController;
 use App\Http\Controllers\ExpeditingCardController;
+use App\Http\Controllers\ExpeditingEquipmentController;
+
+
+
+// API: Get all work packages and their equipment for a context
+Route::get('/api/get-work-packages-by-context', [\App\Http\Controllers\ExpeditingFormController::class, 'getWorkPackagesByContext']);
+
 
 
 // Supplier Expedition Form V2 (for comparison/testing)
@@ -70,6 +77,11 @@ Route::middleware(['auth', 'role:Supplier'])->group(function () {
     Route::get('/supplier/expedition-modern', [ExpeditingFormController::class, 'supplierExpeditionModern'])->name('supplier.expedition_modern');
     Route::post('/supplier/expedition-modern', [ExpeditingFormController::class, 'supplierExpeditionModernSubmit'])->name('supplier.expedition_modern.submit');
 });
+
+// Equipment list API route
+Route::get('/expediting-equipments-list', [\App\Http\Controllers\ExpeditingEquipmentController::class, 'list']);
+// Equipment API route
+Route::post('/expediting-equipments', [\App\Http\Controllers\ExpeditingEquipmentController::class, 'store'])->name('expediting_equipments.store');
 
 // Language switcher route
 Route::post('/language-switch', function (\Illuminate\Http\Request $request) {

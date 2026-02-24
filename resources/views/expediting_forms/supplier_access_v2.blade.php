@@ -1466,8 +1466,53 @@
           cb.checked = !cb.checked;
         }
         function saveEquipment() {
-          // Implement save logic as needed
-          closeModal();
+          // Gather equipment data from modal fields
+          const data = {
+            expediting_form_id: (new URLSearchParams(window.location.search)).get('context_id'),
+            name: document.getElementById('eq-name').value.trim() || 'Unnamed',
+            design: parseInt(document.getElementById('eq-design').value) || 0,
+            material: parseInt(document.getElementById('eq-material').value) || 0,
+            fab: parseInt(document.getElementById('eq-fab').value) || 0,
+            fat: parseInt(document.getElementById('eq-fat').value) || 0,
+            subsupplier: document.getElementById('eq-subsupplier').value,
+            qty: parseInt(document.getElementById('eq-qty').value) || 1,
+            place: document.getElementById('eq-place').value,
+            order_status: document.getElementById('eq-orderstatus').value,
+            drawing: document.getElementById('eq-drawing').value,
+            scope: document.getElementById('eq-scope').value,
+            start: document.getElementById('eq-start').value,
+            end: document.getElementById('eq-end').value,
+            duration: parseInt(document.getElementById('eq-duration').value) || null,
+            fatdate: document.getElementById('eq-fatdate').value,
+            contractualdate: document.getElementById('eq-contractualdate').value,
+            actualdate: document.getElementById('eq-actualdate').value,
+            openpoints: document.getElementById('eq-openpoints').value,
+            remarks: document.getElementById('eq-remarks').value,
+            checks: Array.from(document.querySelectorAll('.modal-checkboxes .check-item')).map(item => item.classList.contains('checked')),
+          };
+          // CSRF token from meta tag
+          const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+          fetch('/expediting-equipments', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': csrf,
+              'Accept': 'application/json',
+            },
+            body: JSON.stringify(data)
+          })
+          .then(response => {
+            if (!response.ok) throw new Error('Failed to save equipment');
+            return response.json();
+          })
+          .then(result => {
+            closeModal();
+            // Optionally refresh equipment list or show success
+            alert('Equipment saved successfully!');
+          })
+          .catch(err => {
+            alert('Error saving equipment: ' + err.message);
+          });
         }
         // --- FAT Date vs Actual Delivery Validation ---
         function validateFatVsActual() {
