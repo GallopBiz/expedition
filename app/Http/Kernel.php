@@ -37,7 +37,7 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'auth' => \App\Http\Middleware\Authenticate::class,
         'role' => \App\Http\Middleware\RoleMiddleware::class,
-        'managerexpeditor' => \App\Http\Middleware\ManagerExpeditorAccess::class,
+        //'managerexpeditor' => \App\Http\Middleware\ManagerExpeditorAccess::class,
         // ...other route middleware...
     ];
 }

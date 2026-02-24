@@ -451,6 +451,14 @@ class ExpeditingFormController extends Controller
             ]);
         }
 
+        // If ajaxform=1, return JSON response with context_id
+        if ($request->input('ajaxform') == 1) {
+            if (count($errors)) {
+                return response()->json(['success' => false, 'errors' => $errors], 422);
+            }
+            return response()->json(['success' => true, 'context_id' => $context->id]);
+        }
+
         if (count($errors)) {
             return redirect()->back()->withErrors(['executions' => $errors])->withInput();
         }

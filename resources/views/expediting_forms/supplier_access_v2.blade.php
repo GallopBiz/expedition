@@ -751,7 +751,7 @@
           </div>
           <div class="field-group">
             <div class="field-label">Work Package Name</div>
-            <input class="field-value" type="text" placeholder="Work Package Name" name="work_package_name">
+            <input class="field-value" type="text" placeholder="Work Package Name" name="workpackage_name">
           </div>
           <div class="field-group">
             <div class="field-label">PO Number</div>
@@ -765,6 +765,24 @@
               <option value="Medium">Medium</option>
               <option value="High">High</option>
             </select>
+            <script>
+              document.addEventListener('DOMContentLoaded', function() {
+                const catSelect = document.querySelector('select[name="expediting_category"]');
+                function updateCategoryColor() {
+                  catSelect.classList.remove('cat-low', 'cat-medium', 'cat-high');
+                  if (catSelect.value === 'Low') catSelect.classList.add('cat-low');
+                  else if (catSelect.value === 'Medium') catSelect.classList.add('cat-medium');
+                  else if (catSelect.value === 'High') catSelect.classList.add('cat-high');
+                }
+                catSelect.addEventListener('change', updateCategoryColor);
+                updateCategoryColor();
+              });
+            </script>
+            <style>
+              .cat-low { background: #d1fae5 !important; }
+              .cat-medium { background: #fef9c3 !important; }
+              .cat-high { background: #fecaca !important; }
+            </style>
           </div>
           <div class="field-group">
             <div class="field-label">Supplier</div>
@@ -808,10 +826,18 @@
           <div class="field-group">
             <div class="field-label">Expediting Contact</div>
             <input class="field-value" type="text" placeholder="Expediting Contact" name="expediting_contact">
+            <input type="hidden" name="executions[0][expediting_contact]" id="exec_expediting_contact">
           </div>
           <div class="field-group">
             <div class="field-label">Workstream/Building</div>
             <input class="field-value" type="text" placeholder="Workstream/Building" name="workstream_building">
+            <input type="hidden" name="executions[0][workstream_building]" id="exec_workstream_building">
+          </div>
+          <div style="display:none;">
+            <input type="hidden" name="executions[0][work_package]" id="exec_work_package">
+          </div>
+          <div style="display:none;">
+            <input type="hidden" name="ajaxform" value="1">
           </div>
           <div class="field-group" style="margin-top:24px;">
             <div class="field-label" style="margin-bottom:8px;">MILESTONES <hr style="margin:0 0 8px 0; border: none; border-top: 1px solid #e0e0e0;"/></div>
@@ -869,6 +895,61 @@
           </style>
           <div class="field-group" style="text-align:right; margin-top:12px;">
             <button id="saveWorkPackage" class="btn btn-primary">Save Work Package</button>
+            <script>
+            let workPackageSaved = false;
+            document.addEventListener('DOMContentLoaded', function() {
+              const btn = document.getElementById('saveWorkPackage');
+              btn.addEventListener('click', function() {
+                if (workPackageSaved) return;
+                // Autofill executions fields from visible fields
+                const parent = btn.closest('.accordion-body');
+                document.getElementById('exec_work_package').value = parent.querySelector('input[name="workpackage_name"]').value;
+                document.getElementById('exec_workstream_building').value = parent.querySelector('input[name="workstream_building"]').value;
+                document.getElementById('exec_expediting_contact').value = parent.querySelector('input[name="expediting_contact"]').value;
+                var formData = new FormData();
+                parent.querySelectorAll('input, select').forEach(el => {
+                  if (el.type === 'checkbox') {
+                    if (!el.checked) return;
+                  }
+                  // Handle multiple values for checkboxes
+                  if (el.type === 'checkbox' && el.name.endsWith('[]')) {
+                    formData.append(el.name, el.value);
+                  } else {
+                    formData.append(el.name, el.value);
+                  }
+                });
+                fetch('http://127.0.0.1:8000/expediting-forms', {
+                  method: 'POST',
+                  headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                  },
+                  body: formData
+                })
+                .then(res => res.json())
+                .then(resp => {
+                  if (resp.success && resp.context_id) {
+                    workPackageSaved = true;
+                    btn.textContent = 'Update Work Package';
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-success');
+                    // Update URL to edit mode with context_id
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('context_id', resp.context_id);
+                    url.searchParams.set('edit', '1');
+                    window.history.replaceState({}, '', url);
+                  } else if (resp.errors) {
+                    alert('Error: ' + (Array.isArray(resp.errors) ? resp.errors.join('\n') : JSON.stringify(resp.errors)));
+                  } else {
+                    alert('Failed to save work package.');
+                  }
+                })
+                .catch(() => {
+                  alert('Failed to save work package.');
+                });
+              });
+            });
+            </script>
           </div>
         </div>
       </div>
