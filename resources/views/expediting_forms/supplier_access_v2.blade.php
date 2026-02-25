@@ -1,3 +1,36 @@
+    <style>
+      .dt-table {
+        margin:0 10px 12px;
+        border:1px solid var(--border);
+        border-radius:10px;
+        overflow:hidden;
+      }
+      .dt-head, .dt-row {
+        display:grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 40px;
+        font-size:11px;
+      }
+      .dt-head span, .dt-row span {
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      .dt-head {
+        background:var(--surface2);
+        font-weight:600;
+        padding:6px 8px;
+      }
+      .dt-row {
+        padding:6px 8px;
+        border-top:1px solid var(--border);
+        align-items:center;
+      }
+      .dt-row .dot {
+        width:8px;height:8px;border-radius:50%;
+      }
+      .dt-row.ok .dot { background:#16a34a }
+      .dt-row.late .dot { background:#dc2626 }
+      .dt-row.none .dot { background:#94a3b8 }
+    </style>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
         <style>
             .modal-overlay {
@@ -616,7 +649,7 @@
 
 .dt-head, .dt-row {
   display:grid;
-  grid-template-columns: 1.2fr repeat(5,1fr) 20px;
+  grid-template-columns: 1.2fr repeat(4,1fr) 20px;
   font-size:11px;
 }
 .dt-head {
@@ -990,11 +1023,11 @@
 
     <!-- FILTER BAR -->
     <div class="dt-toolbar">
-      <input type="text" placeholder="Search tag..." oninput="dtFilter(this.value)">
+      <input type="text" id="dtSearch" placeholder="Search tag..." oninput="dtFilter()">
       <div class="dt-filters">
-        <button class="active" onclick="dtSetFilter('all', this)">All</button>
-        <button onclick="dtSetFilter('late', this)">Late</button>
-        <button onclick="dtSetFilter('ok', this)">OK</button>
+        <button class="active" id="dtAllBtn" onclick="dtSetFilter('all', this)">All</button>
+        <button id="dtLateBtn" onclick="dtSetFilter('late', this)">Late</button>
+        <button id="dtOkBtn" onclick="dtSetFilter('ok', this)">OK</button>
       </div>
       <div class="dt-count"><span id="dtCount">0</span>/<span id="dtTotal">0</span></div>
     </div>
@@ -1003,15 +1036,65 @@
     <div class="dt-table">
       <div class="dt-head">
         <span>Tag</span>
-        <span>Mfg St</span>
-        <span>Mfg End</span>
-        <span>Contract</span>
-        <span>Est</span>
-        <span>Needed</span>
-        <span></span>
+        <span>Contractual</span>
+        <span>Actual</span>
+        <span>FAT Date</span>
+        <span>On Time</span>
       </div>
-
-      <div id="dtBody"></div>
+      <div id="dtBody">
+        @php
+          $contextId = request()->query('context_id');
+          $equipments = \App\Models\ExpeditingEquipment::where('context_id', $contextId)->get();
+        @endphp
+        <script>
+          let dtFilterStatus = 'all';
+          function dtSetFilter(status, btn) {
+            dtFilterStatus = status;
+            document.querySelectorAll('.dt-filters button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            dtFilter();
+          }
+          function dtFilter() {
+            const search = document.getElementById('dtSearch').value.toLowerCase();
+            const rows = Array.from(document.querySelectorAll('#dtBody .dt-row'));
+            let count = 0;
+            rows.forEach(row => {
+              const tag = row.querySelector('span').textContent.toLowerCase();
+              const status = row.classList.contains('ok') ? 'ok' : row.classList.contains('late') ? 'late' : 'none';
+              const show = (dtFilterStatus === 'all' || status === dtFilterStatus) && tag.includes(search);
+              row.style.display = show ? '' : 'none';
+              if (show) count++;
+            });
+            document.getElementById('dtCount').textContent = count;
+            document.getElementById('dtTotal').textContent = rows.length;
+          }
+          document.addEventListener('DOMContentLoaded', dtFilter);
+        </script>
+        @php
+        $count = 0;
+        @endphp
+        @forelse($equipments as $equipment)
+          @php
+            $fatDate = $equipment->fatdate ? strtotime($equipment->fatdate) : null;
+            $contractual = $equipment->contractualdate ? strtotime($equipment->contractualdate) : null;
+            $actual = $equipment->actualdate ? strtotime($equipment->actualdate) : null;
+            $onTime = ($fatDate && $contractual && $actual && $fatDate <= $contractual && $fatDate <= $actual);
+            $status = 'none';
+            if ($onTime) $status = 'ok';
+            else if ($fatDate && $contractual && $actual && ($fatDate > $contractual || $fatDate > $actual)) $status = 'late';
+            $count++;
+          @endphp
+          <div class="dt-row {{ $status }}">
+            <span>{{ $equipment->name ?? $equipment->tag ?? '—' }}</span>
+            <span>{{ $equipment->contractualdate ? date('d-M-Y', strtotime($equipment->contractualdate)) : '—' }}</span>
+            <span>{{ $equipment->actualdate ? date('d-M-Y', strtotime($equipment->actualdate)) : '—' }}</span>
+            <span>{{ $equipment->fatdate ? date('d-M-Y', strtotime($equipment->fatdate)) : '—' }}</span>
+            <span style="display:flex;justify-content:center;align-items:center;height:100%;"><div class="dot"></div></span>
+          </div>
+        @empty
+          <div style="padding:20px;color:#888;">No equipment found for this context.</div>
+        @endforelse
+      </div>
     </div>
 
   </div>
@@ -1038,7 +1121,7 @@
           $filteredEquipments = $equipments->where('context_id', $contextId);
         @endphp
         @forelse($filteredEquipments as $equipment)
-          <div class="equipment-row" onclick="openModal(@json($equipment))">
+          <div class="equipment-row" style="cursor:pointer;" onclick="openModal(@json($equipment))">
             <div class="eq-name"><div class="eq-status-dot dot-green"></div>{{ $equipment->name ?? $equipment->tag ?? '—' }}</div>
             <div class="progress-cell"><div class="progress-label">{{ $equipment->design ?? 0 }}%</div><div class="progress-bar"><div class="progress-fill green" style="width:{{ $equipment->design ?? 0 }}%"></div></div></div>
             <div class="progress-cell"><div class="progress-label">{{ $equipment->material ?? 0 }}%</div><div class="progress-bar"><div class="progress-fill blue" style="width:{{ $equipment->material ?? 0 }}%"></div></div></div>
@@ -1064,7 +1147,7 @@
     align-items: center;
     justify-content: center;
     transition: opacity 0.2s;
-  }
+      .dt-row span { font-size:14px; white-space:nowrap; }
   .modal-overlay.active { display: flex; }
   .modal {
     background: #fff;
@@ -1396,36 +1479,39 @@
     <div class="modal-footer">
       <script>
         function openModal(equipment) {
-          document.getElementById('modalOverlay').classList.add('active');
+          var overlay = document.getElementById('modalOverlay');
+          overlay.classList.add('active');
+          overlay.style.display = 'flex';
           // Support both index and object for backward compatibility
           if (typeof equipment === 'number' && window.equipments && Array.isArray(window.equipments)) {
             equipment = window.equipments[equipment];
           }
           if (equipment) {
-            document.getElementById('modalTitle').textContent = equipment.name || 'Equipment';
-            document.getElementById('eq-name').value = equipment.name || '';
-            document.getElementById('eq-subsupplier').value = equipment.subsupplier || '';
-            document.getElementById('eq-qty').value = equipment.qty || '';
-            document.getElementById('eq-place').value = equipment.place || '';
-            document.getElementById('eq-orderstatus').value = equipment.order_status || equipment.orderstatus || '';
-            document.getElementById('eq-drawing').value = equipment.drawing || '';
-            document.getElementById('eq-scope').value = equipment.scope || '';
-            document.getElementById('eq-design').value = equipment.design || 0;
-            document.getElementById('designVal').textContent = (equipment.design || 0) + '%';
-            document.getElementById('eq-material').value = equipment.material || 0;
-            document.getElementById('materialVal').textContent = (equipment.material || 0) + '%';
-            document.getElementById('eq-fab').value = equipment.fab || 0;
-            document.getElementById('fabVal').textContent = (equipment.fab || 0) + '%';
-            document.getElementById('eq-fat').value = equipment.fat || 0;
-            document.getElementById('fatVal').textContent = (equipment.fat || 0) + '%';
-            document.getElementById('eq-start').value = equipment.start || '';
-            document.getElementById('eq-end').value = equipment.end || '';
-            document.getElementById('eq-duration').value = equipment.duration || '';
-            document.getElementById('eq-fatdate').value = equipment.fatdate || '';
-            document.getElementById('eq-contractualdate').value = equipment.contractualdate || '';
-            document.getElementById('eq-actualdate').value = equipment.actualdate || '';
-            document.getElementById('eq-openpoints').value = equipment.openpoints || '';
-            document.getElementById('eq-remarks').value = equipment.remarks || '';
+            const safe = (v, def) => (v === null || v === undefined ? def : v);
+            document.getElementById('modalTitle').textContent = safe(equipment.name, 'Equipment');
+            document.getElementById('eq-name').value = safe(equipment.name, '');
+            document.getElementById('eq-subsupplier').value = safe(equipment.subsupplier, '');
+            document.getElementById('eq-qty').value = safe(equipment.qty, '');
+            document.getElementById('eq-place').value = safe(equipment.place, '');
+            document.getElementById('eq-orderstatus').value = safe(equipment.order_status || equipment.orderstatus, '');
+            document.getElementById('eq-drawing').value = safe(equipment.drawing, '');
+            document.getElementById('eq-scope').value = safe(equipment.scope, '');
+            document.getElementById('eq-design').value = safe(equipment.design, 0);
+            document.getElementById('designVal').textContent = safe(equipment.design, 0) + '%';
+            document.getElementById('eq-material').value = safe(equipment.material, 0);
+            document.getElementById('materialVal').textContent = safe(equipment.material, 0) + '%';
+            document.getElementById('eq-fab').value = safe(equipment.fab, 0);
+            document.getElementById('fabVal').textContent = safe(equipment.fab, 0) + '%';
+            document.getElementById('eq-fat').value = safe(equipment.fat, 0);
+            document.getElementById('fatVal').textContent = safe(equipment.fat, 0) + '%';
+            document.getElementById('eq-start').value = safe(equipment.start, '');
+            document.getElementById('eq-end').value = safe(equipment.end, '');
+            document.getElementById('eq-duration').value = safe(equipment.duration, '');
+            document.getElementById('eq-fatdate').value = safe(equipment.fatdate, '');
+            document.getElementById('eq-contractualdate').value = safe(equipment.contractualdate, '');
+            document.getElementById('eq-actualdate').value = safe(equipment.actualdate, '');
+            document.getElementById('eq-openpoints').value = safe(equipment.openpoints, '');
+            document.getElementById('eq-remarks').value = safe(equipment.remarks, '');
             // Checkboxes
             let checks = document.querySelectorAll('.modal-checkboxes .check-item');
             checks.forEach((item, idx) => {
@@ -1643,50 +1729,4 @@ function renderDeliveryCards() {
 document.addEventListener('DOMContentLoaded', renderDeliveryCards);
 </script>
 
-<script>
-const dtData = [
-  { tag:'UPS 6812', mfgS:'01 Oct', mfgE:'22 Feb', con:'14 Mar', est:'14 Mar', need:'21 Mar', status:'ok' },
-  { tag:'PDB 6813', mfgS:'04 Oct', mfgE:'04 Dec', con:'27 Dec', est:'28 Dec', need:'03 Jan', status:'risk' },
-  { tag:'ATS 6814', mfgS:'07 Oct', mfgE:'14 Dec', con:'09 Jan', est:'11 Jan', need:'—', status:'risk' },
-  { tag:'RAHU 6816', mfgS:'13 Oct', mfgE:'03 Jan', con:'04 Feb', est:'08 Feb', need:'—', status:'late' },
-];
-
-let dtFilterStatus = 'all';
-
-function renderDT(search = '') {
-  search = typeof search === 'string' ? search : '';
-  const body = document.getElementById('dtBody');
-  const rows = dtData.filter(r => {
-    const tag = typeof r.tag === 'string' ? r.tag : (typeof r.name === 'string' ? r.name : '');
-    return (dtFilterStatus === 'all' || r.status === dtFilterStatus) &&
-      tag.toLowerCase().includes(search.toLowerCase());
-  });
-  document.getElementById('dtCount').textContent = rows.length;
-  document.getElementById('dtTotal').textContent = dtData.length;
-  body.innerHTML = rows.map(r => `
-    <div class="dt-row ${r.status}">
-      <strong>${typeof r.tag === 'string' ? r.tag : (typeof r.name === 'string' ? r.name : '')}</strong>
-      <span>${r.mfgS || ''}</span>
-      <span>${r.mfgE || ''}</span>
-      <span>${r.con || ''}</span>
-      <span>${r.est || ''}</span>
-      <span>${r.need || ''}</span>
-      <div class="dot"></div>
-    </div>
-  `).join('');
-}
-
-function dtFilter(val) {
-  renderDT(val);
-}
-
-function dtSetFilter(status, btn) {
-  dtFilterStatus = status;
-  document.querySelectorAll('.dt-filters button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderDT();
-}
-
-document.addEventListener('DOMContentLoaded', renderDT);
-</script>
 @endsection
