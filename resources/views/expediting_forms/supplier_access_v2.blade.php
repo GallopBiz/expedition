@@ -1566,7 +1566,7 @@
           $filteredEquipments = $equipments->where('context_id', $contextId);
         @endphp
         @forelse($filteredEquipments as $equipment)
-          <div class="equipment-row" style="cursor:pointer;" onclick="openModal(@json($equipment))">
+          <div class="equipment-row" style="cursor:pointer;" onclick='openModal(@json($equipment))'>
             <div class="eq-name"><div class="eq-status-dot dot-green"></div>{{ $equipment->name ?? $equipment->tag ?? '—' }}</div>
             <div class="progress-cell"><div class="progress-label">{{ $equipment->design ?? 0 }}%</div><div class="progress-bar"><div class="progress-fill green" style="width:{{ $equipment->design ?? 0 }}%"></div></div></div>
             <div class="progress-cell"><div class="progress-label">{{ $equipment->material ?? 0 }}%</div><div class="progress-bar"><div class="progress-fill blue" style="width:{{ $equipment->material ?? 0 }}%"></div></div></div>

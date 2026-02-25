@@ -16,8 +16,18 @@ Route::get('/api/get-work-packages-by-context', [\App\Http\Controllers\Expeditin
 
 
 
-// Supplier Expedition Form V2 (for comparison/testing)
-Route::middleware(['auth', 'role:Manager,Supplier,Expeditor'])->group(function () {
+// Manager-only Expedition Form V2
+Route::middleware(['auth', 'role:Manager'])->group(function () {
+    Route::get('/manager/expedition-v2', [\App\Http\Controllers\SupplierExpeditionV2Controller::class, 'show'])->name('manager.expedition_v2');
+});
+
+// Expeditor-only Expedition Form V2
+Route::middleware(['auth', 'role:Expeditor'])->group(function () {
+    Route::get('/expeditor/expedition-v2', [\App\Http\Controllers\SupplierExpeditionV2Controller::class, 'show'])->name('expeditor.expedition_v2');
+});
+
+// Supplier-only Expedition Form V2
+Route::middleware(['auth', 'role:Supplier'])->group(function () {
     Route::get('/supplier/expedition-v2', [\App\Http\Controllers\SupplierExpeditionV2Controller::class, 'show'])->name('supplier.expedition_v2');
 });
 
