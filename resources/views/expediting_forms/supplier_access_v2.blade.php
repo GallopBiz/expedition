@@ -1,4 +1,4 @@
-    <style>
+<style>
       .dt-table {
         margin:0 10px 12px;
         border:1px solid var(--border);
@@ -990,20 +990,7 @@
           <!-- Empty for now -->
         </div>
       </div>
-
-      <!-- ACCORDION: MILESTONES -->
-      <div class="accordion-item">
-        <button class="accordion-trigger" onclick="toggleAccordion(this)">
-          <div class="accordion-trigger-left">
-            <div class="panel-dot" style="background:var(--warn);"></div>
-            <h2>Milestones</h2>
-          </div>
-          <div class="accordion-arrow">▼</div>
-        </button>
-        <div class="accordion-body">
-          <!-- Empty for now -->
-        </div>
-	  <!-- DELIVERY TRACKING -->
+        	  <!-- DELIVERY TRACKING -->
 <div class="accordion-item">
   <button class="accordion-trigger" onclick="toggleAccordion(this)">
     <div class="accordion-trigger-left">
@@ -1095,11 +1082,361 @@
           <div style="padding:20px;color:#888;">No equipment found for this context.</div>
         @endforelse
       </div>
+      
     </div>
 
   </div>
-</div>
+
+	  <!-- CALENDAR & COMMENTS ACCORDION -->
+      <div class="accordion-item">
+        <button class="accordion-trigger" onclick="toggleAccordion(this)">
+          <div class="accordion-trigger-left">
+            <div class="panel-dot" style="background:#7c3aed;"></div>
+            <h2>Calendar &amp; Comments</h2>
+          </div>
+          <div class="accordion-arrow">▼</div>
+        </button>
+        <div class="accordion-body">
+          <style>
+            /* Calendar styles (same as your provided code) */
+            .cal-card { padding: 16px 20px 12px; background: var(--surface); }
+            .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+            .cal-nav { width: 26px; height: 26px; border: 1px solid var(--border2); border-radius: 6px; background: var(--surface2); color: var(--muted2); font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; font-family: 'Figtree', ui-sans-serif, sans-serif; line-height: 1; }
+            .cal-nav:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+            .cal-month-label { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: -.2px; font-family: 'Figtree', ui-sans-serif, sans-serif; }
+            .cal-year-label { font-size: 11px; color: var(--muted2); font-weight: 400; margin-left: 5px; }
+            .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+            .cal-dow { text-align: center; font-size: 9px; font-weight: 700; color: var(--muted2); letter-spacing: 1px; text-transform: uppercase; padding-bottom: 6px; }
+            .cal-dow:nth-child(6), .cal-dow:nth-child(7) { color: var(--border2); }
+            #cal-days { display: contents; }
+            .cal-day { aspect-ratio: 1; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; gap: 2px; border: 1px solid transparent; }
+            .cal-day-num { font-size: 11px; font-weight: 600; color: var(--text); line-height: 1; font-family: 'Figtree', ui-sans-serif, sans-serif; }
+            .cal-day:hover:not(.cal-day-other) { background: var(--accent-light); border-color: rgba(10,124,85,.2); }
+            .cal-day:hover:not(.cal-day-other) .cal-day-num { color: var(--accent); }
+            .cal-day.cal-day-today { background: var(--accent); border-color: var(--accent); box-shadow: 0 2px 6px rgba(10,124,85,.3); }
+            .cal-day.cal-day-today .cal-day-num { color: #fff; font-weight: 700; font-size: 12px; }
+            .cal-day.cal-day-today:hover { background: #0a9966; }
+            .cal-day.cal-day-selected:not(.cal-day-today) { background: var(--surface2); border-color: var(--accent); box-shadow: 0 0 0 2px rgba(10,124,85,.12); }
+            .cal-day.cal-day-selected:not(.cal-day-today) .cal-day-num { color: var(--accent); font-weight: 700; }
+            .cal-day.cal-day-other { cursor: default; pointer-events: none; }
+            .cal-day.cal-day-other .cal-day-num { color: var(--border2); }
+            .cal-day.cal-day-weekend:not(.cal-day-today):not(.cal-day-selected) .cal-day-num { color: var(--muted2); }
+            .cal-day-dots { display: flex; gap: 2px; align-items: center; justify-content: center; min-height: 4px; }
+            .cal-evt-dot { width: 3px; height: 3px; border-radius: 50%; flex-shrink: 0; }
+            .cal-evt-dot.Inspection { background: #7c3aed; }
+            .cal-evt-dot.Material\ Planning { background: #0284c7; }
+            .cal-evt-dot.Fabrication\ Planning { background: var(--warn); }
+            .cal-panel { border-top: 1px solid var(--border); background: var(--surface); }
+            .cal-placeholder { padding: 12px 20px; font-size: 11px; color: var(--muted2); font-style: italic; text-align: center; border-bottom: 1px solid var(--border); background: var(--surface2); }
+            .cal-date-banner { padding: 9px 20px; border-bottom: 1px solid var(--border); background: var(--surface2); display: none; }
+            .cal-date-banner-text { font-size: 12px; font-weight: 700; color: var(--text); font-family: 'Figtree', ui-sans-serif, sans-serif; }
+            .cal-date-banner-sub { font-size: 10px; color: var(--muted2); margin-top: 1px; letter-spacing: .5px; }
+            .cal-cat-tabs { display: flex; border-bottom: 2px solid var(--border); }
+            .cal-cat-tab { flex: 1; padding: 8px 4px; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; border: none; background: none; cursor: pointer; color: var(--muted2); font-family: 'Figtree', ui-sans-serif, sans-serif; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .15s; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+            .cal-cat-tab:hover { background: var(--surface2); color: var(--text); }
+            .cal-tab-dot { width: 6px; height: 6px; border-radius: 50%; opacity: .35; transition: opacity .15s; }
+            .cal-cat-tab.active .cal-tab-dot { opacity: 1; }
+            .cal-cat-tab[data-cat="Inspection"].active { color: #7c3aed; border-bottom-color: #7c3aed; }
+            .cal-cat-tab[data-cat="Material Planning"].active { color: #0284c7; border-bottom-color: #0284c7; }
+            .cal-cat-tab[data-cat="Fabrication Planning"].active { color: var(--warn); border-bottom-color: var(--warn); }
+            .cal-cat-tab[data-cat="Inspection"] .cal-tab-dot { background: #7c3aed; }
+            .cal-cat-tab[data-cat="Material Planning"] .cal-tab-dot { background: #0284c7; }
+            .cal-cat-tab[data-cat="Fabrication Planning"] .cal-tab-dot { background: var(--warn); }
+            .cal-existing-comment { padding: 9px 12px; border-radius: 7px; margin-bottom: 10px; font-size: 12px; line-height: 1.5; color: var(--text); border: 1px solid; position: relative; display: none; }
+            .cal-existing-comment.Inspection { background: #f5f3ff; border-color: #ddd6fe; }
+            .cal-existing-comment.Material\ Planning { background: #f0f9ff; border-color: #bae6fd; }
+            .cal-existing-comment.Fabrication\ Planning { background: #fff7ed; border-color: #fed7aa; }
+            .cal-existing-meta { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+            .cal-existing-meta.Inspection { color: #7c3aed; }
+            .cal-existing-meta.Material\ Planning { color: #0284c7; }
+            .cal-existing-meta.Fabrication\ Planning { color: var(--warn); }
+            .cal-existing-del { position: absolute; top: 7px; right: 8px; background: none; border: none; color: var(--border2); cursor: pointer; font-size: 15px; line-height: 1; padding: 0; transition: color .15s; }
+            .cal-existing-del:hover { color: var(--warn); }
+            .cal-comment-area { padding: 10px 20px 14px; }
+            .cal-input-label { font-size: 11px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-bottom: 5px; display: block; }
+            .cal-textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 7px 12px; font-size: 12px; color: var(--text); width: 100%; outline: none; transition: border-color .2s, box-shadow .2s; font-family: 'Figtree', ui-sans-serif, sans-serif; box-shadow: 0 1px 3px rgba(0,0,0,.06); resize: none; height: 68px; line-height: 1.5; }
+            .cal-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(10,124,85,.1); background: #fff; }
+            .cal-textarea[data-cat="Inspection"]:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,.08); }
+            .cal-textarea[data-cat="Material Planning"]:focus { border-color: #0284c7; box-shadow: 0 0 0 3px rgba(2,132,199,.08); }
+            .cal-textarea[data-cat="Fabrication Planning"]:focus { border-color: var(--warn); box-shadow: 0 0 0 3px rgba(200,71,10,.08); }
+            .cal-save-row { display: flex; align-items: center; justify-content: space-between; margin-top: 7px; }
+            .cal-char-count { font-size: 10px; color: var(--border2); }
+            .cal-save-btn { border: none; border-radius: 7px; padding: 6px 18px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; font-family: 'Figtree', ui-sans-serif, sans-serif; color: #fff; transition: all .2s; }
+            .cal-save-btn.Inspection { background: #7c3aed; box-shadow: 0 2px 6px rgba(124,58,237,.25); }
+            .cal-save-btn.Material\ Planning { background: #0284c7; box-shadow: 0 2px 6px rgba(2,132,199,.25); }
+            .cal-save-btn.Fabrication\ Planning { background: var(--warn); box-shadow: 0 2px 6px rgba(200,71,10,.25); }
+            .cal-save-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+            .cal-timeline-section { border-top: 1px solid var(--border); padding: 12px 20px 18px; background: var(--surface2); }
+            .cal-timeline-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+            .cal-timeline-title { font-size: 9px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+            .cal-timeline-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+            .cal-filter-pills { display: flex; gap: 4px; }
+            .cal-filter-pill { padding: 2px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; border: 1px solid var(--border2); background: none; color: var(--muted2); cursor: pointer; font-family: 'Figtree', ui-sans-serif, sans-serif; transition: all .15s; letter-spacing: .3px; }
+            .cal-filter-pill.active { background: var(--muted2); border-color: var(--muted2); color: #fff; }
+            .cal-filter-pill[data-f="Inspection"].active { background: #7c3aed; border-color: #7c3aed; }
+            .cal-filter-pill[data-f="Material Planning"].active { background: #0284c7; border-color: #0284c7; }
+            .cal-filter-pill[data-f="Fabrication Planning"].active { background: var(--warn); border-color: var(--warn); }
+            .cal-tl-empty { font-size: 11px; color: var(--border2); font-style: italic; text-align: center; padding: 12px 0; }
+            .cal-tl-item { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .12s; }
+            .cal-tl-item:last-child { border-bottom: none; }
+            .cal-tl-item:hover { background: rgba(10,124,85,.03); }
+            .cal-tl-left { display: flex; flex-direction: column; align-items: center; gap: 1px; flex-shrink: 0; width: 32px; }
+            .cal-tl-date-d { font-size: 15px; font-weight: 800; color: var(--text); line-height: 1; font-family: 'Figtree', ui-sans-serif, sans-serif; }
+            .cal-tl-date-m { font-size: 9px; font-weight: 700; color: var(--muted2); letter-spacing: 1px; text-transform: uppercase; }
+            .cal-tl-dot { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--surface2); flex-shrink: 0; margin-top: 3px; }
+            .cal-tl-dot.Inspection { background: #7c3aed; box-shadow: 0 0 0 2px rgba(124,58,237,.15); }
+            .cal-tl-dot.Material\ Planning { background: #0284c7; box-shadow: 0 0 0 2px rgba(2,132,199,.15); }
+            .cal-tl-dot.Fabrication\ Planning { background: var(--warn); box-shadow: 0 0 0 2px rgba(200,71,10,.15); }
+            .cal-tl-content { flex: 1; min-width: 0; padding-top: 1px; }
+            .cal-tl-cat { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1px; }
+            .cal-tl-cat.Inspection { color: #7c3aed; }
+            .cal-tl-cat.Material\ Planning { color: #0284c7; }
+            .cal-tl-cat.Fabrication\ Planning { color: var(--warn); }
+            .cal-tl-text { font-size: 11.5px; color: var(--text); line-height: 1.4; word-break: break-word; }
+            .cal-tl-past .cal-tl-date-d, .cal-tl-past .cal-tl-date-m, .cal-tl-past .cal-tl-text { opacity: .4; }
+          </style>
+          <div class="cal-card">
+            <div class="cal-header">
+              <button class="cal-nav" onclick="calMove(-1)">‹</button>
+              <div>
+                <span class="cal-month-label" id="cal-month-label"></span>
+                <span class="cal-year-label"  id="cal-year-label"></span>
+              </div>
+              <button class="cal-nav" onclick="calMove(1)">›</button>
+            </div>
+            <div class="cal-grid">
+              <div class="cal-dow">Mo</div>
+              <div class="cal-dow">Tu</div>
+              <div class="cal-dow">We</div>
+              <div class="cal-dow">Th</div>
+              <div class="cal-dow">Fr</div>
+              <div class="cal-dow">Sa</div>
+              <div class="cal-dow">Su</div>
+              <div id="cal-days"></div>
+            </div>
+          </div>
+          <div class="cal-panel">
+            <div class="cal-placeholder" id="cal-placeholder">↑ Click a date to add or view a comment</div>
+            <div id="cal-date-content" style="display:none;">
+              <div class="cal-date-banner" id="cal-date-banner">
+                <div class="cal-date-banner-text" id="cal-date-banner-text"></div>
+                <div class="cal-date-banner-sub"  id="cal-date-banner-sub"></div>
+              </div>
+              <div class="cal-cat-tabs">
+                <button class="cal-cat-tab active" data-cat="Inspection" onclick="calSwitchCat(this)"><div class="cal-tab-dot"></div>Inspection</button>
+                <button class="cal-cat-tab" data-cat="Material Planning" onclick="calSwitchCat(this)"><div class="cal-tab-dot"></div>Material</button>
+                <button class="cal-cat-tab" data-cat="Fabrication Planning" onclick="calSwitchCat(this)"><div class="cal-tab-dot"></div>Fabrication</button>
+              </div>
+              <div class="cal-comment-area">
+                <div class="cal-existing-comment" id="cal-existing-comment">
+                  <div class="cal-existing-meta" id="cal-existing-meta"></div>
+                  <div id="cal-existing-text"></div>
+                  <button class="cal-existing-del" onclick="calDeleteComment()" title="Delete">×</button>
+                </div>
+                <label class="cal-input-label" id="cal-input-label">Add comment</label>
+                <textarea class="cal-textarea" id="cal-textarea" placeholder="Type your comment…" oninput="calCharCount(this)"></textarea>
+                <div class="cal-save-row">
+                  <span class="cal-char-count" id="cal-char-count">0 / 300</span>
+                  <button class="cal-save-btn Inspection" id="cal-save-btn" onclick="calSaveComment()">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cal-timeline-section">
+            <div class="cal-timeline-header">
+              <span class="cal-timeline-title">All Comments</span>
+              <div class="cal-filter-pills">
+                <button class="cal-filter-pill active" data-f="all" onclick="calFilterTl(this)">All</button>
+                <button class="cal-filter-pill" data-f="Inspection" onclick="calFilterTl(this)">Insp.</button>
+                <button class="cal-filter-pill" data-f="Material Planning" onclick="calFilterTl(this)">Mat.</button>
+                <button class="cal-filter-pill" data-f="Fabrication Planning" onclick="calFilterTl(this)">Fab.</button>
+              </div>
+            </div>
+            <div id="cal-timeline"></div>
+          </div>
+          <script>
+            (function () {
+              var CAL_TODAY   = new Date();
+              var calCursor   = new Date(CAL_TODAY.getFullYear(), CAL_TODAY.getMonth(), 1);
+              var calSel      = null;
+              var calActiveCat  = 'Inspection';
+              var calTlFilter   = 'all';
+              var calComments   = {};
+              var CY = CAL_TODAY.getFullYear(), CM = CAL_TODAY.getMonth() + 1;
+              function seed(d, cat, txt) {
+                var k = iso(CY, CM, d);
+                if (!calComments[k]) calComments[k] = {};
+                calComments[k][cat] = txt;
+              }
+              seed(5,  'Inspection',           'Witness test at ABB factory');
+              seed(12, 'Material Planning',    'Steel delivery confirmation');
+              seed(12, 'Fabrication Planning', 'Start panel assembly, shift A');
+              seed(20, 'Inspection',           'Pre-FAT checklist review');
+              function iso(y, m, d) { return y + '-' + pad(m) + '-' + pad(d); }
+              function pad(n) { return String(n).padStart(2, '0'); }
+              function todayStr() { return iso(CAL_TODAY.getFullYear(), CAL_TODAY.getMonth() + 1, CAL_TODAY.getDate()); }
+              function calRender() {
+                var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                var y = calCursor.getFullYear(), m = calCursor.getMonth();
+                document.getElementById('cal-month-label').textContent = MONTHS[m];
+                document.getElementById('cal-year-label').textContent  = y;
+                var firstDow   = new Date(y, m, 1).getDay();
+                var offset     = firstDow === 0 ? 6 : firstDow - 1;
+                var daysInMo   = new Date(y, m + 1, 0).getDate();
+                var daysInPrev = new Date(y, m, 0).getDate();
+                var today      = todayStr();
+                var cont       = document.getElementById('cal-days');
+                cont.innerHTML = '';
+                var cells = [];
+                for (var i = offset - 1; i >= 0; i--)
+                  cells.push({ day: daysInPrev - i, own: false, ds: null });
+                for (var d = 1; d <= daysInMo; d++)
+                  cells.push({ day: d, own: true, ds: iso(y, m + 1, d) });
+                while (cells.length % 7 !== 0)
+                  cells.push({ day: cells.length - offset - daysInMo + 1, own: false, ds: null });
+                cells.forEach(function (cell, idx) {
+                  var el  = document.createElement('div');
+                  var cls = ['cal-day'];
+                  if (!cell.own)                           cls.push('cal-day-other');
+                  if (idx % 7 >= 5 && cell.own)           cls.push('cal-day-weekend');
+                  if (cell.ds === today)                   cls.push('cal-day-today');
+                  if (cell.ds === calSel && cell.own)      cls.push('cal-day-selected');
+                  el.className = cls.join(' ');
+                  var num = document.createElement('div');
+                  num.className   = 'cal-day-num';
+                  num.textContent = cell.day;
+                  el.appendChild(num);
+                  var dotRow = document.createElement('div');
+                  dotRow.className = 'cal-day-dots';
+                  if (cell.ds && calComments[cell.ds]) {
+                    Object.keys(calComments[cell.ds]).slice(0, 3).forEach(function (cat) {
+                      var dot = document.createElement('div');
+                      dot.className = 'cal-evt-dot ' + cat;
+                      dotRow.appendChild(dot);
+                    });
+                  }
+                  el.appendChild(dotRow);
+                  if (cell.own && cell.ds) {
+                    el.onclick = (function (ds) { return function () { calSelectDay(ds); }; })(cell.ds);
+                  }
+                  cont.appendChild(el);
+                });
+              }
+              function calSelectDay(ds) {
+                calSel = ds;
+                calRender();
+                var d      = new Date(ds);
+                var isToday = ds === todayStr();
+                var weekday = d.toLocaleDateString('en-GB', { weekday: 'long' });
+                var daymon  = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
+                document.getElementById('cal-date-banner-text').textContent = weekday + ', ' + daymon;
+                document.getElementById('cal-date-banner-sub').textContent  = isToday ? 'Today' : d.getFullYear();
+                document.getElementById('cal-placeholder').style.display    = 'none';
+                document.getElementById('cal-date-content').style.display   = 'block';
+                document.getElementById('cal-date-banner').style.display    = 'block';
+                calRefreshCommentArea();
+              }
+              window.calSwitchCat = function (btn) {
+                document.querySelectorAll('.cal-cat-tab').forEach(function (b) {
+                  b.classList.remove('active');
+                });
+                btn.classList.add('active');
+                calActiveCat = btn.dataset.cat;
+                calRefreshCommentArea();
+              };
+              function calRefreshCommentArea() {
+                if (!calSel) return;
+                var cat      = calActiveCat;
+                var existing = calComments[calSel] && calComments[calSel][cat] ? calComments[calSel][cat] : null;
+                var exEl     = document.getElementById('cal-existing-comment');
+                var inLabel  = document.getElementById('cal-input-label');
+                var ta       = document.getElementById('cal-textarea');
+                var saveBtn  = document.getElementById('cal-save-btn');
+                var meta     = document.getElementById('cal-existing-meta');
+                var exText   = document.getElementById('cal-existing-text');
+                ta.setAttribute('data-cat', cat);
+                saveBtn.className = 'cal-save-btn ' + cat;
+                if (existing) {
+                  exEl.className      = 'cal-existing-comment ' + cat;
+                  exEl.style.display  = 'block';
+                  meta.className      = 'cal-existing-meta ' + cat;
+                  meta.textContent    = cat;
+                  exText.textContent  = existing;
+                  inLabel.textContent = 'Update comment';
+                  ta.value            = existing;
+                } else {
+                  exEl.style.display  = 'none';
+                  inLabel.textContent = 'Add comment';
+                  ta.value            = '';
+                }
+                document.getElementById('cal-char-count').textContent = ta.value.length + ' / 300';
+              }
+              window.calCharCount = function (ta) {
+                ta.value = ta.value.slice(0, 300);
+                document.getElementById('cal-char-count').textContent = ta.value.length + ' / 300';
+              };
+              window.calSaveComment = function () {
+                if (!calSel) return;
+                var text = document.getElementById('cal-textarea').value.trim();
+                if (!text) { document.getElementById('cal-textarea').focus(); return; }
+                if (!calComments[calSel]) calComments[calSel] = {};
+                calComments[calSel][calActiveCat] = text;
+                calRender();
+                calRefreshCommentArea();
+                calRenderTimeline();
+              };
+              window.calDeleteComment = function () {
+                if (!calSel || !calComments[calSel]) return;
+                delete calComments[calSel][calActiveCat];
+                if (Object.keys(calComments[calSel]).length === 0) delete calComments[calSel];
+                calRender();
+                calRefreshCommentArea();
+                calRenderTimeline();
+              };
+              window.calMove = function (dir) {
+                calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth() + dir, 1);
+                calRender();
+              };
+              window.calFilterTl = function (btn) {
+                calTlFilter = btn.dataset.f;
+                document.querySelectorAll('.cal-filter-pill').forEach(function (b) {
+                  b.classList.remove('active');
+                });
+                btn.classList.add('active');
+                calRenderTimeline();
+              };
+              function calRenderTimeline() {
+                var el    = document.getElementById('cal-timeline');
+                var today = todayStr();
+                var all   = [];
+                Object.keys(calComments).forEach(function (ds) {
+                  Object.keys(calComments[ds]).forEach(function (cat) {
+                    all.push({ ds: ds, cat: cat, text: calComments[ds][cat] });
+                  });
+                });
+                all.sort(function (a, b) { return a.ds.localeCompare(b.ds); });
+                var filtered = calTlFilter === 'all' ? all : all.filter(function (e) { return e.cat === calTlFilter; });
+                if (!filtered.length) {
+                  el.innerHTML = '<div class="cal-tl-empty">No comments yet</div>';
+                  return;
+                }
+                el.innerHTML = filtered.map(function (ev) {
+                  var d      = new Date(ev.ds);
+                  var isPast = ev.ds < today;
+                  return '<div class="cal-tl-item' + (isPast ? ' cal-tl-past' : '') + '" onclick="calSelectDay(\'' + ev.ds + '\')">' + '<div class="cal-tl-left">' + '<div class="cal-tl-date-d">' + d.getDate() + '</div>' + '<div class="cal-tl-date-m">' + d.toLocaleDateString('en-GB', { month: 'short' }) + '</div>' + '</div>' + '<div class="cal-tl-dot ' + ev.cat + '"></div>' + '<div class="cal-tl-content">' + '<div class="cal-tl-cat ' + ev.cat + '">' + ev.cat + '</div>' + '<div class="cal-tl-text">' + ev.text + '</div>' + '</div>' + '</div>';
+                }).join('');
+              }
+              document.addEventListener('DOMContentLoaded', function () {
+                calRender();
+                calRenderTimeline();
+              });
+              window.calSelectDay = calSelectDay;
+            })();
+          </script>
+        </div>
+      </div>
     </div>
+    
     
   </div>
   <!-- RIGHT: EQUIPMENT LIST -->
@@ -1107,14 +1444,8 @@
       <div class="equipment-header">
         <h2><span class="panel-dot" style="margin-right:8px;"></span>Equipment</h2>
         <div class="equipment-btn-row">
-          <form action="{{ route('expediting_forms.send_email', request('context_id')) }}" method="POST" class="inline email-form">
-            @csrf
-            <button type="button" class="add-btn email-btn" title="Email to Supplier">
-              <span class="material-icons" style="font-size:18px;vertical-align:middle;"></span> Send Email to Supplier
-            </button>
-            <input type="hidden" class="supplier-name" value="{{ $supplier ?? 'Supplier' }}">
-          </form>
-          <button class="add-btn" onclick="openModal()">+ Add Equipment</button>
+          <!-- Email button temporarily removed -->
+          <button class="add-btn" onclick="openModal()" @if(!request('context_id')) disabled style="opacity:0.5;cursor:not-allowed;" @endif>+ Add Equipment</button>
         </div>
         <style>
           .equipment-btn-row {
@@ -1213,6 +1544,7 @@
         });
         </script>
       </div>
+      @if(request('context_id'))
       <div class="equipment-table-wrap">
         <div class="col-headers">
           <span>Type / Tag</span>
@@ -1237,6 +1569,7 @@
           <div style="padding:20px;color:#888;">No equipment found for this context.</div>
         @endforelse
       </div>
+      @endif
     </div>
 
   <!-- MODAL -->
@@ -1833,5 +2166,6 @@ function renderDeliveryCards() {
 
 document.addEventListener('DOMContentLoaded', renderDeliveryCards);
 </script>
+
 
 @endsection
