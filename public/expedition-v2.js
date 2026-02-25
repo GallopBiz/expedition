@@ -105,6 +105,12 @@ function saveEquipment() {
     openpoints: document.getElementById('eq-openpoints').value,
     remarks: document.getElementById('eq-remarks').value,
   };
+  // Add context_id from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const contextId = urlParams.get('context_id');
+  if (contextId) {
+    data.context_id = contextId;
+  }
   let isUpdate = currentIndex >= 0;
   if (isUpdate) equipments[currentIndex] = data; else equipments.push(data);
   renderEquipments();

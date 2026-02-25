@@ -689,21 +689,11 @@
               </div>
               <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
                 <div class="gauge-ring">
-                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill silver" id="ringFat" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="107.07" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:var(--muted);"/><text class="gauge-number" id="gaugeFatNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">29%</text></svg>
+                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill shipment" id="ringShipment" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="107.07" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#2563eb;"/><text class="gauge-number" id="gaugeShipmentNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">29%</text></svg>
                 </div>
                 <div>
                   <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">FAT Status</div>
                   <div class="gauge-value silver" id="gaugeFat" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--muted2);">29%</div>
-                  <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
-                </div>
-              </div>
-              <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
-                <div class="gauge-ring">
-                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill shipment" id="ringShipment" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="120" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#2563eb;"/><text class="gauge-number" id="gaugeShipmentNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">0%</text></svg>
-                </div>
-                <div>
-                  <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Ready for Shipment</div>
-                  <div class="gauge-value shipment" id="gaugeShipment" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:#2563eb;">0%</div>
                   <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
                 </div>
               </div>
@@ -747,23 +737,23 @@
         <div class="accordion-body">
           <div class="field-group">
             <div class="field-label">Work Package No.</div>
-            <input class="field-value" type="text" placeholder="Identifier" name="identifier">
+            <input class="field-value" type="text" placeholder="Work Package No." name="work_package_no" value="{{ $context->work_package_no ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">Work Package Name</div>
-            <input class="field-value" type="text" placeholder="Work Package Name" name="workpackage_name">
+            <input class="field-value" type="text" placeholder="Work Package Name" name="workpackage_name" value="{{ $context->workpackage_name ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">PO Number</div>
-            <input class="field-value" type="text" placeholder="PO Number" name="po_number">
+            <input class="field-value" type="text" placeholder="PO Number" name="po_number" value="{{ $context->po_number ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">Expediting Category</div>
             <select class="field-value" name="expediting_category">
               <option value="">Select Category</option>
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
+              <option value="Low" {{ ($context->expediting_category ?? '') == 'Low' ? 'selected' : '' }}>Low</option>
+              <option value="Medium" {{ ($context->expediting_category ?? '') == 'Medium' ? 'selected' : '' }}>Medium</option>
+              <option value="High" {{ ($context->expediting_category ?? '') == 'High' ? 'selected' : '' }}>High</option>
             </select>
             <script>
               document.addEventListener('DOMContentLoaded', function() {
@@ -790,47 +780,47 @@
               <option value="">Select Supplier</option>
               @foreach(\App\Models\ExpeditingForm::distinct()->orderBy('supplier')->pluck('supplier') as $supplier)
                 @if($supplier)
-                  <option value="{{ $supplier }}">{{ $supplier }}</option>
+                  <option value="{{ $supplier }}" {{ ($context->supplier ?? '') == $supplier ? 'selected' : '' }}>{{ $supplier }}</option>
                 @endif
               @endforeach
             </select>
           </div>
           <div class="field-group">
             <div class="field-label">Order Date</div>
-            <input class="field-value" type="date" placeholder="Order Date" name="order_date">
+            <input class="field-value" type="date" placeholder="Order Date" name="order_date" value="{{ $context->order_date ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">Forecast Delivery to Site</div>
-            <input class="field-value" type="date" placeholder="Forecast Delivery to Site" name="forecast_delivery_to_site">
+            <input class="field-value" type="date" placeholder="Forecast Delivery to Site" name="forecast_delivery_to_site" value="{{ $context->forecast_delivery_to_site ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">Incoterms</div>
             <select class="field-value" name="incoterms">
               <option value="">No Select</option>
-              <option value="Not Available">Not Available</option>
-              <option value="DAP">DAP</option>
+              <option value="Not Available" {{ ($context->incoterms ?? '') == 'Not Available' ? 'selected' : '' }}>Not Available</option>
+              <option value="DAP" {{ ($context->incoterms ?? '') == 'DAP' ? 'selected' : '' }}>DAP</option>
             </select>
           </div>
           <div class="field-group">
             <div class="field-label">Exyte Procurement Contract Manager</div>
-            <input class="field-value" type="text" placeholder="Exyte Procurement Contract Manager" name="exyte_procurement_contract_manager">
+            <input class="field-value" type="text" placeholder="Exyte Procurement Contract Manager" name="exyte_procurement_contract_manager" value="{{ $context->exyte_procurement_contract_manager ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">Customer Procurement Contact</div>
-            <input class="field-value" type="text" placeholder="Customer Procurement Contact" name="customer_procurement_contact">
+            <input class="field-value" type="text" placeholder="Customer Procurement Contact" name="customer_procurement_contact" value="{{ $context->customer_procurement_contact ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">Technical Workpackage Owner</div>
-            <input class="field-value" type="text" placeholder="Technical Workpackage Owner" name="technical_workpackage_owner">
+            <input class="field-value" type="text" placeholder="Technical Workpackage Owner" name="technical_workpackage_owner" value="{{ $context->technical_workpackage_owner ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">Expediting Contact</div>
-            <input class="field-value" type="text" placeholder="Expediting Contact" name="expediting_contact">
+            <input class="field-value" type="text" placeholder="Expediting Contact" name="expediting_contact" value="{{ $context->expediting_contact ?? '' }}">
             <input type="hidden" name="executions[0][expediting_contact]" id="exec_expediting_contact">
           </div>
           <div class="field-group">
             <div class="field-label">Workstream/Building</div>
-            <input class="field-value" type="text" placeholder="Workstream/Building" name="workstream_building">
+            <input class="field-value" type="text" placeholder="Workstream/Building" name="workstream_building" value="{{ $context->workstream_building ?? '' }}">
             <input type="hidden" name="executions[0][workstream_building]" id="exec_workstream_building">
           </div>
           <div style="display:none;">
@@ -843,9 +833,9 @@
             <div class="field-label" style="margin-bottom:8px;">MILESTONES <hr style="margin:0 0 8px 0; border: none; border-top: 1px solid #e0e0e0;"/></div>
             <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
               <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
-                <span style="margin-bottom:4px;">COMPLETED</span>
+                {{-- <span style="margin-bottom:4px;">COMPLETED</span>
                 <input type="checkbox" name="milestones[]" value="Completed" class="toggle-switch" style="display:none;">
-                <span class="custom-toggle"></span>
+                <span class="custom-toggle"></span> --}}
               </label>
               <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
                 <span style="margin-bottom:4px;">LLI</span>
@@ -995,9 +985,7 @@
     <!-- STATUS LEGEND -->
     <div class="dt-legend">
       <span><i class="ok"></i> On Time</span>
-      <span><i class="risk"></i> At Risk</span>
       <span><i class="late"></i> Late</span>
-      <span><i class="none"></i> No Date</span>
     </div>
 
     <!-- FILTER BAR -->
@@ -1006,7 +994,6 @@
       <div class="dt-filters">
         <button class="active" onclick="dtSetFilter('all', this)">All</button>
         <button onclick="dtSetFilter('late', this)">Late</button>
-        <button onclick="dtSetFilter('risk', this)">Risk</button>
         <button onclick="dtSetFilter('ok', this)">OK</button>
       </div>
       <div class="dt-count"><span id="dtCount">0</span>/<span id="dtTotal">0</span></div>
@@ -1046,26 +1033,21 @@
           <span>Fabrication</span>
           <span>FAT Status</span>
         </div>
-        <div class="equipment-row" onclick="openModal()">
-          <div class="eq-name"><span class="eq-status-dot dot-green"></span>RAHU 6801</div>
-          <div class="progress-cell">
-            <span class="progress-label">29%</span>
-            <div class="progress-bar"><div class="progress-fill green" style="width:29%"></div></div>
+        @php
+          $contextId = request()->query('context_id');
+          $filteredEquipments = $equipments->where('context_id', $contextId);
+        @endphp
+        @forelse($filteredEquipments as $equipment)
+          <div class="equipment-row" onclick="openModal(@json($equipment))">
+            <div class="eq-name"><div class="eq-status-dot dot-green"></div>{{ $equipment->name ?? $equipment->tag ?? '—' }}</div>
+            <div class="progress-cell"><div class="progress-label">{{ $equipment->design ?? 0 }}%</div><div class="progress-bar"><div class="progress-fill green" style="width:{{ $equipment->design ?? 0 }}%"></div></div></div>
+            <div class="progress-cell"><div class="progress-label">{{ $equipment->material ?? 0 }}%</div><div class="progress-bar"><div class="progress-fill blue" style="width:{{ $equipment->material ?? 0 }}%"></div></div></div>
+            <div class="progress-cell"><div class="progress-label">{{ $equipment->fab ?? 0 }}%</div><div class="progress-bar"><div class="progress-fill warn" style="width:{{ $equipment->fab ?? 0 }}%"></div></div></div>
+            <div class="progress-cell"><div class="progress-label">{{ $equipment->fat ?? 0 }}%</div><div class="progress-bar"><div class="progress-fill silver" style="width:{{ $equipment->fat ?? 0 }}%"></div></div></div>
           </div>
-          <div class="progress-cell">
-            <span class="progress-label">60%</span>
-            <div class="progress-bar"><div class="progress-fill blue" style="width:60%"></div></div>
-          </div>
-          <div class="progress-cell">
-            <span class="progress-label">90%</span>
-            <div class="progress-bar"><div class="progress-fill warn" style="width:90%"></div></div>
-          </div>
-          <div class="progress-cell">
-            <span class="progress-label">73%</span>
-            <div class="progress-bar"><div class="progress-fill silver" style="width:73%"></div></div>
-          </div>
-        </div>
-        <!-- Add more equipment rows here as needed -->
+        @empty
+          <div style="padding:20px;color:#888;">No equipment found for this context.</div>
+        @endforelse
       </div>
     </div>
 
@@ -1415,14 +1397,17 @@
       <script>
         function openModal(equipment) {
           document.getElementById('modalOverlay').classList.add('active');
-          // Populate modal fields if equipment data is provided
+          // Support both index and object for backward compatibility
+          if (typeof equipment === 'number' && window.equipments && Array.isArray(window.equipments)) {
+            equipment = window.equipments[equipment];
+          }
           if (equipment) {
             document.getElementById('modalTitle').textContent = equipment.name || 'Equipment';
             document.getElementById('eq-name').value = equipment.name || '';
             document.getElementById('eq-subsupplier').value = equipment.subsupplier || '';
             document.getElementById('eq-qty').value = equipment.qty || '';
             document.getElementById('eq-place').value = equipment.place || '';
-            document.getElementById('eq-orderstatus').value = equipment.orderstatus || '';
+            document.getElementById('eq-orderstatus').value = equipment.order_status || equipment.orderstatus || '';
             document.getElementById('eq-drawing').value = equipment.drawing || '';
             document.getElementById('eq-scope').value = equipment.scope || '';
             document.getElementById('eq-design').value = equipment.design || 0;
@@ -1490,6 +1475,12 @@
             remarks: document.getElementById('eq-remarks').value,
             checks: Array.from(document.querySelectorAll('.modal-checkboxes .check-item')).map(item => item.classList.contains('checked')),
           };
+          // Add context_id from URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const contextId = urlParams.get('context_id');
+          if (contextId) {
+            data.context_id = contextId;
+          }
           // CSRF token from meta tag
           const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
           fetch('/expediting-equipments', {

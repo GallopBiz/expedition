@@ -76,6 +76,96 @@
                 <div class="mb-6">
                     <h3 class="text-lg md:text-2xl font-bold text-[#01426a] mb-2 tracking-wide">Context Information</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full">
+            <div>
+                <label for="lli" class="block text-sm font-medium text-gray-700">LLI?</label>
+                <div class="locked-wrapper">
+                    <select name="lli" id="lli" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
+                        <option value="">Select</option>
+                        <option value="1" @if(old('lli', isset($expeditingForm) ? (string)(optional($expeditingForm->context)->lli ?? $expeditingForm->lli) : '')==='1') selected @endif>Yes</option>
+                        <option value="0" @if(old('lli', isset($expeditingForm) ? (string)(optional($expeditingForm->context)->lli ?? $expeditingForm->lli) : '')==='0') selected @endif>No</option>
+                    </select>
+                </div>
+                @error('lli')
+                    <div class="text-red-600 text-xs mt-1">{{ $message }}</div>
+                @enderror
+            </div>
+            <div>
+                <label for="contract_data_available_dmcs" class="block text-sm font-medium text-gray-700">Contract Data Available (DMCS)</label>
+                <div class="flex items-center mt-1">
+                    <input type="hidden" name="contract_data_available_dmcs" value="0">
+                    <label class="relative inline-flex items-center cursor-pointer" style="position:relative;">
+                        @php
+                            $dmcsValue = old('contract_data_available_dmcs', isset($expeditingForm) ? (optional($expeditingForm->context)->contract_data_available_dmcs ?? $expeditingForm->contract_data_available_dmcs) : '');
+                            $dmcsChecked = ($dmcsValue === '1' || $dmcsValue === 1 || $dmcsValue === true);
+                        @endphp
+                        <input type="checkbox" name="contract_data_available_dmcs" id="contract_data_available_dmcs" value="1" @if($dmcsChecked) checked @endif style="display:none;" onchange="this.nextElementSibling.style.background = this.checked ? '#01426a' : '#e5e7eb'; this.nextElementSibling.nextElementSibling.style.transform = this.checked ? 'translateX(20px)' : 'translateX(0)';">
+                        <span id="dmcs_status_bg" style="width:44px;height:24px;background:{{ $dmcsChecked ? '#01426a' : '#e5e7eb' }};border-radius:999px;display:inline-block;transition:background .2s;position:relative;"></span>
+                        <span id="dmcs_status_knob" style="width:20px;height:20px;background:#fff;border-radius:999px;position:absolute;top:2px;left:2px;transition:transform .2s;{{ $dmcsChecked ? 'transform:translateX(20px);' : '' }}"></span>
+                    </label>
+                    <span class="ml-3 text-sm">Yes/No</span>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            var cb = document.getElementById('contract_data_available_dmcs');
+                            var bg = document.getElementById('dmcs_status_bg');
+                            var knob = document.getElementById('dmcs_status_knob');
+                            if(cb && bg && knob) {
+                                if(cb.checked) {
+                                    bg.style.background = '#01426a';
+                                    knob.style.transform = 'translateX(20px)';
+                                } else {
+                                    bg.style.background = '#e5e7eb';
+                                    knob.style.transform = 'translateX(0)';
+                                }
+                            }
+                        });
+                    </script>
+                </div>
+                @error('contract_data_available_dmcs')
+                    <div class="text-red-600 text-xs mt-1">{{ $message }}</div>
+                @enderror
+            </div>
+            <div>
+                <label for="kickoff_status" class="block text-sm font-medium text-gray-700">Kick-off Status</label>
+                <div class="flex items-center mt-1">
+                    <input type="hidden" name="kickoff_status" value="No">
+                    <label class="relative inline-flex items-center cursor-pointer" style="position:relative;">
+                        @php
+                            $kickoffValue = old('kickoff_status', isset($expeditingForm) ? (optional($expeditingForm->context)->kickoff_status ?? $expeditingForm->kickoff_status) : '');
+                            $kickoffChecked = ($kickoffValue === 'Yes' || $kickoffValue === 1 || $kickoffValue === true || $kickoffValue === '1');
+                        @endphp
+                        <input type="checkbox" name="kickoff_status" id="kickoff_status" value="Yes" @if($kickoffChecked) checked @endif style="display:none;" onchange="this.nextElementSibling.style.background = this.checked ? '#01426a' : '#e5e7eb'; this.nextElementSibling.nextElementSibling.style.transform = this.checked ? 'translateX(20px)' : 'translateX(0)';">
+                        <span id="kickoff_status_bg" style="width:44px;height:24px;background:{{ $kickoffChecked ? '#01426a' : '#e5e7eb' }};border-radius:999px;display:inline-block;transition:background .2s;position:relative;"></span>
+                        <span id="kickoff_status_knob" style="width:20px;height:20px;background:#fff;border-radius:999px;position:absolute;top:2px;left:2px;transition:transform .2s;{{ $kickoffChecked ? 'transform:translateX(20px);' : '' }}"></span>
+                    </label>
+                    <span class="ml-3 text-sm">On/Off</span>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            var cb = document.getElementById('kickoff_status');
+                            var bg = document.getElementById('kickoff_status_bg');
+                            var knob = document.getElementById('kickoff_status_knob');
+                            if(cb && bg && knob) {
+                                if(cb.checked) {
+                                    bg.style.background = '#01426a';
+                                    knob.style.transform = 'translateX(20px)';
+                                } else {
+                                    bg.style.background = '#e5e7eb';
+                                    knob.style.transform = 'translateX(0)';
+                                }
+                            }
+                        });
+                    </script>
+                </div>
+                @error('kickoff_status')
+                    <div class="text-red-600 text-xs mt-1">{{ $message }}</div>
+                @enderror
+            </div>
+        <div>
+            <label for="work_package_no" class="block text-sm font-medium text-gray-700">Work Package No</label>
+            <input type="text" name="work_package_no" id="work_package_no" value="{{ old('work_package_no', isset($expeditingForm) ? (optional($expeditingForm->context)->work_package_no ?? $expeditingForm->work_package_no) : '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans">
+            @error('work_package_no')
+                <div class="text-red-600 text-xs mt-1">{{ $message }}</div>
+            @enderror
+        </div>
     <div>
         <label for="work_package" class="block text-sm font-medium text-gray-700">Work package</label>
         <input type="text" name="work_package" id="work_package" value="{{ old('work_package', isset($expeditingForm) ? $expeditingForm->work_package : '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none text-sm font-sans" required>

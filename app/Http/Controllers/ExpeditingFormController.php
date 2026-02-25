@@ -398,6 +398,7 @@ class ExpeditingFormController extends Controller
         $validated = $request->validate([
             // Context fields
             'workpackage_name' => 'required|string|max:255',
+            'work_package_no' => 'nullable|string|max:255',
             'supplier' => 'required|string|max:255',
             'po_number' => 'nullable|string|max:255',
             'lli' => 'nullable',
@@ -430,6 +431,7 @@ class ExpeditingFormController extends Controller
                 'po_number' => $validated['po_number'],
             ],
             [
+                'work_package_no' => $validated['work_package_no'] ?? null,
                 'lli' => $validated['lli'] ?? null,
                 'expediting_category' => $validated['expediting_category'] ?? null,
                 'order_date' => $validated['order_date'] ?? null,

@@ -10,6 +10,7 @@ class ExpeditingEquipmentController extends Controller
     {
         $validated = $request->validate([
             'expediting_form_id' => 'required|exists:expediting_forms,id',
+            'context_id' => 'required|exists:expediting_contexts,id',
             'name' => 'required|string|max:255',
             'design' => 'nullable|integer',
             'material' => 'nullable|integer',

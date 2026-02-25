@@ -310,7 +310,9 @@
         <span class="badge-delivered {{ $isDelivered ? 'badge-delivered-yes' : 'badge-delivered-no' }}">
           Delivered {{ $isDelivered ? 'Yes' : 'No' }}
         </span>
-        <a href="{{ route('expediting_forms.edit', $form->id) }}" class="action-btn btn-view">Manage</a>
+        <!-- Hide Manage button and add View button -->
+        <!-- <a href="{{ route('expediting_forms.edit', $form->id) }}" class="action-btn btn-view">Manage</a> -->
+        <a href="/supplier/expedition-v2?context_id={{ $form->context_id ?? $form->id }}&edit=1" class="action-btn btn-view" target="_blank">View</a>
       </div>
     </div>
     @endforeach

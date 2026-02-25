@@ -9,6 +9,7 @@ class ExpeditingContext extends Model
     protected $fillable = [
         'supplier',
         'workpackage_name',
+        'work_package_no',
         'po_number',
         'lli',
         'expediting_category',
@@ -19,6 +20,7 @@ class ExpeditingContext extends Model
         'customer_procurement_contact',
         'kickoff_status',
         'technical_workpackage_owner',
+        'forecast_delivery_to_site',
     ];
 
     public function executions()
