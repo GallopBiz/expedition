@@ -688,55 +688,63 @@
               <span id="collapseArrow" class="collapse-arrow" style="width:22px;height:22px;border:1px solid var(--border2);border-radius:5px;display:flex;align-items:center;justify-content:center;color:var(--muted2);font-size:10px;transition:transform 0.25s,background 0.15s;background:var(--surface2);">▲</span>
             </div>
           </div>
-          <div class="overall-body" id="overallBody">
+          <div class="overall-body open" id="overallBody">
             <div class="gauges-strip" style="display:flex;gap:14px;padding:18px 32px 22px;border-top:1px solid var(--border);">
+              @php
+                $count = $equipments->count() ?: 1;
+                $avgDesign = round($equipments->avg('design'));
+                $avgMaterial = round($equipments->avg('material'));
+                $avgFab = round($equipments->avg('fab'));
+                $avgFat = round($equipments->avg('fat'));
+                $avgDelivered = round($equipments->avg('delivered'));
+              @endphp
               <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
                 <div class="gauge-ring">
-                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill green" id="ringDesign" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="89.97" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:var(--accent);"/><text class="gauge-number" id="gaugeDesignNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">41%</text></svg>
+                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill green" id="ringDesign" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="{{ 150.8 - ($avgDesign/100)*150.8 }}" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:var(--accent);"/><text class="gauge-number" id="gaugeDesignNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">{{ $avgDesign }}%</text></svg>
                 </div>
                 <div>
                   <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Design Status</div>
-                  <div class="gauge-value green" id="gaugeDesign" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--accent);">41%</div>
+                  <div class="gauge-value green" id="gaugeDesign" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--accent);">{{ $avgDesign }}%</div>
                   <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
                 </div>
               </div>
               <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
                 <div class="gauge-ring">
-                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill blue" id="ringMaterial" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="91.99" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:var(--accent2);"/><text class="gauge-number" id="gaugeMaterialNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">39%</text></svg>
+                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill blue" id="ringMaterial" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="{{ 150.8 - ($avgMaterial/100)*150.8 }}" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:var(--accent2);"/><text class="gauge-number" id="gaugeMaterialNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">{{ $avgMaterial }}%</text></svg>
                 </div>
                 <div>
                   <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Material Status</div>
-                  <div class="gauge-value blue" id="gaugeMaterial" style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--accent2);">39%</div>
+                  <div class="gauge-value blue" id="gaugeMaterial" style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--accent2);">{{ $avgMaterial }}%</div>
                   <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
                 </div>
               </div>
               <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
                 <div class="gauge-ring">
-                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill warn" id="ringFab" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="93.5" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:var(--warn);"/><text class="gauge-number" id="gaugeFabNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">38%</text></svg>
+                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill warn" id="ringFab" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="{{ 150.8 - ($avgFab/100)*150.8 }}" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:var(--warn);"/><text class="gauge-number" id="gaugeFabNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">{{ $avgFab }}%</text></svg>
                 </div>
                 <div>
                   <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Fabrication Status</div>
-                  <div class="gauge-value warn" id="gaugeFab" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--warn);">38%</div>
+                  <div class="gauge-value warn" id="gaugeFab" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--warn);">{{ $avgFab }}%</div>
                   <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
                 </div>
               </div>
               <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
                 <div class="gauge-ring">
-                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill shipment" id="ringShipment" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="107.07" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#2563eb;"/><text class="gauge-number" id="gaugeShipmentNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">29%</text></svg>
+                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill shipment" id="ringShipment" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="{{ 150.8 - ($avgFat/100)*150.8 }}" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#2563eb;"/><text class="gauge-number" id="gaugeShipmentNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">{{ $avgFat }}%</text></svg>
                 </div>
                 <div>
                   <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">FAT Status</div>
-                  <div class="gauge-value silver" id="gaugeFat" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--muted2);">29%</div>
+                  <div class="gauge-value silver" id="gaugeFat" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--muted2);">{{ $avgFat }}%</div>
                   <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
                 </div>
               </div>
               <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
                 <div class="gauge-ring">
-                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill delivered" id="ringDelivered" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="130" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#01426a;"/><text class="gauge-number" id="gaugeDeliveredNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">0%</text></svg>
+                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill delivered" id="ringDelivered" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="{{ 150.8 - ($avgDelivered/100)*150.8 }}" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#01426a;"/><text class="gauge-number" id="gaugeDeliveredNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">{{ $avgDelivered }}%</text></svg>
                 </div>
                 <div>
                   <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Delivered</div>
-                  <div class="gauge-value delivered" id="gaugeDelivered" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:#01426a;">0%</div>
+                  <div class="gauge-value delivered" id="gaugeDelivered" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:#01426a;">{{ $avgDelivered }}%</div>
                   <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
                 </div>
               </div>
