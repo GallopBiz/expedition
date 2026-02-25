@@ -1106,7 +1106,112 @@
     <div class="right-panel">
       <div class="equipment-header">
         <h2><span class="panel-dot" style="margin-right:8px;"></span>Equipment</h2>
-        <button class="add-btn" onclick="openModal()">+ Add Equipment</button>
+        <div class="equipment-btn-row">
+          <form action="{{ route('expediting_forms.send_email', request('context_id')) }}" method="POST" class="inline email-form">
+            @csrf
+            <button type="button" class="add-btn email-btn" title="Email to Supplier">
+              <span class="material-icons" style="font-size:18px;vertical-align:middle;"></span> Send Email to Supplier
+            </button>
+            <input type="hidden" class="supplier-name" value="{{ $supplier ?? 'Supplier' }}">
+          </form>
+          <button class="add-btn" onclick="openModal()">+ Add Equipment</button>
+        </div>
+        <style>
+          .equipment-btn-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+          }
+        </style>
+            <style>
+              .btn.btn-email {
+                background: linear-gradient(90deg,#2563eb,#1d4ed8);
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                padding: 10px 28px;
+                margin-right: 12px;
+                box-shadow: 0 2px 8px rgba(37,99,235,0.12);
+                transition: background 0.2s;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+              }
+              .btn.btn-email:hover {
+                background: linear-gradient(90deg,#1d4ed8,#2563eb);
+              }
+              .btn.btn-add-equipment {
+                background: linear-gradient(90deg,#0a7c55,#16a34a);
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                padding: 10px 28px;
+                box-shadow: 0 2px 8px rgba(10,124,85,0.12);
+                transition: background 0.2s;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+              }
+              .btn.btn-add-equipment:hover {
+                background: linear-gradient(90deg,#16a34a,#0a7c55);
+              }
+            </style>
+        <!-- Email Confirmation Modal -->
+        <div id="emailConfirmModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
+          <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center border-t-8 border-green-600 relative animate-fade-in">
+            <div class="flex flex-col items-center mb-4">
+              <div id="emailConfirmText" class="text-gray-900 font-bold text-lg mb-1"></div>
+              <div class="text-gray-600 text-base mb-4">Are you sure you want to send this expediting form link to the supplier?</div>
+            </div>
+            <div class="flex justify-center gap-4 mt-2">
+              <button id="emailConfirmYes" class="px-6 py-2 rounded-lg bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold shadow hover:from-green-600 hover:to-green-800 transition">Yes, Send Email</button>
+              <button id="emailConfirmNo" class="px-6 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold shadow hover:bg-gray-300 transition">Cancel</button>
+            </div>
+            <button id="emailConfirmClose" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl leading-none">&times;</button>
+          </div>
+        </div>
+        <style>
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fade-in 0.3s ease; }
+        </style>
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          let modal = document.getElementById('emailConfirmModal');
+          let confirmText = document.getElementById('emailConfirmText');
+          let yesBtn = document.getElementById('emailConfirmYes');
+          let noBtn = document.getElementById('emailConfirmNo');
+          let closeBtn = document.getElementById('emailConfirmClose');
+          let formToSubmit = null;
+          document.querySelectorAll('.email-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+              e.preventDefault();
+              formToSubmit = btn.closest('form');
+              let supplierName = formToSubmit.querySelector('.supplier-name').value;
+              confirmText.innerHTML = '<span class="text-green-700">Send email to <b>' + supplierName + '</b>?</span>';
+              modal.classList.remove('hidden');
+            });
+          });
+          yesBtn.addEventListener('click', function() {
+            if (formToSubmit) formToSubmit.submit();
+            modal.classList.add('hidden');
+          });
+          noBtn.addEventListener('click', function() {
+            modal.classList.add('hidden');
+          });
+          closeBtn.addEventListener('click', function() {
+            modal.classList.add('hidden');
+          });
+        });
+        </script>
       </div>
       <div class="equipment-table-wrap">
         <div class="col-headers">
