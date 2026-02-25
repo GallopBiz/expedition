@@ -272,34 +272,44 @@
       </div>
       @endif
       <hr class="card-divider">
+      <div style="font-size: .85rem; color: var(--text-mid); margin-bottom: 0.2rem;">
+        <strong>Delivered:</strong> {{ $form->delivered_equipment ?? 0 }}/{{ $form->total_equipment ?? 0 }}
+      </div>
       <div class="circles-row">
         <div class="circle-item">
-          <div class="circle-wrap" data-pct="{{ $form->design_status ?? 0 }}">
+          <div class="circle-wrap" data-pct="{{ $form->avg_design ?? 0 }}">
             <svg class="circle-svg" viewBox="0 0 38 38"><circle class="circle-track" cx="19" cy="19" r="15.5"/><circle class="circle-fill" cx="19" cy="19" r="15.5" stroke-dasharray="97.4 97.4" stroke-dashoffset="97.4"/></svg>
-            <span class="circle-pct">{{ $form->design_status ?? 0 }}%</span>
+            <span class="circle-pct">{{ $form->avg_design ?? 0 }}%</span>
           </div>
           <span class="circle-label">Design</span>
         </div>
         <div class="circle-item">
-          <div class="circle-wrap" data-pct="{{ $form->material_status ?? 0 }}">
+          <div class="circle-wrap" data-pct="{{ $form->avg_material ?? 0 }}">
             <svg class="circle-svg" viewBox="0 0 38 38"><circle class="circle-track" cx="19" cy="19" r="15.5"/><circle class="circle-fill" cx="19" cy="19" r="15.5" stroke-dasharray="97.4 97.4" stroke-dashoffset="97.4"/></svg>
-            <span class="circle-pct">{{ $form->material_status ?? 0 }}%</span>
+            <span class="circle-pct">{{ $form->avg_material ?? 0 }}%</span>
           </div>
           <span class="circle-label">Material</span>
         </div>
         <div class="circle-item">
-          <div class="circle-wrap" data-pct="{{ $form->fabrication_status ?? 0 }}">
+          <div class="circle-wrap" data-pct="{{ $form->avg_fabrication ?? 0 }}">
             <svg class="circle-svg" viewBox="0 0 38 38"><circle class="circle-track" cx="19" cy="19" r="15.5"/><circle class="circle-fill" cx="19" cy="19" r="15.5" stroke-dasharray="97.4 97.4" stroke-dashoffset="97.4"/></svg>
-            <span class="circle-pct">{{ $form->fabrication_status ?? 0 }}%</span>
+            <span class="circle-pct">{{ $form->avg_fabrication ?? 0 }}%</span>
           </div>
           <span class="circle-label">Fabrication</span>
         </div>
         <div class="circle-item">
-          <div class="circle-wrap" data-pct="{{ $form->fat_status ?? 0 }}">
+          <div class="circle-wrap" data-pct="{{ $form->avg_fat ?? 0 }}">
             <svg class="circle-svg" viewBox="0 0 38 38"><circle class="circle-track" cx="19" cy="19" r="15.5"/><circle class="circle-fill" cx="19" cy="19" r="15.5" stroke-dasharray="97.4 97.4" stroke-dashoffset="97.4"/></svg>
-            <span class="circle-pct">{{ $form->fat_status ?? 0 }}%</span>
+            <span class="circle-pct">{{ $form->avg_fat ?? 0 }}%</span>
           </div>
           <span class="circle-label">FAT</span>
+        </div>
+        <div class="circle-item">
+          <div class="circle-wrap" data-pct="{{ $form->total_equipment ? round(($form->delivered_equipment / max($form->total_equipment,1)) * 100) : 0 }}">
+            <svg class="circle-svg" viewBox="0 0 38 38"><circle class="circle-track" cx="19" cy="19" r="15.5"/><circle class="circle-fill" cx="19" cy="19" r="15.5" stroke-dasharray="97.4 97.4" stroke-dashoffset="97.4"/></svg>
+            <span class="circle-pct">{{ $form->delivered_equipment ?? 0 }}/{{ $form->total_equipment ?? 0 }}</span>
+          </div>
+          <span class="circle-label">Delivered</span>
         </div>
       </div>
       <div class="card-actions">

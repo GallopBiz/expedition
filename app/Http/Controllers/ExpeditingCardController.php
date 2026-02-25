@@ -42,6 +42,15 @@ class ExpeditingCardController extends Controller
         foreach ($expeditingForms as $form) {
             $supplierUser = \App\Models\User::where('role', 'Supplier')->where('name', $form->supplier)->first();
             $form->supplier_email = $supplierUser ? $supplierUser->email : null;
+            // Calculate average progress for each status using ExpeditingEquipment for this context_id
+            $equipments = \App\Models\ExpeditingEquipment::where('context_id', $form->context_id)->get();
+            $form->avg_design = $equipments->count() ? round($equipments->avg('design')) : 0;
+            $form->avg_material = $equipments->count() ? round($equipments->avg('material')) : 0;
+            $form->avg_fabrication = $equipments->count() ? round($equipments->avg('fab')) : 0;
+            $form->avg_fat = $equipments->count() ? round($equipments->avg('fat')) : 0;
+            // Delivered/Total equipment count
+            $form->total_equipment = $equipments->count();
+            $form->delivered_equipment = $equipments->where('status', 'Delivered')->count();
         }
         return view('expediting.cards', compact('expeditingForms'));
     }

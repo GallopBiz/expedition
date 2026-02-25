@@ -697,6 +697,8 @@
                 $avgFab = round($equipments->avg('fab'));
                 $avgFat = round($equipments->avg('fat'));
                 $avgDelivered = round($equipments->avg('delivered'));
+                $deliveredCount = $equipments->where('status', 'Delivered')->count();
+                $totalCount = $equipments->count();
               @endphp
               <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
                 <div class="gauge-ring">
@@ -740,12 +742,12 @@
               </div>
               <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
                 <div class="gauge-ring">
-                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill delivered" id="ringDelivered" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="{{ 150.8 - ($avgDelivered/100)*150.8 }}" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#01426a;"/><text class="gauge-number" id="gaugeDeliveredNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">{{ $avgDelivered }}%</text></svg>
+                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill delivered" id="ringDelivered" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="{{ $totalCount ? (150.8 - ($deliveredCount/$totalCount)*150.8) : 150.8 }}" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#3cb546;"/><text class="gauge-number" id="gaugeDeliveredNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">{{ $deliveredCount }}/{{ $totalCount }}</text></svg>
                 </div>
                 <div>
                   <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Delivered</div>
-                  <div class="gauge-value delivered" id="gaugeDelivered" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:#01426a;">{{ $avgDelivered }}%</div>
-                  <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
+                  <div class="gauge-value delivered" id="gaugeDelivered" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:#3cb546;">{{ $deliveredCount }}/{{ $totalCount }}</div>
+                  <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Delivered/Total</div>
                 </div>
               </div>
             </div>
@@ -778,19 +780,19 @@
         <div class="accordion-body">
           <div class="field-group">
             <div class="field-label">Work Package No.</div>
-            <input class="field-value" type="text" placeholder="Work Package No." name="work_package_no" value="{{ $context->work_package_no ?? '' }}">
+            <input class="field-value" type="text" placeholder="Work Package No." name="work_package_no" value="{{ $context->work_package_no ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
           </div>
           <div class="field-group">
             <div class="field-label">Work Package Name</div>
-            <input class="field-value" type="text" placeholder="Work Package Name" name="workpackage_name" value="{{ $context->workpackage_name ?? '' }}">
+            <input class="field-value" type="text" placeholder="Work Package Name" name="workpackage_name" value="{{ $context->workpackage_name ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
           </div>
           <div class="field-group">
             <div class="field-label">PO Number</div>
-            <input class="field-value" type="text" placeholder="PO Number" name="po_number" value="{{ $context->po_number ?? '' }}">
+            <input class="field-value" type="text" placeholder="PO Number" name="po_number" value="{{ $context->po_number ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
           </div>
           <div class="field-group">
             <div class="field-label">Expediting Category</div>
-            <select class="field-value" name="expediting_category">
+            <select class="field-value" name="expediting_category" @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
               <option value="">Select Category</option>
               <option value="Low" {{ ($context->expediting_category ?? '') == 'Low' ? 'selected' : '' }}>Low</option>
               <option value="Medium" {{ ($context->expediting_category ?? '') == 'Medium' ? 'selected' : '' }}>Medium</option>
@@ -817,7 +819,7 @@
           </div>
           <div class="field-group">
             <div class="field-label">Supplier</div>
-            <select class="field-value" name="supplier">
+            <select class="field-value" name="supplier" @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
               <option value="">Select Supplier</option>
               @foreach(\App\Models\ExpeditingForm::distinct()->orderBy('supplier')->pluck('supplier') as $supplier)
                 @if($supplier)
@@ -828,15 +830,15 @@
           </div>
           <div class="field-group">
             <div class="field-label">Order Date</div>
-            <input class="field-value" type="date" placeholder="Order Date" name="order_date" value="{{ $context->order_date ?? '' }}">
+            <input class="field-value" type="date" placeholder="Order Date" name="order_date" value="{{ $context->order_date ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
           </div>
           <div class="field-group">
             <div class="field-label">Forecast Delivery to Site</div>
-            <input class="field-value" type="date" placeholder="Forecast Delivery to Site" name="forecast_delivery_to_site" value="{{ $context->forecast_delivery_to_site ?? '' }}">
+            <input class="field-value" type="date" placeholder="Forecast Delivery to Site" name="forecast_delivery_to_site" value="{{ $context->forecast_delivery_to_site ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
           </div>
           <div class="field-group">
             <div class="field-label">Incoterms</div>
-            <select class="field-value" name="incoterms">
+            <select class="field-value" name="incoterms" @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
               <option value="">No Select</option>
               <option value="Not Available" {{ ($context->incoterms ?? '') == 'Not Available' ? 'selected' : '' }}>Not Available</option>
               <option value="DAP" {{ ($context->incoterms ?? '') == 'DAP' ? 'selected' : '' }}>DAP</option>
@@ -844,24 +846,24 @@
           </div>
           <div class="field-group">
             <div class="field-label">Exyte Procurement Contract Manager</div>
-            <input class="field-value" type="text" placeholder="Exyte Procurement Contract Manager" name="exyte_procurement_contract_manager" value="{{ $context->exyte_procurement_contract_manager ?? '' }}">
+            <input class="field-value" type="text" placeholder="Exyte Procurement Contract Manager" name="exyte_procurement_contract_manager" value="{{ $context->exyte_procurement_contract_manager ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
           </div>
           <div class="field-group">
             <div class="field-label">Customer Procurement Contact</div>
-            <input class="field-value" type="text" placeholder="Customer Procurement Contact" name="customer_procurement_contact" value="{{ $context->customer_procurement_contact ?? '' }}">
+            <input class="field-value" type="text" placeholder="Customer Procurement Contact" name="customer_procurement_contact" value="{{ $context->customer_procurement_contact ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
           </div>
           <div class="field-group">
             <div class="field-label">Technical Workpackage Owner</div>
-            <input class="field-value" type="text" placeholder="Technical Workpackage Owner" name="technical_workpackage_owner" value="{{ $context->technical_workpackage_owner ?? '' }}">
+            <input class="field-value" type="text" placeholder="Technical Workpackage Owner" name="technical_workpackage_owner" value="{{ $context->technical_workpackage_owner ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
           </div>
           <div class="field-group">
             <div class="field-label">Expediting Contact</div>
-            <input class="field-value" type="text" placeholder="Expediting Contact" name="expediting_contact" value="{{ $context->expediting_contact ?? '' }}">
+            <input class="field-value" type="text" placeholder="Expediting Contact" name="expediting_contact" value="{{ $context->expediting_contact ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
             <input type="hidden" name="executions[0][expediting_contact]" id="exec_expediting_contact">
           </div>
           <div class="field-group">
             <div class="field-label">Workstream/Building</div>
-            <input class="field-value" type="text" placeholder="Workstream/Building" name="workstream_building" value="{{ $context->workstream_building ?? '' }}">
+            <input class="field-value" type="text" placeholder="Workstream/Building" name="workstream_building" value="{{ $context->workstream_building ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
             <input type="hidden" name="executions[0][workstream_building]" id="exec_workstream_building">
           </div>
           <div style="display:none;">
