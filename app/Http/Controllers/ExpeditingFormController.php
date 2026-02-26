@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use App\Mail\SupplierExpeditingFormLink;
@@ -8,8 +9,6 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\ExpeditingContext;
 use App\Models\ExpeditingForm;
-
-
 
 
 class ExpeditingFormController extends Controller
@@ -95,6 +94,31 @@ class ExpeditingFormController extends Controller
             'emailLogs' => $emailLogs,
             'actualDeliveryHistories' => $actualDeliveryHistories,
         ]);
+    }
+
+        // API: Get all work packages and their equipment for a context
+    public function getWorkPackagesByContext(Request $request)
+    {
+        $context_id = $request->query('context_id');
+        if (!$context_id) {
+            return response()->json([], 404);
+        }
+        $workPackages = \App\Models\ExpeditingForm::where('context_id', $context_id)->get();
+        $result = $workPackages->map(function($pkg) {
+            $equipments = \App\Models\ExpeditingEquipment::where('expediting_form_id', $pkg->id)->get();
+            return [
+                'workpackage_name' => $pkg->workpackage_name,
+                'equipments' => $equipments->map(function($eq) {
+                    return [
+                        'name' => $eq->name,
+                        'contractualdate' => $eq->contractualdate,
+                        'actualdate' => $eq->actualdate,
+                        'fatdate' => $eq->fatdate,
+                    ];
+                }),
+            ];
+        });
+        return response()->json($result);
     }
 
     /**
@@ -374,6 +398,7 @@ class ExpeditingFormController extends Controller
         $validated = $request->validate([
             // Context fields
             'workpackage_name' => 'required|string|max:255',
+            'work_package_no' => 'nullable|string|max:255',
             'supplier' => 'required|string|max:255',
             'po_number' => 'nullable|string|max:255',
             'lli' => 'nullable',
@@ -406,6 +431,7 @@ class ExpeditingFormController extends Controller
                 'po_number' => $validated['po_number'],
             ],
             [
+                'work_package_no' => $validated['work_package_no'] ?? null,
                 'lli' => $validated['lli'] ?? null,
                 'expediting_category' => $validated['expediting_category'] ?? null,
                 'order_date' => $validated['order_date'] ?? null,

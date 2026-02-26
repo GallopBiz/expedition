@@ -1,3 +1,36 @@
+    <style>
+      .dt-table {
+        margin:0 10px 12px;
+        border:1px solid var(--border);
+        border-radius:10px;
+        overflow:hidden;
+      }
+      .dt-head, .dt-row {
+        display:grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 40px;
+        font-size:11px;
+      }
+      .dt-head span, .dt-row span {
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      .dt-head {
+        background:var(--surface2);
+        font-weight:600;
+        padding:6px 8px;
+      }
+      .dt-row {
+        padding:6px 8px;
+        border-top:1px solid var(--border);
+        align-items:center;
+      }
+      .dt-row .dot {
+        width:8px;height:8px;border-radius:50%;
+      }
+      .dt-row.ok .dot { background:#16a34a }
+      .dt-row.late .dot { background:#dc2626 }
+      .dt-row.none .dot { background:#94a3b8 }
+    </style>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
         <style>
             .modal-overlay {
@@ -616,7 +649,7 @@
 
 .dt-head, .dt-row {
   display:grid;
-  grid-template-columns: 1.2fr repeat(5,1fr) 20px;
+  grid-template-columns: 1.2fr repeat(4,1fr) 20px;
   font-size:11px;
 }
 .dt-head {
@@ -689,21 +722,11 @@
               </div>
               <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
                 <div class="gauge-ring">
-                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill silver" id="ringFat" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="107.07" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:var(--muted);"/><text class="gauge-number" id="gaugeFatNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">29%</text></svg>
+                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill shipment" id="ringShipment" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="107.07" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#2563eb;"/><text class="gauge-number" id="gaugeShipmentNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">29%</text></svg>
                 </div>
                 <div>
                   <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">FAT Status</div>
                   <div class="gauge-value silver" id="gaugeFat" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--muted2);">29%</div>
-                  <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
-                </div>
-              </div>
-              <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
-                <div class="gauge-ring">
-                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill shipment" id="ringShipment" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="120" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#2563eb;"/><text class="gauge-number" id="gaugeShipmentNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">0%</text></svg>
-                </div>
-                <div>
-                  <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Ready for Shipment</div>
-                  <div class="gauge-value shipment" id="gaugeShipment" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:#2563eb;">0%</div>
                   <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
                 </div>
               </div>
@@ -747,23 +770,23 @@
         <div class="accordion-body">
           <div class="field-group">
             <div class="field-label">Work Package No.</div>
-            <input class="field-value" type="text" placeholder="Identifier" name="identifier">
+            <input class="field-value" type="text" placeholder="Work Package No." name="work_package_no" value="{{ $context->work_package_no ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">Work Package Name</div>
-            <input class="field-value" type="text" placeholder="Work Package Name" name="workpackage_name">
+            <input class="field-value" type="text" placeholder="Work Package Name" name="workpackage_name" value="{{ $context->workpackage_name ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">PO Number</div>
-            <input class="field-value" type="text" placeholder="PO Number" name="po_number">
+            <input class="field-value" type="text" placeholder="PO Number" name="po_number" value="{{ $context->po_number ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">Expediting Category</div>
             <select class="field-value" name="expediting_category">
               <option value="">Select Category</option>
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
+              <option value="Low" {{ ($context->expediting_category ?? '') == 'Low' ? 'selected' : '' }}>Low</option>
+              <option value="Medium" {{ ($context->expediting_category ?? '') == 'Medium' ? 'selected' : '' }}>Medium</option>
+              <option value="High" {{ ($context->expediting_category ?? '') == 'High' ? 'selected' : '' }}>High</option>
             </select>
             <script>
               document.addEventListener('DOMContentLoaded', function() {
@@ -790,47 +813,47 @@
               <option value="">Select Supplier</option>
               @foreach(\App\Models\ExpeditingForm::distinct()->orderBy('supplier')->pluck('supplier') as $supplier)
                 @if($supplier)
-                  <option value="{{ $supplier }}">{{ $supplier }}</option>
+                  <option value="{{ $supplier }}" {{ ($context->supplier ?? '') == $supplier ? 'selected' : '' }}>{{ $supplier }}</option>
                 @endif
               @endforeach
             </select>
           </div>
           <div class="field-group">
             <div class="field-label">Order Date</div>
-            <input class="field-value" type="date" placeholder="Order Date" name="order_date">
+            <input class="field-value" type="date" placeholder="Order Date" name="order_date" value="{{ $context->order_date ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">Forecast Delivery to Site</div>
-            <input class="field-value" type="date" placeholder="Forecast Delivery to Site" name="forecast_delivery_to_site">
+            <input class="field-value" type="date" placeholder="Forecast Delivery to Site" name="forecast_delivery_to_site" value="{{ $context->forecast_delivery_to_site ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">Incoterms</div>
             <select class="field-value" name="incoterms">
               <option value="">No Select</option>
-              <option value="Not Available">Not Available</option>
-              <option value="DAP">DAP</option>
+              <option value="Not Available" {{ ($context->incoterms ?? '') == 'Not Available' ? 'selected' : '' }}>Not Available</option>
+              <option value="DAP" {{ ($context->incoterms ?? '') == 'DAP' ? 'selected' : '' }}>DAP</option>
             </select>
           </div>
           <div class="field-group">
             <div class="field-label">Exyte Procurement Contract Manager</div>
-            <input class="field-value" type="text" placeholder="Exyte Procurement Contract Manager" name="exyte_procurement_contract_manager">
+            <input class="field-value" type="text" placeholder="Exyte Procurement Contract Manager" name="exyte_procurement_contract_manager" value="{{ $context->exyte_procurement_contract_manager ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">Customer Procurement Contact</div>
-            <input class="field-value" type="text" placeholder="Customer Procurement Contact" name="customer_procurement_contact">
+            <input class="field-value" type="text" placeholder="Customer Procurement Contact" name="customer_procurement_contact" value="{{ $context->customer_procurement_contact ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">Technical Workpackage Owner</div>
-            <input class="field-value" type="text" placeholder="Technical Workpackage Owner" name="technical_workpackage_owner">
+            <input class="field-value" type="text" placeholder="Technical Workpackage Owner" name="technical_workpackage_owner" value="{{ $context->technical_workpackage_owner ?? '' }}">
           </div>
           <div class="field-group">
             <div class="field-label">Expediting Contact</div>
-            <input class="field-value" type="text" placeholder="Expediting Contact" name="expediting_contact">
+            <input class="field-value" type="text" placeholder="Expediting Contact" name="expediting_contact" value="{{ $context->expediting_contact ?? '' }}">
             <input type="hidden" name="executions[0][expediting_contact]" id="exec_expediting_contact">
           </div>
           <div class="field-group">
             <div class="field-label">Workstream/Building</div>
-            <input class="field-value" type="text" placeholder="Workstream/Building" name="workstream_building">
+            <input class="field-value" type="text" placeholder="Workstream/Building" name="workstream_building" value="{{ $context->workstream_building ?? '' }}">
             <input type="hidden" name="executions[0][workstream_building]" id="exec_workstream_building">
           </div>
           <div style="display:none;">
@@ -843,9 +866,9 @@
             <div class="field-label" style="margin-bottom:8px;">MILESTONES <hr style="margin:0 0 8px 0; border: none; border-top: 1px solid #e0e0e0;"/></div>
             <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
               <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
-                <span style="margin-bottom:4px;">COMPLETED</span>
+                {{-- <span style="margin-bottom:4px;">COMPLETED</span>
                 <input type="checkbox" name="milestones[]" value="Completed" class="toggle-switch" style="display:none;">
-                <span class="custom-toggle"></span>
+                <span class="custom-toggle"></span> --}}
               </label>
               <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
                 <span style="margin-bottom:4px;">LLI</span>
@@ -995,19 +1018,16 @@
     <!-- STATUS LEGEND -->
     <div class="dt-legend">
       <span><i class="ok"></i> On Time</span>
-      <span><i class="risk"></i> At Risk</span>
       <span><i class="late"></i> Late</span>
-      <span><i class="none"></i> No Date</span>
     </div>
 
     <!-- FILTER BAR -->
     <div class="dt-toolbar">
-      <input type="text" placeholder="Search tag..." oninput="dtFilter(this.value)">
+      <input type="text" id="dtSearch" placeholder="Search tag..." oninput="dtFilter()">
       <div class="dt-filters">
-        <button class="active" onclick="dtSetFilter('all', this)">All</button>
-        <button onclick="dtSetFilter('late', this)">Late</button>
-        <button onclick="dtSetFilter('risk', this)">Risk</button>
-        <button onclick="dtSetFilter('ok', this)">OK</button>
+        <button class="active" id="dtAllBtn" onclick="dtSetFilter('all', this)">All</button>
+        <button id="dtLateBtn" onclick="dtSetFilter('late', this)">Late</button>
+        <button id="dtOkBtn" onclick="dtSetFilter('ok', this)">OK</button>
       </div>
       <div class="dt-count"><span id="dtCount">0</span>/<span id="dtTotal">0</span></div>
     </div>
@@ -1016,15 +1036,65 @@
     <div class="dt-table">
       <div class="dt-head">
         <span>Tag</span>
-        <span>Mfg St</span>
-        <span>Mfg End</span>
-        <span>Contract</span>
-        <span>Est</span>
-        <span>Needed</span>
-        <span></span>
+        <span>Contractual</span>
+        <span>Actual</span>
+        <span>FAT Date</span>
+        <span>On Time</span>
       </div>
-
-      <div id="dtBody"></div>
+      <div id="dtBody">
+        @php
+          $contextId = request()->query('context_id');
+          $equipments = \App\Models\ExpeditingEquipment::where('context_id', $contextId)->get();
+        @endphp
+        <script>
+          let dtFilterStatus = 'all';
+          function dtSetFilter(status, btn) {
+            dtFilterStatus = status;
+            document.querySelectorAll('.dt-filters button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            dtFilter();
+          }
+          function dtFilter() {
+            const search = document.getElementById('dtSearch').value.toLowerCase();
+            const rows = Array.from(document.querySelectorAll('#dtBody .dt-row'));
+            let count = 0;
+            rows.forEach(row => {
+              const tag = row.querySelector('span').textContent.toLowerCase();
+              const status = row.classList.contains('ok') ? 'ok' : row.classList.contains('late') ? 'late' : 'none';
+              const show = (dtFilterStatus === 'all' || status === dtFilterStatus) && tag.includes(search);
+              row.style.display = show ? '' : 'none';
+              if (show) count++;
+            });
+            document.getElementById('dtCount').textContent = count;
+            document.getElementById('dtTotal').textContent = rows.length;
+          }
+          document.addEventListener('DOMContentLoaded', dtFilter);
+        </script>
+        @php
+        $count = 0;
+        @endphp
+        @forelse($equipments as $equipment)
+          @php
+            $fatDate = $equipment->fatdate ? strtotime($equipment->fatdate) : null;
+            $contractual = $equipment->contractualdate ? strtotime($equipment->contractualdate) : null;
+            $actual = $equipment->actualdate ? strtotime($equipment->actualdate) : null;
+            $onTime = ($fatDate && $contractual && $actual && $fatDate <= $contractual && $fatDate <= $actual);
+            $status = 'none';
+            if ($onTime) $status = 'ok';
+            else if ($fatDate && $contractual && $actual && ($fatDate > $contractual || $fatDate > $actual)) $status = 'late';
+            $count++;
+          @endphp
+          <div class="dt-row {{ $status }}">
+            <span>{{ $equipment->name ?? $equipment->tag ?? '—' }}</span>
+            <span>{{ $equipment->contractualdate ? date('d-M-Y', strtotime($equipment->contractualdate)) : '—' }}</span>
+            <span>{{ $equipment->actualdate ? date('d-M-Y', strtotime($equipment->actualdate)) : '—' }}</span>
+            <span>{{ $equipment->fatdate ? date('d-M-Y', strtotime($equipment->fatdate)) : '—' }}</span>
+            <span style="display:flex;justify-content:center;align-items:center;height:100%;"><div class="dot"></div></span>
+          </div>
+        @empty
+          <div style="padding:20px;color:#888;">No equipment found for this context.</div>
+        @endforelse
+      </div>
     </div>
 
   </div>
@@ -1036,7 +1106,112 @@
     <div class="right-panel">
       <div class="equipment-header">
         <h2><span class="panel-dot" style="margin-right:8px;"></span>Equipment</h2>
-        <button class="add-btn" onclick="openModal()">+ Add Equipment</button>
+        <div class="equipment-btn-row">
+          <form action="{{ route('expediting_forms.send_email', request('context_id')) }}" method="POST" class="inline email-form">
+            @csrf
+            <button type="button" class="add-btn email-btn" title="Email to Supplier">
+              <span class="material-icons" style="font-size:18px;vertical-align:middle;"></span> Send Email to Supplier
+            </button>
+            <input type="hidden" class="supplier-name" value="{{ $supplier ?? 'Supplier' }}">
+          </form>
+          <button class="add-btn" onclick="openModal()">+ Add Equipment</button>
+        </div>
+        <style>
+          .equipment-btn-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+          }
+        </style>
+            <style>
+              .btn.btn-email {
+                background: linear-gradient(90deg,#2563eb,#1d4ed8);
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                padding: 10px 28px;
+                margin-right: 12px;
+                box-shadow: 0 2px 8px rgba(37,99,235,0.12);
+                transition: background 0.2s;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+              }
+              .btn.btn-email:hover {
+                background: linear-gradient(90deg,#1d4ed8,#2563eb);
+              }
+              .btn.btn-add-equipment {
+                background: linear-gradient(90deg,#0a7c55,#16a34a);
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                padding: 10px 28px;
+                box-shadow: 0 2px 8px rgba(10,124,85,0.12);
+                transition: background 0.2s;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+              }
+              .btn.btn-add-equipment:hover {
+                background: linear-gradient(90deg,#16a34a,#0a7c55);
+              }
+            </style>
+        <!-- Email Confirmation Modal -->
+        <div id="emailConfirmModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
+          <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center border-t-8 border-green-600 relative animate-fade-in">
+            <div class="flex flex-col items-center mb-4">
+              <div id="emailConfirmText" class="text-gray-900 font-bold text-lg mb-1"></div>
+              <div class="text-gray-600 text-base mb-4">Are you sure you want to send this expediting form link to the supplier?</div>
+            </div>
+            <div class="flex justify-center gap-4 mt-2">
+              <button id="emailConfirmYes" class="px-6 py-2 rounded-lg bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold shadow hover:from-green-600 hover:to-green-800 transition">Yes, Send Email</button>
+              <button id="emailConfirmNo" class="px-6 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold shadow hover:bg-gray-300 transition">Cancel</button>
+            </div>
+            <button id="emailConfirmClose" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl leading-none">&times;</button>
+          </div>
+        </div>
+        <style>
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fade-in 0.3s ease; }
+        </style>
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          let modal = document.getElementById('emailConfirmModal');
+          let confirmText = document.getElementById('emailConfirmText');
+          let yesBtn = document.getElementById('emailConfirmYes');
+          let noBtn = document.getElementById('emailConfirmNo');
+          let closeBtn = document.getElementById('emailConfirmClose');
+          let formToSubmit = null;
+          document.querySelectorAll('.email-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+              e.preventDefault();
+              formToSubmit = btn.closest('form');
+              let supplierName = formToSubmit.querySelector('.supplier-name').value;
+              confirmText.innerHTML = '<span class="text-green-700">Send email to <b>' + supplierName + '</b>?</span>';
+              modal.classList.remove('hidden');
+            });
+          });
+          yesBtn.addEventListener('click', function() {
+            if (formToSubmit) formToSubmit.submit();
+            modal.classList.add('hidden');
+          });
+          noBtn.addEventListener('click', function() {
+            modal.classList.add('hidden');
+          });
+          closeBtn.addEventListener('click', function() {
+            modal.classList.add('hidden');
+          });
+        });
+        </script>
       </div>
       <div class="equipment-table-wrap">
         <div class="col-headers">
@@ -1046,26 +1221,21 @@
           <span>Fabrication</span>
           <span>FAT Status</span>
         </div>
-        <div class="equipment-row" onclick="openModal()">
-          <div class="eq-name"><span class="eq-status-dot dot-green"></span>RAHU 6801</div>
-          <div class="progress-cell">
-            <span class="progress-label">29%</span>
-            <div class="progress-bar"><div class="progress-fill green" style="width:29%"></div></div>
+        @php
+          $contextId = request()->query('context_id');
+          $filteredEquipments = $equipments->where('context_id', $contextId);
+        @endphp
+        @forelse($filteredEquipments as $equipment)
+          <div class="equipment-row" style="cursor:pointer;" onclick="openModal(@json($equipment))">
+            <div class="eq-name"><div class="eq-status-dot dot-green"></div>{{ $equipment->name ?? $equipment->tag ?? '—' }}</div>
+            <div class="progress-cell"><div class="progress-label">{{ $equipment->design ?? 0 }}%</div><div class="progress-bar"><div class="progress-fill green" style="width:{{ $equipment->design ?? 0 }}%"></div></div></div>
+            <div class="progress-cell"><div class="progress-label">{{ $equipment->material ?? 0 }}%</div><div class="progress-bar"><div class="progress-fill blue" style="width:{{ $equipment->material ?? 0 }}%"></div></div></div>
+            <div class="progress-cell"><div class="progress-label">{{ $equipment->fab ?? 0 }}%</div><div class="progress-bar"><div class="progress-fill warn" style="width:{{ $equipment->fab ?? 0 }}%"></div></div></div>
+            <div class="progress-cell"><div class="progress-label">{{ $equipment->fat ?? 0 }}%</div><div class="progress-bar"><div class="progress-fill silver" style="width:{{ $equipment->fat ?? 0 }}%"></div></div></div>
           </div>
-          <div class="progress-cell">
-            <span class="progress-label">60%</span>
-            <div class="progress-bar"><div class="progress-fill blue" style="width:60%"></div></div>
-          </div>
-          <div class="progress-cell">
-            <span class="progress-label">90%</span>
-            <div class="progress-bar"><div class="progress-fill warn" style="width:90%"></div></div>
-          </div>
-          <div class="progress-cell">
-            <span class="progress-label">73%</span>
-            <div class="progress-bar"><div class="progress-fill silver" style="width:73%"></div></div>
-          </div>
-        </div>
-        <!-- Add more equipment rows here as needed -->
+        @empty
+          <div style="padding:20px;color:#888;">No equipment found for this context.</div>
+        @endforelse
       </div>
     </div>
 
@@ -1082,7 +1252,7 @@
     align-items: center;
     justify-content: center;
     transition: opacity 0.2s;
-  }
+      .dt-row span { font-size:14px; white-space:nowrap; }
   .modal-overlay.active { display: flex; }
   .modal {
     background: #fff;
@@ -1414,33 +1584,39 @@
     <div class="modal-footer">
       <script>
         function openModal(equipment) {
-          document.getElementById('modalOverlay').classList.add('active');
-          // Populate modal fields if equipment data is provided
+          var overlay = document.getElementById('modalOverlay');
+          overlay.classList.add('active');
+          overlay.style.display = 'flex';
+          // Support both index and object for backward compatibility
+          if (typeof equipment === 'number' && window.equipments && Array.isArray(window.equipments)) {
+            equipment = window.equipments[equipment];
+          }
           if (equipment) {
-            document.getElementById('modalTitle').textContent = equipment.name || 'Equipment';
-            document.getElementById('eq-name').value = equipment.name || '';
-            document.getElementById('eq-subsupplier').value = equipment.subsupplier || '';
-            document.getElementById('eq-qty').value = equipment.qty || '';
-            document.getElementById('eq-place').value = equipment.place || '';
-            document.getElementById('eq-orderstatus').value = equipment.orderstatus || '';
-            document.getElementById('eq-drawing').value = equipment.drawing || '';
-            document.getElementById('eq-scope').value = equipment.scope || '';
-            document.getElementById('eq-design').value = equipment.design || 0;
-            document.getElementById('designVal').textContent = (equipment.design || 0) + '%';
-            document.getElementById('eq-material').value = equipment.material || 0;
-            document.getElementById('materialVal').textContent = (equipment.material || 0) + '%';
-            document.getElementById('eq-fab').value = equipment.fab || 0;
-            document.getElementById('fabVal').textContent = (equipment.fab || 0) + '%';
-            document.getElementById('eq-fat').value = equipment.fat || 0;
-            document.getElementById('fatVal').textContent = (equipment.fat || 0) + '%';
-            document.getElementById('eq-start').value = equipment.start || '';
-            document.getElementById('eq-end').value = equipment.end || '';
-            document.getElementById('eq-duration').value = equipment.duration || '';
-            document.getElementById('eq-fatdate').value = equipment.fatdate || '';
-            document.getElementById('eq-contractualdate').value = equipment.contractualdate || '';
-            document.getElementById('eq-actualdate').value = equipment.actualdate || '';
-            document.getElementById('eq-openpoints').value = equipment.openpoints || '';
-            document.getElementById('eq-remarks').value = equipment.remarks || '';
+            const safe = (v, def) => (v === null || v === undefined ? def : v);
+            document.getElementById('modalTitle').textContent = safe(equipment.name, 'Equipment');
+            document.getElementById('eq-name').value = safe(equipment.name, '');
+            document.getElementById('eq-subsupplier').value = safe(equipment.subsupplier, '');
+            document.getElementById('eq-qty').value = safe(equipment.qty, '');
+            document.getElementById('eq-place').value = safe(equipment.place, '');
+            document.getElementById('eq-orderstatus').value = safe(equipment.order_status || equipment.orderstatus, '');
+            document.getElementById('eq-drawing').value = safe(equipment.drawing, '');
+            document.getElementById('eq-scope').value = safe(equipment.scope, '');
+            document.getElementById('eq-design').value = safe(equipment.design, 0);
+            document.getElementById('designVal').textContent = safe(equipment.design, 0) + '%';
+            document.getElementById('eq-material').value = safe(equipment.material, 0);
+            document.getElementById('materialVal').textContent = safe(equipment.material, 0) + '%';
+            document.getElementById('eq-fab').value = safe(equipment.fab, 0);
+            document.getElementById('fabVal').textContent = safe(equipment.fab, 0) + '%';
+            document.getElementById('eq-fat').value = safe(equipment.fat, 0);
+            document.getElementById('fatVal').textContent = safe(equipment.fat, 0) + '%';
+            document.getElementById('eq-start').value = safe(equipment.start, '');
+            document.getElementById('eq-end').value = safe(equipment.end, '');
+            document.getElementById('eq-duration').value = safe(equipment.duration, '');
+            document.getElementById('eq-fatdate').value = safe(equipment.fatdate, '');
+            document.getElementById('eq-contractualdate').value = safe(equipment.contractualdate, '');
+            document.getElementById('eq-actualdate').value = safe(equipment.actualdate, '');
+            document.getElementById('eq-openpoints').value = safe(equipment.openpoints, '');
+            document.getElementById('eq-remarks').value = safe(equipment.remarks, '');
             // Checkboxes
             let checks = document.querySelectorAll('.modal-checkboxes .check-item');
             checks.forEach((item, idx) => {
@@ -1466,8 +1642,59 @@
           cb.checked = !cb.checked;
         }
         function saveEquipment() {
-          // Implement save logic as needed
-          closeModal();
+          // Gather equipment data from modal fields
+          const data = {
+            expediting_form_id: (new URLSearchParams(window.location.search)).get('context_id'),
+            name: document.getElementById('eq-name').value.trim() || 'Unnamed',
+            design: parseInt(document.getElementById('eq-design').value) || 0,
+            material: parseInt(document.getElementById('eq-material').value) || 0,
+            fab: parseInt(document.getElementById('eq-fab').value) || 0,
+            fat: parseInt(document.getElementById('eq-fat').value) || 0,
+            subsupplier: document.getElementById('eq-subsupplier').value,
+            qty: parseInt(document.getElementById('eq-qty').value) || 1,
+            place: document.getElementById('eq-place').value,
+            order_status: document.getElementById('eq-orderstatus').value,
+            drawing: document.getElementById('eq-drawing').value,
+            scope: document.getElementById('eq-scope').value,
+            start: document.getElementById('eq-start').value,
+            end: document.getElementById('eq-end').value,
+            duration: parseInt(document.getElementById('eq-duration').value) || null,
+            fatdate: document.getElementById('eq-fatdate').value,
+            contractualdate: document.getElementById('eq-contractualdate').value,
+            actualdate: document.getElementById('eq-actualdate').value,
+            openpoints: document.getElementById('eq-openpoints').value,
+            remarks: document.getElementById('eq-remarks').value,
+            checks: Array.from(document.querySelectorAll('.modal-checkboxes .check-item')).map(item => item.classList.contains('checked')),
+          };
+          // Add context_id from URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const contextId = urlParams.get('context_id');
+          if (contextId) {
+            data.context_id = contextId;
+          }
+          // CSRF token from meta tag
+          const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+          fetch('/expediting-equipments', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': csrf,
+              'Accept': 'application/json',
+            },
+            body: JSON.stringify(data)
+          })
+          .then(response => {
+            if (!response.ok) throw new Error('Failed to save equipment');
+            return response.json();
+          })
+          .then(result => {
+            closeModal();
+            // Optionally refresh equipment list or show success
+            alert('Equipment saved successfully!');
+          })
+          .catch(err => {
+            alert('Error saving equipment: ' + err.message);
+          });
         }
         // --- FAT Date vs Actual Delivery Validation ---
         function validateFatVsActual() {
@@ -1607,50 +1834,4 @@ function renderDeliveryCards() {
 document.addEventListener('DOMContentLoaded', renderDeliveryCards);
 </script>
 
-<script>
-const dtData = [
-  { tag:'UPS 6812', mfgS:'01 Oct', mfgE:'22 Feb', con:'14 Mar', est:'14 Mar', need:'21 Mar', status:'ok' },
-  { tag:'PDB 6813', mfgS:'04 Oct', mfgE:'04 Dec', con:'27 Dec', est:'28 Dec', need:'03 Jan', status:'risk' },
-  { tag:'ATS 6814', mfgS:'07 Oct', mfgE:'14 Dec', con:'09 Jan', est:'11 Jan', need:'—', status:'risk' },
-  { tag:'RAHU 6816', mfgS:'13 Oct', mfgE:'03 Jan', con:'04 Feb', est:'08 Feb', need:'—', status:'late' },
-];
-
-let dtFilterStatus = 'all';
-
-function renderDT(search = '') {
-  search = typeof search === 'string' ? search : '';
-  const body = document.getElementById('dtBody');
-  const rows = dtData.filter(r => {
-    const tag = typeof r.tag === 'string' ? r.tag : (typeof r.name === 'string' ? r.name : '');
-    return (dtFilterStatus === 'all' || r.status === dtFilterStatus) &&
-      tag.toLowerCase().includes(search.toLowerCase());
-  });
-  document.getElementById('dtCount').textContent = rows.length;
-  document.getElementById('dtTotal').textContent = dtData.length;
-  body.innerHTML = rows.map(r => `
-    <div class="dt-row ${r.status}">
-      <strong>${typeof r.tag === 'string' ? r.tag : (typeof r.name === 'string' ? r.name : '')}</strong>
-      <span>${r.mfgS || ''}</span>
-      <span>${r.mfgE || ''}</span>
-      <span>${r.con || ''}</span>
-      <span>${r.est || ''}</span>
-      <span>${r.need || ''}</span>
-      <div class="dot"></div>
-    </div>
-  `).join('');
-}
-
-function dtFilter(val) {
-  renderDT(val);
-}
-
-function dtSetFilter(status, btn) {
-  dtFilterStatus = status;
-  document.querySelectorAll('.dt-filters button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderDT();
-}
-
-document.addEventListener('DOMContentLoaded', renderDT);
-</script>
 @endsection

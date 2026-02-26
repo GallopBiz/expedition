@@ -23,16 +23,51 @@ function renderEquipments() {
     list.innerHTML = '<div class="empty-state">No equipment added yet.<br>Click "+ Add Equipment" to begin.</div>';
     return;
   }
-  list.innerHTML = equipments.map((eq, i) => `
-    <div class="equipment-row" onclick="openModal(${i})">
-      <div class="eq-name"><div class="eq-status-dot dot-${eq.status}"></div>${eq.name}</div>
-      <div class="progress-cell"><div class="progress-label">${eq.design}%</div><div class="progress-bar"><div class="progress-fill green" style="width:${eq.design}%"></div></div></div>
-      <div class="progress-cell"><div class="progress-label">${eq.material}%</div><div class="progress-bar"><div class="progress-fill blue" style="width:${eq.material}%"></div></div></div>
-      <div class="progress-cell"><div class="progress-label">${eq.fab}%</div><div class="progress-bar"><div class="progress-fill warn" style="width:${eq.fab}%"></div></div></div>
-      <div class="progress-cell"><div class="progress-label">${eq.fat}%</div><div class="progress-bar"><div class="progress-fill silver" style="width:${eq.fat}%"></div></div></div>
-    </div>
-  `).join('');
+  list.innerHTML = equipments.map((eq, i) => {
+    const eqData = encodeURIComponent(JSON.stringify(eq));
+    return `
+      <div class="equipment-row" style="cursor:pointer;" onclick='openModalObj("${eqData}")'>
+        <div class="eq-name"><div class="eq-status-dot dot-${eq.status}"></div>${eq.name}</div>
+        <div class="progress-cell"><div class="progress-label">${eq.design}%</div><div class="progress-bar"><div class="progress-fill green" style="width:${eq.design}%"></div></div></div>
+        <div class="progress-cell"><div class="progress-label">${eq.material}%</div><div class="progress-bar"><div class="progress-fill blue" style="width:${eq.material}%"></div></div></div>
+        <div class="progress-cell"><div class="progress-label">${eq.fab}%</div><div class="progress-bar"><div class="progress-fill warn" style="width:${eq.fab}%"></div></div></div>
+        <div class="progress-cell"><div class="progress-label">${eq.fat}%</div><div class="progress-bar"><div class="progress-fill silver" style="width:${eq.fat}%"></div></div></div>
+      </div>
+    `;
+  }).join('');
   updateGauges();
+}
+
+// Global function to handle object popup
+window.openModalObj = function(eqStr) {
+  const eq = JSON.parse(decodeURIComponent(eqStr));
+  // Find index if needed
+  const idx = equipments.findIndex(e => e.name === eq.name);
+  currentIndex = idx;
+  document.getElementById('modalTitle').textContent        = eq ? eq.name : 'New Equipment';
+  document.getElementById('eq-name').value                 = eq ? eq.name : '';
+  document.getElementById('eq-subsupplier').value          = eq ? eq.subsupplier : '';
+  document.getElementById('eq-qty').value                  = eq ? eq.qty : '';
+  document.getElementById('eq-place').value                = eq ? eq.place : '';
+  document.getElementById('eq-orderstatus').value          = eq ? eq.orderStatus : '';
+  document.getElementById('eq-drawing').value              = eq ? eq.drawing : '';
+  document.getElementById('eq-scope').value                = eq ? eq.scope : '';
+  document.getElementById('eq-start').value                = eq ? eq.start : '';
+  document.getElementById('eq-end').value                  = eq ? eq.end : '';
+  document.getElementById('eq-duration').value             = eq ? eq.duration : '';
+  document.getElementById('eq-fatdate').value              = eq ? eq.fatdate : '';
+  document.getElementById('eq-contractualdate').value      = eq ? eq.contractualdate : '';
+  document.getElementById('eq-actualdate').value           = eq ? eq.actualdate : '';
+  document.getElementById('eq-openpoints').value           = eq ? eq.openpoints : '';
+  document.getElementById('eq-remarks').value              = eq ? eq.remarks : '';
+  const sl = (id, vid, v) => { document.getElementById(id).value=v; document.getElementById(vid).textContent=v+'%'; };
+  sl('eq-design',   'designVal',   eq ? eq.design   : 0);
+  sl('eq-material', 'materialVal', eq ? eq.material : 0);
+  sl('eq-fab',      'fabVal',      eq ? eq.fab      : 0);
+  sl('eq-fat',      'fatVal',      eq ? eq.fat      : 0);
+  document.querySelectorAll('.check-item').forEach((item,i) => item.classList.toggle('checked', eq ? !!eq.checks[i] : false));
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('modal').scrollTop = 0;
 }
 function updateGauges() {
   if (!equipments.length) return;
@@ -105,6 +140,12 @@ function saveEquipment() {
     openpoints: document.getElementById('eq-openpoints').value,
     remarks: document.getElementById('eq-remarks').value,
   };
+  // Add context_id from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const contextId = urlParams.get('context_id');
+  if (contextId) {
+    data.context_id = contextId;
+  }
   let isUpdate = currentIndex >= 0;
   if (isUpdate) equipments[currentIndex] = data; else equipments.push(data);
   renderEquipments();
@@ -174,3 +215,4 @@ function dtSetFilter(status, btn) {
   renderDT(''); // Always call with string
 }
 document.addEventListener('DOMContentLoaded', function() { renderDT(''); });
+}
