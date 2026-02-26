@@ -9,6 +9,8 @@ use App\Http\Controllers\ExpeditingFormController;
 use App\Http\Controllers\ExpeditingCardController;
 use App\Http\Controllers\ExpeditingEquipmentController;
 
+// One-time supplier email for equipment context
+Route::post('/expediting-equipment/send-supplier-email', [ExpeditingEquipmentController::class, 'sendSupplierEmail'])->name('expediting_equipment.send_supplier_email');
 
 
 // API: Get all work packages and their equipment for a context
@@ -90,8 +92,9 @@ Route::middleware(['auth', 'role:Supplier'])->group(function () {
 
 // Equipment list API route
 Route::get('/expediting-equipments-list', [\App\Http\Controllers\ExpeditingEquipmentController::class, 'list']);
-// Equipment API route
+// Equipment API routes
 Route::post('/expediting-equipments', [\App\Http\Controllers\ExpeditingEquipmentController::class, 'store'])->name('expediting_equipments.store');
+Route::patch('/expediting-equipments/{equipment}', [\App\Http\Controllers\ExpeditingEquipmentController::class, 'update'])->name('expediting_equipments.update');
 
 // Language switcher route
 Route::post('/language-switch', function (\Illuminate\Http\Request $request) {

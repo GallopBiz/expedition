@@ -27,6 +27,7 @@ return new class extends Migration {
             $table->date('fatdate')->nullable();
             $table->date('contractualdate')->nullable();
             $table->date('actualdate')->nullable();
+            $table->date('neededsite')->nullable();
             $table->string('openpoints')->nullable();
             $table->text('remarks')->nullable();
             $table->json('checks')->nullable();

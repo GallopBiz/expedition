@@ -206,7 +206,7 @@
         @if($supplierEmail)
           <span style="color: #357ab7; font-size: 1em; margin-left: 0.5em;">{{ $supplierEmail }}</span>
         @endif
-        <div style="margin-left:auto;display:flex;align-items:center;">
+        <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
           @if($supplierEmail)
             <form action="{{ route('expediting_forms.send_email', $form->id) }}" method="POST" class="inline email-form">
               @csrf
@@ -216,6 +216,39 @@
                 </svg>
               </button>
             </form>
+            <!-- New email icon for one-time supplier form submission -->
+            <button type="button" class="email-btn-onetime" title="Send One-Time Supplier Link" style="background:none;border:none;padding:0;display:flex;align-items:center;color:#3cb546;cursor:pointer;font-size:1.1em;" onclick="confirmOneTimeSupplierEmail(this, {{ $form->context_id }})">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M2 2h12v12H2V2zm1 1v10h10V3H3zm2 2h6v6H5V5zm1 1v4h4V6H6z"/>
+              </svg>
+            </button>
+          @push('scripts')
+          <script>
+          function confirmOneTimeSupplierEmail(btn, contextId) {
+            if (confirm('Send one-time supplier form link by email?')) {
+              fetch('/expediting-equipment/send-supplier-email', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: JSON.stringify({ context_id: contextId })
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  alert('Supplier email sent successfully!');
+                } else {
+                  alert('Error: ' + (data.error || 'Failed to send email.'));
+                }
+              })
+              .catch(() => {
+                alert('Failed to send email.');
+              });
+            }
+          }
+          </script>
+          @endpush
           @endif
         </div>
       </div>
@@ -322,7 +355,18 @@
         </span>
         <!-- Hide Manage button and add View button -->
         <!-- <a href="{{ route('expediting_forms.edit', $form->id) }}" class="action-btn btn-view">Manage</a> -->
-        <a href="/supplier/expedition-v2?context_id={{ $form->context_id ?? $form->id }}&edit=1" class="action-btn btn-view" target="_blank">View</a>
+        @php
+          $user = Auth::user();
+          $viewUrl = '';
+          if ($user && $user->role === 'Manager') {
+            $viewUrl = route('manager.expedition_v2', ['context_id' => $form->context_id ?? $form->id, 'edit' => 1]);
+          } elseif ($user && $user->role === 'Expeditor') {
+            $viewUrl = route('expeditor.expedition_v2', ['context_id' => $form->context_id ?? $form->id, 'edit' => 1]);
+          } else {
+            $viewUrl = route('supplier.expedition_v2', ['context_id' => $form->context_id ?? $form->id, 'edit' => 1]);
+          }
+        @endphp
+        <a href="{{ $viewUrl }}" class="action-btn btn-view" target="_blank">View</a>
       </div>
     </div>
     @endforeach

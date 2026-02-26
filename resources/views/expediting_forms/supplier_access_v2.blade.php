@@ -1926,6 +1926,7 @@
     </div>
     <div class="modal-footer">
       <script>
+        let editingEquipmentId = null;
         function openModal(equipment) {
           var overlay = document.getElementById('modalOverlay');
           overlay.classList.add('active');
@@ -1935,6 +1936,7 @@
             equipment = window.equipments[equipment];
           }
           if (equipment) {
+            editingEquipmentId = equipment.id || null;
             const safe = (v, def) => (v === null || v === undefined ? def : v);
             document.getElementById('modalTitle').textContent = safe(equipment.name, 'Equipment');
             document.getElementById('eq-name').value = safe(equipment.name, '');
@@ -1952,12 +1954,20 @@
             document.getElementById('fabVal').textContent = safe(equipment.fab, 0) + '%';
             document.getElementById('eq-fat').value = safe(equipment.fat, 0);
             document.getElementById('fatVal').textContent = safe(equipment.fat, 0) + '%';
-            document.getElementById('eq-start').value = safe(equipment.start, '');
-            document.getElementById('eq-end').value = safe(equipment.end, '');
+            function formatDate(val) {
+              if (!val) return '';
+              if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}$/)) return val;
+              const d = new Date(val);
+              if (isNaN(d)) return '';
+              return d.toISOString().slice(0,10);
+            }
+            document.getElementById('eq-start').value = formatDate(equipment.start);
+            document.getElementById('eq-end').value = formatDate(equipment.end);
             document.getElementById('eq-duration').value = safe(equipment.duration, '');
-            document.getElementById('eq-fatdate').value = safe(equipment.fatdate, '');
-            document.getElementById('eq-contractualdate').value = safe(equipment.contractualdate, '');
-            document.getElementById('eq-actualdate').value = safe(equipment.actualdate, '');
+            document.getElementById('eq-fatdate').value = formatDate(equipment.fatdate);
+            document.getElementById('eq-contractualdate').value = formatDate(equipment.contractualdate);
+            document.getElementById('eq-actualdate').value = formatDate(equipment.actualdate);
+            document.getElementById('eq-neededsite').value = formatDate(equipment.neededsite);
             document.getElementById('eq-openpoints').value = safe(equipment.openpoints, '');
             document.getElementById('eq-remarks').value = safe(equipment.remarks, '');
             // Checkboxes
@@ -2005,6 +2015,7 @@
             fatdate: document.getElementById('eq-fatdate').value,
             contractualdate: document.getElementById('eq-contractualdate').value,
             actualdate: document.getElementById('eq-actualdate').value,
+            neededsite: document.getElementById('eq-neededsite').value,
             openpoints: document.getElementById('eq-openpoints').value,
             remarks: document.getElementById('eq-remarks').value,
             checks: Array.from(document.querySelectorAll('.modal-checkboxes .check-item')).map(item => item.classList.contains('checked')),
@@ -2017,8 +2028,14 @@
           }
           // CSRF token from meta tag
           const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-          fetch('/expediting-equipments', {
-            method: 'POST',
+          let url = '/expediting-equipments';
+          let method = 'POST';
+          if (editingEquipmentId) {
+            url = `/expediting-equipments/${editingEquipmentId}`;
+            method = 'PATCH';
+          }
+          fetch(url, {
+            method: method,
             headers: {
               'Content-Type': 'application/json',
               'X-CSRF-TOKEN': csrf,
@@ -2031,6 +2048,7 @@
             return response.json();
           })
           .then(result => {
+            editingEquipmentId = null;
             closeModal();
             // Optionally refresh equipment list or show success
             alert('Equipment saved successfully!');
