@@ -137,6 +137,16 @@
   .btn-view { background: #01426a; color: #fff; }
   .btn-view:hover { background: #003a54; }
 </style>
+<style>
+  @php
+    $user = Auth::user();
+  @endphp
+  @if($user && $user->role === 'Supplier')
+  .email-btn, .email-btn-onetime, .email-form, #emailConfirmModal {
+    display: none !important;
+  }
+  @endif
+</style>
 <main>
   <div class="card-filters" style="display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;align-items:center;justify-content:center;background:#f7f8fa;border-radius:12px;padding:1.2rem 1rem;box-shadow:0 2px 8px rgba(60,181,70,.07);">
     <form method="GET" action="" style="display:flex;flex-wrap:wrap;gap:1.2rem;align-items:center;width:100%;justify-content:center;">

@@ -40,6 +40,11 @@ Route::middleware(['auth', 'role:Supplier'])->group(function () {
     Route::post('/supplier/expedition-v2/save', [\App\Http\Controllers\ExpeditingContextController::class, 'saveOrUpdate'])->name('supplier.expedition_v2.save');
 });
 
+// Supplier-only: Work Package Cards
+Route::middleware(['auth', 'role:Supplier'])->group(function () {
+    Route::get('/supplier/work-package-cards', [\App\Http\Controllers\ExpeditingCardController::class, 'index'])->name('supplier.work_package_cards');
+});
+
 // Notification routes
 Route::middleware(['auth'])->group(function () {
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.readAll');
@@ -52,7 +57,11 @@ Route::get('/work-packages', function () {
 })->name('work_packages');
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    return view('dashboard_new');
+});
+
+Route::get('/dashboard-new', function () {
+    return view('dashboard_new');
 });
 
 // Route::get('/dashboard', function () {

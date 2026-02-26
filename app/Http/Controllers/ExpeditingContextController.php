@@ -67,7 +67,14 @@ class ExpeditingContextController extends Controller
 
     public function exportAll()
     {
-        $contexts = \App\Models\ExpeditingContext::all();
+        $user = auth()->user();
+        $query = \App\Models\ExpeditingContext::query();
+        // If supplier, filter by their company_name or name
+        if ($user && $user->role === 'Supplier') {
+            $supplierName = $user->company_name ?? $user->name;
+            $query->where('supplier', $supplierName);
+        }
+        $contexts = $query->get();
         $rows = [];
         foreach ($contexts as $context) {
             $equipments = \App\Models\ExpeditingEquipment::where('context_id', $context->id)->get();
