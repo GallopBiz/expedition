@@ -11,6 +11,12 @@ class ExpeditingCardController extends Controller
     public function index(Request $request)
     {
         $query = \App\Models\ExpeditingContext::query();
+        // Only show for supplier: filter by supplier name or company
+        if (auth()->user()->role === 'Supplier') {
+            // Try to match by company_name or user name (adjust as needed)
+            $supplierName = auth()->user()->company_name ?? auth()->user()->name;
+            $query->where('supplier', $supplierName);
+        }
         // Filters
         if ($request->filled('supplier_name')) {
             $query->where('supplier', 'like', '%' . $request->supplier_name . '%');
