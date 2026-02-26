@@ -9,6 +9,11 @@ use App\Http\Controllers\ExpeditingFormController;
 use App\Http\Controllers\ExpeditingCardController;
 use App\Http\Controllers\ExpeditingEquipmentController;
 
+// Export all work packages with equipment
+Route::get('/workpackage/export-all', [\App\Http\Controllers\ExpeditingContextController::class, 'exportAll'])->name('workpackage.export.all');
+
+// Export Work Package with Equipment
+Route::get('/workpackage/export', [\App\Http\Controllers\ExpeditingContextController::class, 'export'])->name('workpackage.export');
 // One-time supplier email for equipment context
 Route::post('/expediting-equipment/send-supplier-email', [ExpeditingEquipmentController::class, 'sendSupplierEmail'])->name('expediting_equipment.send_supplier_email');
 

@@ -168,6 +168,7 @@
       <button type="submit" style="padding:.6em 2em;border-radius:8px;background:#01426a;color:#fff;font-weight:600;border:none;font-size:1.05rem;box-shadow:0 2px 8px rgba(60,181,70,.07);margin-top:0;">Filter/Search</button>
       <a href="{{ url()->current() }}" style="padding:.6em 2em;border-radius:8px;background:#b3c9db;color:#01426a;font-weight:600;border:none;font-size:1.05rem;box-shadow:0 2px 8px rgba(60,181,70,.07);text-decoration:none;display:inline-block;margin-top:0;">Reset</a>
     </form>
+    <a href="{{ route('workpackage.export.all') }}" class="action-btn btn-view" style="background:#3cb546;margin-left:20px;">Export All Work Packages</a>
   </div>
   <div class="card-grid">
     @foreach($expeditingForms as $form)
@@ -365,6 +366,7 @@
           }
         @endphp
         <a href="{{ $viewUrl }}" class="action-btn btn-view" target="_blank">View</a>
+        <a href="{{ route('workpackage.export', ['context_id' => $form->context_id ?? $form->id]) }}" class="action-btn btn-view" style="background:#3cb546;" target="_blank">Export</a>
       </div>
     </div>
     @endforeach
