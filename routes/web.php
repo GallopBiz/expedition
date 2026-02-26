@@ -98,6 +98,11 @@ Route::middleware(['auth', 'role:Manager,Expeditor'])->group(function () {
     Route::get('/expediting-forms/{expeditingForm}/edit', [ExpeditingFormController::class, 'edit'])->name('expediting_forms.edit');
     Route::put('/expediting-forms/{expeditingForm}', [ExpeditingFormController::class, 'update'])->name('expediting_forms.update');
     Route::delete('/expediting-forms/{expeditingForm}', [ExpeditingFormController::class, 'destroy'])->name('expediting_forms.destroy');
+
+    // Add Work Package route
+    Route::get('/expediting-forms/add-work-package', function () {
+        return view('expediting_forms.add_work_package');
+    })->name('expediting_forms.add_work_package');
 });
 
 // New modern supplier expedition form (for suppliers)

@@ -37,6 +37,9 @@
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
             @include('layouts.navigation')
+            @isset($breadcrumb)
+                <x-breadcrumb :items="$breadcrumb" />
+            @endisset
 
             <!-- Page Heading -->
             @isset($header)

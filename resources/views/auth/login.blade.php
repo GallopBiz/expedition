@@ -39,6 +39,20 @@
             overflow: hidden;
             box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
         }
+        
+            /* ── Main navigation link hover (remove background, keep text white) ── */
+            .main-nav-link:hover,
+            .main-nav-link:focus {
+                background: none !important;
+                color: #fff !important;
+            }
+        
+            /* ── Submenu hover: background #01426a, text white ── */
+            .main-nav-dropdown a:hover,
+            .main-nav-dropdown a:focus {
+                background: #01426a !important;
+                color: #fff !important;
+            }
 
         /* ── Left panel ── */
         .panel-left {
@@ -341,9 +355,13 @@
         <hr class="divider">
 
         <ul class="feature-list">
-            <li>Supplier &amp; Delivery Tracking</li>
-            <li>Reporting &amp; Analytics</li>
-            <li>User Management</li>
+            @if(isset($isSupplierLogin) && $isSupplierLogin)
+                <li>Work Package <span class="ml-1 inline-block align-middle px-2 py-0.5 text-xs font-bold rounded-full bg-orange-500 text-white animate-pulse" style="vertical-align: middle;">New</span></li>
+            @else
+                <li>Supplier &amp; Delivery Tracking</li>
+                <li>Reporting &amp; Analytics</li>
+                <li>User Management</li>
+            @endif
         </ul>
 
     </div>

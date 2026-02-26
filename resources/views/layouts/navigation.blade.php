@@ -1,54 +1,100 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="border-b border-gray-100" style="background-color: #01426a;">
+   
+    <style>
+        .main-nav-link, .main-nav-link:visited {
+            color: #fff !important;
+            background: transparent;
+            transition: background 0.2s, color 0.2s;
+        }
+        .main-nav-link:hover, .main-nav-link:focus {
+            background: none !important;
+            color: #fff !important;
+            text-decoration: none !important;
+            border-bottom: none !important;
+        }
+        .main-nav-dropdown > button {
+            color: #fff !important;
+            background: transparent;
+            transition: background 0.2s, color 0.2s;
+        }
+        .main-nav-dropdown > button:hover, .main-nav-dropdown > button:focus {
+            background: #ffffff02 !important;
+            color: #ffffff !important;
+        }
+        /* Notification bell icon color */
+        .notification-bell-icon {
+            stroke: #00b5e2 !important;
+        }
+    </style>
     <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="w-full px-4 sm:px-6 lg:px-12">
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <img src="/images/exyte-logo.png" alt="Exyte Logo" class="block h-9 w-auto" />
+                        <img src="/images/111.png" alt="Exyte Logo" class="block h-9 w-auto" />
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    @if(Auth::user() && Auth::user()->role === 'Supplier')
-                        <x-nav-link :href="route('work_packages')" :active="request()->routeIs('work_packages')">
-                            {{ __('Work Packages') }}
+                    <div class="flex items-center space-x-4">
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="main-nav-link" style="border-bottom: none;">
+                            {{ __('Dashboard') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('supplier.work_package_cards')" :active="request()->routeIs('supplier.work_package_cards')">
-                            {{ __('Work Package Cards') }}
-                        </x-nav-link>
-                    @endif
-                    @if(Auth::user() && Auth::user()->role === 'Manager')
-                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
-                            {{ __('Users') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('users.create')" :active="request()->routeIs('users.create')">
-                            {{ __('Create User') }}
-                        </x-nav-link>
-                    @endif
-                    @if(Auth::user() && (Auth::user()->role === 'Manager' || Auth::user()->role === 'Expeditor'))
-                        <x-nav-link :href="route('expediting_forms.create')" :active="request()->routeIs('expediting_forms.create')">
-                            {{ __('Expediting Form') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('expediting_forms.list')" :active="request()->routeIs('expediting_forms.list')">
-                            {{ __('Work Package List') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('expediting_forms.expediting_list')" :active="request()->routeIs('expediting_forms.expediting_list')">
-                            {{ __('Expediting List') }}
-                        </x-nav-link>
-                    @endif
+
+                        @if(Auth::user() && (Auth::user()->role === 'Manager' || Auth::user()->role === 'Expeditor'))
+                            <!-- User Management Dropdown -->
+                            <div x-data="{ open: false }" class="relative main-nav-dropdown">
+                                <button @click="open = !open" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md focus:outline-none transition">
+                                    User Management
+                                    <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 20 20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8l5 5 5-5" /></svg>
+                                </button>
+                                <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                                    <div class="py-1">
+                                        <x-dropdown-link :href="route('users.create')">Create User</x-dropdown-link>
+                                        <x-dropdown-link :href="route('users.index')">All User</x-dropdown-link>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Work Package Management Dropdown -->
+                            <div x-data="{ open: false }" class="relative main-nav-dropdown">
+                                <button @click="open = !open" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md focus:outline-none transition">
+                                    Work Package Management
+                                    <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 20 20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8l5 5 5-5" /></svg>
+                                </button>
+                                <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                                    <div class="py-1">
+                                        @if(Auth::user()->role === 'Manager')
+                                            <x-dropdown-link href="/manager/expedition-v2">Create Work Package</x-dropdown-link>
+                                        @elseif(Auth::user()->role === 'Expeditor')
+                                            <x-dropdown-link href="/expeditor/expedition-v2">Create Work Package</x-dropdown-link>
+                                        @endif
+                                        <x-dropdown-link :href="route('expediting_forms.cards')">All Work Package</x-dropdown-link>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Old Menu Dropdown -->
+                            <div x-data="{ open: false }" class="relative main-nav-dropdown">
+                                <button @click="open = !open" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md focus:outline-none transition">
+                                    Old Menu
+                                    <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 20 20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8l5 5 5-5" /></svg>
+                                </button>
+                                <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                                    <div class="py-1">
+                                        <x-dropdown-link :href="route('expediting_forms.create')">Expediting Form</x-dropdown-link>
+                                        <x-dropdown-link :href="route('expediting_forms.list')">Work Package List</x-dropdown-link>
+                                        <x-dropdown-link :href="route('expediting_forms.expediting_list')">Expediting List</x-dropdown-link>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
-        @if(Auth::user() && (Auth::user()->role === 'Manager' || Auth::user()->role === 'Expeditor'))
-                        <x-nav-link :href="route('expediting_forms.cards')" :active="request()->routeIs('expediting_forms.cards')">
-                            {{ __('Work Package Cards') }}
-                        </x-nav-link>
-                    @endif
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <!-- Language Switcher -->
@@ -81,7 +127,7 @@
                             }
                             open = !open;
                         " class="text-gray-500 hover:text-gray-700 focus:outline-none relative">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <svg class="h-6 w-6 notification-bell-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                             </svg>
                             <template x-if="unread > 0">
