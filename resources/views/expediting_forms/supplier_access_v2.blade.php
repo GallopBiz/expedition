@@ -768,241 +768,261 @@
   <div class="main">
     <!-- LEFT: WORK PACKAGE DETAILS -->
     <div class="left-panel">
-      <!-- ACCORDION: GENERAL INFO -->
-      <div class="accordion-item" id="work-package-accordion">
-        <button class="accordion-trigger" onclick="toggleAccordion(this)">
-          <div class="accordion-trigger-left">
-            <div class="panel-dot" style="background:#2563eb"></div>
-            <h2>Work Package</h2>
-          </div>
-          <div class="accordion-arrow">▼</div>
-        </button>
-        <div class="accordion-body">
-          <div class="field-group">
-            <div class="field-label">Work Package No.</div>
-            <input class="field-value" type="text" placeholder="Work Package No." name="work_package_no" value="{{ $context->work_package_no ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Work Package Name</div>
-            <input class="field-value" type="text" placeholder="Work Package Name" name="workpackage_name" value="{{ $context->workpackage_name ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
-          </div>
-          <div class="field-group">
-            <div class="field-label">PO Number</div>
-            <input class="field-value" type="text" placeholder="PO Number" name="po_number" value="{{ $context->po_number ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Expediting Category</div>
-            <select class="field-value" name="expediting_category" @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
-              <option value="">Select Category</option>
-              <option value="Low" {{ ($context->expediting_category ?? '') == 'Low' ? 'selected' : '' }}>Low</option>
-              <option value="Medium" {{ ($context->expediting_category ?? '') == 'Medium' ? 'selected' : '' }}>Medium</option>
-              <option value="High" {{ ($context->expediting_category ?? '') == 'High' ? 'selected' : '' }}>High</option>
-            </select>
-            <script>
-              document.addEventListener('DOMContentLoaded', function() {
-                const catSelect = document.querySelector('select[name="expediting_category"]');
-                function updateCategoryColor() {
-                  catSelect.classList.remove('cat-low', 'cat-medium', 'cat-high');
-                  if (catSelect.value === 'Low') catSelect.classList.add('cat-low');
-                  else if (catSelect.value === 'Medium') catSelect.classList.add('cat-medium');
-                  else if (catSelect.value === 'High') catSelect.classList.add('cat-high');
-                }
-                catSelect.addEventListener('change', updateCategoryColor);
-                updateCategoryColor();
-              });
-            </script>
+      <form id="workPackageForm" method="POST" action="{{ auth()->user() && auth()->user()->role == 'Supplier' ? route('supplier.expedition_v2.save') : route('manager.expedition_v2.save') }}">
+        @csrf
+        @if(isset($context) && $context->id)
+          <input type="hidden" name="context_id" value="{{ $context->id }}">
+        @endif
+        <!-- ACCORDION: GENERAL INFO -->
+        <div class="accordion-item" id="work-package-accordion">
+          <button class="accordion-trigger" type="button" onclick="toggleAccordion(this)">
+            <div class="accordion-trigger-left">
+              <div class="panel-dot" style="background:#2563eb"></div>
+              <h2>Work Package</h2>
+            </div>
+            <div class="accordion-arrow">▼</div>
+          </button>
+          <div class="accordion-body">
+          <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            const url = new URL(window.location.href);
+            if (url.searchParams.get('edit') === '1') {
+              const trigger = document.querySelector('#work-package-accordion .accordion-trigger');
+              const body = document.querySelector('#work-package-accordion .accordion-body');
+              if (trigger && body) {
+                trigger.classList.add('open');
+                body.classList.add('open');
+              }
+            }
+          });
+          </script>
+            <div class="field-group">
+              <div class="field-label">Work Package No.</div>
+              <input class="field-value" type="text" placeholder="Work Package No." name="work_package_no" value="{{ $context->work_package_no ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Work Package Name</div>
+              <input class="field-value" type="text" placeholder="Work Package Name" name="workpackage_name" value="{{ $context->workpackage_name ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">PO Number</div>
+              <input class="field-value" type="text" placeholder="PO Number" name="po_number" value="{{ $context->po_number ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Expediting Category</div>
+              <select class="field-value" name="expediting_category" @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
+                <option value="">Select Category</option>
+                <option value="Low" {{ ($context->expediting_category ?? '') == 'Low' ? 'selected' : '' }}>Low</option>
+                <option value="Medium" {{ ($context->expediting_category ?? '') == 'Medium' ? 'selected' : '' }}>Medium</option>
+                <option value="High" {{ ($context->expediting_category ?? '') == 'High' ? 'selected' : '' }}>High</option>
+              </select>
+              <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                  const catSelect = document.querySelector('select[name="expediting_category"]');
+                  function updateCategoryColor() {
+                    catSelect.classList.remove('cat-low', 'cat-medium', 'cat-high');
+                    if (catSelect.value === 'Low') catSelect.classList.add('cat-low');
+                    else if (catSelect.value === 'Medium') catSelect.classList.add('cat-medium');
+                    else if (catSelect.value === 'High') catSelect.classList.add('cat-high');
+                  }
+                  catSelect.addEventListener('change', updateCategoryColor);
+                  updateCategoryColor();
+                });
+              </script>
+              <style>
+                .cat-low { background: #d1fae5 !important; }
+                .cat-medium { background: #fef9c3 !important; }
+                .cat-high { background: #fecaca !important; }
+              </style>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Supplier</div>
+              <select class="field-value" name="supplier" @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
+                <option value="">Select Supplier</option>
+                @foreach(\App\Models\ExpeditingForm::distinct()->orderBy('supplier')->pluck('supplier') as $supplier)
+                  @if($supplier)
+                    <option value="{{ $supplier }}" {{ ($context->supplier ?? '') == $supplier ? 'selected' : '' }}>{{ $supplier }}</option>
+                  @endif
+                @endforeach
+              </select>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Order Date</div>
+              <input class="field-value" type="date" placeholder="Order Date" name="order_date" value="{{ $context->order_date ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Forecast Delivery to Site</div>
+              <input class="field-value" type="date" placeholder="Forecast Delivery to Site" name="forecast_delivery_to_site" value="{{ $context->forecast_delivery_to_site ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Incoterms</div>
+              <select class="field-value" name="incoterms" @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
+                <option value="">No Select</option>
+                <option value="Not Available" {{ ($context->incoterms ?? '') == 'Not Available' ? 'selected' : '' }}>Not Available</option>
+                <option value="DAP" {{ ($context->incoterms ?? '') == 'DAP' ? 'selected' : '' }}>DAP</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Exyte Procurement Contract Manager</div>
+              <input class="field-value" type="text" placeholder="Exyte Procurement Contract Manager" name="exyte_procurement_contract_manager" value="{{ $context->exyte_procurement_contract_manager ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Customer Procurement Contact</div>
+              <input class="field-value" type="text" placeholder="Customer Procurement Contact" name="customer_procurement_contact" value="{{ $context->customer_procurement_contact ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Technical Workpackage Owner</div>
+              <input class="field-value" type="text" placeholder="Technical Workpackage Owner" name="technical_workpackage_owner" value="{{ $context->technical_workpackage_owner ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Expediting Contact</div>
+              <input class="field-value" type="text" placeholder="Expediting Contact" name="expediting_contact" value="{{ $context->expediting_contact ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+              <input type="hidden" name="executions[0][expediting_contact]" id="exec_expediting_contact">
+            </div>
+            <div class="field-group">
+              <div class="field-label">Workstream/Building</div>
+              <input class="field-value" type="text" placeholder="Workstream/Building" name="workstream_building" value="{{ $context->workstream_building ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+              <input type="hidden" name="executions[0][workstream_building]" id="exec_workstream_building">
+            </div>
+            <div style="display:none;">
+              <input type="hidden" name="executions[0][work_package]" id="exec_work_package">
+            </div>
+            <div style="display:none;">
+              <input type="hidden" name="ajaxform" value="1">
+            </div>
+            <div class="field-group" style="margin-top:24px;">
+              <div class="field-label" style="margin-bottom:8px;">MILESTONES <hr style="margin:0 0 8px 0; border: none; border-top: 1px solid #e0e0e0;"/></div>
+              <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
+                <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
+                  {{-- <span style="margin-bottom:4px;">COMPLETED</span>
+                  <input type="checkbox" name="milestones[]" value="Completed" class="toggle-switch" style="display:none;">
+                  <span class="custom-toggle"></span> --}}
+                </label>
+                <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
+                  <span style="margin-bottom:4px;">LLI</span>
+                  <input type="checkbox" name="lli" value="1" class="toggle-switch" style="display:none;" @if(($context->lli ?? null) == 1) checked @endif @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
+                  <span class="custom-toggle"></span>
+                </label>
+                <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
+                  <span style="margin-bottom:4px;">CONTRACT</span>
+                  <input type="checkbox" name="contract_data_available_dmcs" value="1" class="toggle-switch" style="display:none;" @if(($context->contract_data_available_dmcs ?? null) == 1) checked @endif @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
+                  <span class="custom-toggle"></span>
+                </label>
+                <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
+                  <span style="margin-bottom:4px;">KICK OFF</span>
+                  <input type="checkbox" name="kickoff_status" value="1" class="toggle-switch" style="display:none;" @if(($context->kickoff_status ?? null) == 1) checked @endif @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
+                  <span class="custom-toggle"></span>
+                </label>
+                <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
+                  <span style="margin-bottom:4px;">DELIVERED</span>
+                  <input type="checkbox" name="delivered" value="1" class="toggle-switch" style="display:none;" @if(($context->delivered ?? null) == 1) checked @endif @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
+                  <span class="custom-toggle"></span>
+                </label>
+              </div>
+            </div>
             <style>
-              .cat-low { background: #d1fae5 !important; }
-              .cat-medium { background: #fef9c3 !important; }
-              .cat-high { background: #fecaca !important; }
+              .custom-toggle {
+                display: inline-block;
+                width: 40px;
+                height: 22px;
+                background: #e5e7eb; /* light grey */
+                border-radius: 22px;
+                position: relative;
+                transition: background 0.2s;
+                cursor: pointer;
+              }
+              .custom-toggle:before {
+                content: '';
+                position: absolute;
+                left: 3px;
+                top: 3px;
+                width: 16px;
+                height: 16px;
+                background: #fff;
+                border-radius: 50%;
+                transition: transform 0.2s;
+              }
+              input.toggle-switch:checked + .custom-toggle {
+                background: #01426a; /* on color */
+              }
+              input.toggle-switch:checked + .custom-toggle:before {
+                transform: translateX(18px);
+              }
             </style>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Supplier</div>
-            <select class="field-value" name="supplier" @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
-              <option value="">Select Supplier</option>
-              @foreach(\App\Models\ExpeditingForm::distinct()->orderBy('supplier')->pluck('supplier') as $supplier)
-                @if($supplier)
-                  <option value="{{ $supplier }}" {{ ($context->supplier ?? '') == $supplier ? 'selected' : '' }}>{{ $supplier }}</option>
-                @endif
-              @endforeach
-            </select>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Order Date</div>
-            <input class="field-value" type="date" placeholder="Order Date" name="order_date" value="{{ $context->order_date ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Forecast Delivery to Site</div>
-            <input class="field-value" type="date" placeholder="Forecast Delivery to Site" name="forecast_delivery_to_site" value="{{ $context->forecast_delivery_to_site ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Incoterms</div>
-            <select class="field-value" name="incoterms" @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
-              <option value="">No Select</option>
-              <option value="Not Available" {{ ($context->incoterms ?? '') == 'Not Available' ? 'selected' : '' }}>Not Available</option>
-              <option value="DAP" {{ ($context->incoterms ?? '') == 'DAP' ? 'selected' : '' }}>DAP</option>
-            </select>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Exyte Procurement Contract Manager</div>
-            <input class="field-value" type="text" placeholder="Exyte Procurement Contract Manager" name="exyte_procurement_contract_manager" value="{{ $context->exyte_procurement_contract_manager ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Customer Procurement Contact</div>
-            <input class="field-value" type="text" placeholder="Customer Procurement Contact" name="customer_procurement_contact" value="{{ $context->customer_procurement_contact ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Technical Workpackage Owner</div>
-            <input class="field-value" type="text" placeholder="Technical Workpackage Owner" name="technical_workpackage_owner" value="{{ $context->technical_workpackage_owner ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Expediting Contact</div>
-            <input class="field-value" type="text" placeholder="Expediting Contact" name="expediting_contact" value="{{ $context->expediting_contact ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
-            <input type="hidden" name="executions[0][expediting_contact]" id="exec_expediting_contact">
-          </div>
-          <div class="field-group">
-            <div class="field-label">Workstream/Building</div>
-            <input class="field-value" type="text" placeholder="Workstream/Building" name="workstream_building" value="{{ $context->workstream_building ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
-            <input type="hidden" name="executions[0][workstream_building]" id="exec_workstream_building">
-          </div>
-          <div style="display:none;">
-            <input type="hidden" name="executions[0][work_package]" id="exec_work_package">
-          </div>
-          <div style="display:none;">
-            <input type="hidden" name="ajaxform" value="1">
-          </div>
-          <div class="field-group" style="margin-top:24px;">
-            <div class="field-label" style="margin-bottom:8px;">MILESTONES <hr style="margin:0 0 8px 0; border: none; border-top: 1px solid #e0e0e0;"/></div>
-            <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
-              <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
-                {{-- <span style="margin-bottom:4px;">COMPLETED</span>
-                <input type="checkbox" name="milestones[]" value="Completed" class="toggle-switch" style="display:none;">
-                <span class="custom-toggle"></span> --}}
-              </label>
-              <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
-                <span style="margin-bottom:4px;">LLI</span>
-                <input type="checkbox" name="milestones[]" value="LLI" class="toggle-switch" style="display:none;">
-                <span class="custom-toggle"></span>
-              </label>
-              <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
-                <span style="margin-bottom:4px;">CONTRACT</span>
-                <input type="checkbox" name="milestones[]" value="Contract" class="toggle-switch" style="display:none;">
-                <span class="custom-toggle"></span>
-              </label>
-              <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
-                <span style="margin-bottom:4px;">KICK OFF</span>
-                <input type="checkbox" name="milestones[]" value="Kick Off" class="toggle-switch" style="display:none;">
-                <span class="custom-toggle"></span>
-              </label>
+            <div class="field-group" style="text-align:right; margin-top:12px;">
+              <button id="saveWorkPackage" class="btn btn-primary" type="submit">Save Work Package</button>
+              <script>
+              let workPackageSaved = false;
+              document.addEventListener('DOMContentLoaded', function() {
+                const form = document.getElementById('workPackageForm');
+                const btn = document.getElementById('saveWorkPackage');
+                // Only handle submit from the Save button
+                btn.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  if (workPackageSaved) return;
+                  // Autofill executions fields from visible fields
+                  const parent = btn.closest('.accordion-body');
+                  document.getElementById('exec_work_package').value = parent.querySelector('input[name="workpackage_name"]').value;
+                  document.getElementById('exec_workstream_building').value = parent.querySelector('input[name="workstream_building"]').value;
+                  document.getElementById('exec_expediting_contact').value = parent.querySelector('input[name="expediting_contact"]').value;
+                  var formData = new FormData(form);
+                  fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                      'X-Requested-With': 'XMLHttpRequest',
+                      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: formData
+                  })
+                  .then(res => res.json())
+                  .then(resp => {
+                    if (resp.success && resp.context_id) {
+                      workPackageSaved = true;
+                      btn.textContent = 'Update Work Package';
+                      btn.classList.remove('btn-primary');
+                      btn.classList.add('btn-success');
+                      // Update URL to edit mode with context_id
+                      const url = new URL(window.location.href);
+                      url.searchParams.set('context_id', resp.context_id);
+                      url.searchParams.set('edit', '1');
+                      window.history.replaceState({}, '', url);
+                      if (typeof showSavePopup === 'function') {
+                        showSavePopup('Work package saved successfully!');
+                      } else {
+                        alert('Work package saved successfully!');
+                      }
+                    } else if (resp.errors) {
+                      alert('Error: ' + (Array.isArray(resp.errors) ? resp.errors.join('\n') : JSON.stringify(resp.errors)));
+                    } else {
+                      alert('Failed to save work package.');
+                    }
+                  })
+                  .catch(() => {
+                    alert('Failed to save work package.');
+                  });
+                });
+              });
+              </script>
             </div>
           </div>
-          <style>
-            .custom-toggle {
-              display: inline-block;
-              width: 40px;
-              height: 22px;
-              background: #e5e7eb; /* light grey */
-              border-radius: 22px;
-              position: relative;
-              transition: background 0.2s;
-              cursor: pointer;
-            }
-            .custom-toggle:before {
-              content: '';
-              position: absolute;
-              left: 3px;
-              top: 3px;
-              width: 16px;
-              height: 16px;
-              background: #fff;
-              border-radius: 50%;
-              transition: transform 0.2s;
-            }
-            input.toggle-switch:checked + .custom-toggle {
-              background: #01426a; /* on color */
-            }
-            input.toggle-switch:checked + .custom-toggle:before {
-              transform: translateX(18px);
-            }
-          </style>
-          <div class="field-group" style="text-align:right; margin-top:12px;">
-            <button id="saveWorkPackage" class="btn btn-primary">Save Work Package</button>
-            <script>
-            let workPackageSaved = false;
-            document.addEventListener('DOMContentLoaded', function() {
-              const btn = document.getElementById('saveWorkPackage');
-              btn.addEventListener('click', function() {
-                if (workPackageSaved) return;
-                // Autofill executions fields from visible fields
-                const parent = btn.closest('.accordion-body');
-                document.getElementById('exec_work_package').value = parent.querySelector('input[name="workpackage_name"]').value;
-                document.getElementById('exec_workstream_building').value = parent.querySelector('input[name="workstream_building"]').value;
-                document.getElementById('exec_expediting_contact').value = parent.querySelector('input[name="expediting_contact"]').value;
-                var formData = new FormData();
-                parent.querySelectorAll('input, select').forEach(el => {
-                  if (el.type === 'checkbox') {
-                    if (!el.checked) return;
-                  }
-                  // Handle multiple values for checkboxes
-                  if (el.type === 'checkbox' && el.name.endsWith('[]')) {
-                    formData.append(el.name, el.value);
-                  } else {
-                    formData.append(el.name, el.value);
-                  }
-                });
-                fetch('http://127.0.0.1:8000/expediting-forms', {
-                  method: 'POST',
-                  headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                  },
-                  body: formData
-                })
-                .then(res => res.json())
-                .then(resp => {
-                  if (resp.success && resp.context_id) {
-                    workPackageSaved = true;
-                    btn.textContent = 'Update Work Package';
-                    btn.classList.remove('btn-primary');
-                    btn.classList.add('btn-success');
-                    // Update URL to edit mode with context_id
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('context_id', resp.context_id);
-                    url.searchParams.set('edit', '1');
-                    window.history.replaceState({}, '', url);
-                  } else if (resp.errors) {
-                    alert('Error: ' + (Array.isArray(resp.errors) ? resp.errors.join('\n') : JSON.stringify(resp.errors)));
-                  } else {
-                    alert('Failed to save work package.');
-                  }
-                })
-                .catch(() => {
-                  alert('Failed to save work package.');
-                });
-              });
-            });
-            </script>
-          </div>
         </div>
-      </div>
 
-      <!-- ACCORDION: CONTACTS -->
-      <div class="accordion-item">
-        <button class="accordion-trigger" onclick="toggleAccordion(this)">
-          <div class="accordion-trigger-left">
-            <div class="panel-dot" style="background:var(--accent2);"></div>
-            <h2>Contacts</h2>
+        <!-- ACCORDION: CONTACTS -->
+        <div class="accordion-item">
+          <button class="accordion-trigger" type="button" onclick="toggleAccordion(this)">
+            <div class="accordion-trigger-left">
+              <div class="panel-dot" style="background:var(--accent2);"></div>
+              <h2>Contacts</h2>
+            </div>
+            <div class="accordion-arrow">▼</div>
+          </button>
+          <div class="accordion-body">
+            <!-- Empty for now -->
           </div>
-          <div class="accordion-arrow">▼</div>
-        </button>
-        <div class="accordion-body">
-          <!-- Empty for now -->
         </div>
-      </div>
         	  <!-- DELIVERY TRACKING -->
 <div class="accordion-item">
-  <button class="accordion-trigger" onclick="toggleAccordion(this)">
+  <button class="accordion-trigger" type="button" onclick="toggleAccordion(this)">
     <div class="accordion-trigger-left">
       <div class="panel-dot" style="background:#2563eb"></div>
       <h2>Delivery Tracking</h2>
@@ -1099,7 +1119,7 @@
 
 	  <!-- CALENDAR & COMMENTS ACCORDION -->
       <div class="accordion-item">
-        <button class="accordion-trigger" onclick="toggleAccordion(this)">
+        <button class="accordion-trigger" type="button" onclick="toggleAccordion(this)">
           <div class="accordion-trigger-left">
             <div class="panel-dot" style="background:#7c3aed;"></div>
             <h2>Calendar &amp; Comments</h2>
@@ -1455,7 +1475,7 @@
         <h2><span class="panel-dot" style="margin-right:8px;"></span>Equipment</h2>
         <div class="equipment-btn-row">
           <!-- Email button temporarily removed -->
-          <button class="add-btn" onclick="openModal()" @if(!request('context_id')) disabled style="opacity:0.5;cursor:not-allowed;" @endif>+ Add Equipment</button>
+          <button type="button" class="add-btn" onclick="openModal()" @if(!request('context_id')) disabled style="opacity:0.5;cursor:not-allowed;" @endif>+ Add Equipment</button>
         </div>
         <style>
           .equipment-btn-row {

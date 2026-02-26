@@ -21,6 +21,7 @@ Route::get('/api/get-work-packages-by-context', [\App\Http\Controllers\Expeditin
 // Manager-only Expedition Form V2
 Route::middleware(['auth', 'role:Manager'])->group(function () {
     Route::get('/manager/expedition-v2', [\App\Http\Controllers\SupplierExpeditionV2Controller::class, 'show'])->name('manager.expedition_v2');
+    Route::post('/manager/expedition-v2/save', [\App\Http\Controllers\ExpeditingContextController::class, 'saveOrUpdate'])->name('manager.expedition_v2.save');
 });
 
 // Expeditor-only Expedition Form V2
@@ -31,6 +32,7 @@ Route::middleware(['auth', 'role:Expeditor'])->group(function () {
 // Supplier-only Expedition Form V2
 Route::middleware(['auth', 'role:Supplier'])->group(function () {
     Route::get('/supplier/expedition-v2', [\App\Http\Controllers\SupplierExpeditionV2Controller::class, 'show'])->name('supplier.expedition_v2');
+    Route::post('/supplier/expedition-v2/save', [\App\Http\Controllers\ExpeditingContextController::class, 'saveOrUpdate'])->name('supplier.expedition_v2.save');
 });
 
 // Notification routes

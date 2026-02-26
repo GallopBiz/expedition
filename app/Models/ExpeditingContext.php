@@ -21,6 +21,8 @@ class ExpeditingContext extends Model
         'kickoff_status',
         'technical_workpackage_owner',
         'forecast_delivery_to_site',
+        'workstream_building',
+        'delivered',
     ];
 
     public function executions()

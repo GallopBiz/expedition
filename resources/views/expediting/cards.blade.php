@@ -33,7 +33,7 @@
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg-page); color: var(--text-dark); min-height: 100vh; }
-  main { max-width: 1240px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  main { max-width: 1270px; margin: 0 auto; }
   .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
   @media (max-width: 960px) { .card-grid { grid-template-columns: repeat(2,1fr); } }
   @media (max-width: 520px) { .card-grid { grid-template-columns: 1fr; } }
@@ -186,12 +186,12 @@
           @endif
         </div>
         <div style="margin-left: auto; text-align: right;">
-          <span style="font-size: .65rem; font-weight: 700; color: var(--text-dark);">Actual Delivery: {{ $form->actual_delivery_to_site_supplier ?? 'N/A' }}</span>
+          <span style="font-size: .65rem; font-weight: 700; color: var(--text-dark);">Kick Off: {{ ($form->kickoff_status ?? 0) == 1 ? 'Yes' : 'No' }}</span>
         </div>
       </div>
       <div class="card-head">
         <p class="card-title">
-          {{ $form->workpackage_name ?? $form->work_package_name ?? '' }} - {{ $form->work_package ?? $form->work_package_number ?? '' }}
+          {{ $form->workpackage_name ?? '' }} - {{ $form->work_package_no ?? $form->po_number ?? '' }}
         </p>
       </div>
       <div class="card-owner" style="display: flex; align-items: center; gap: .4rem; font-size: .76rem;">
@@ -217,7 +217,7 @@
               </button>
             </form>
             <!-- New email icon for one-time supplier form submission -->
-            <button type="button" class="email-btn-onetime" title="Send One-Time Supplier Link" style="background:none;border:none;padding:0;display:flex;align-items:center;color:#3cb546;cursor:pointer;font-size:1.1em;" onclick="confirmOneTimeSupplierEmail(this, {{ $form->context_id }})">
+                  <button type="button" class="email-btn-onetime" title="Send One-Time Supplier Link" style="background:none;border:none;padding:0;display:flex;align-items:center;color:#3cb546;cursor:pointer;font-size:1.1em;" onclick="confirmOneTimeSupplierEmail(this, {{ $form->context_id ?? $form->id }})">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M2 2h12v12H2V2zm1 1v10h10V3H3zm2 2h6v6H5V5zm1 1v4h4V6H6z"/>
               </svg>
@@ -305,9 +305,7 @@
       </div>
       @endif
       <hr class="card-divider">
-      <div style="font-size: .85rem; color: var(--text-mid); margin-bottom: 0.2rem;">
-        <strong>Delivered:</strong> {{ $form->delivered_equipment ?? 0 }}/{{ $form->total_equipment ?? 0 }}
-      </div>
+     
       <div class="circles-row">
         <div class="circle-item">
           <div class="circle-wrap" data-pct="{{ $form->avg_design ?? 0 }}">
@@ -348,7 +346,7 @@
       <div class="card-actions">
         @php
           $delivered = $form->delivered;
-          $isDelivered = ($delivered === true || $delivered === 1 || $delivered === 'Yes');
+          $isDelivered = ($delivered == 1);
         @endphp
         <span class="badge-delivered {{ $isDelivered ? 'badge-delivered-yes' : 'badge-delivered-no' }}">
           Delivered {{ $isDelivered ? 'Yes' : 'No' }}
