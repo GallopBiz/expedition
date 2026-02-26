@@ -1,4 +1,4 @@
-    <style>
+<style>
       .dt-table {
         margin:0 10px 12px;
         border:1px solid var(--border);
@@ -688,56 +688,66 @@
               <span id="collapseArrow" class="collapse-arrow" style="width:22px;height:22px;border:1px solid var(--border2);border-radius:5px;display:flex;align-items:center;justify-content:center;color:var(--muted2);font-size:10px;transition:transform 0.25s,background 0.15s;background:var(--surface2);">▲</span>
             </div>
           </div>
-          <div class="overall-body" id="overallBody">
+          <div class="overall-body open" id="overallBody">
             <div class="gauges-strip" style="display:flex;gap:14px;padding:18px 32px 22px;border-top:1px solid var(--border);">
+              @php
+                $count = $equipments->count() ?: 1;
+                $avgDesign = round($equipments->avg('design'));
+                $avgMaterial = round($equipments->avg('material'));
+                $avgFab = round($equipments->avg('fab'));
+                $avgFat = round($equipments->avg('fat'));
+                $avgDelivered = round($equipments->avg('delivered'));
+                $deliveredCount = $equipments->where('status', 'Delivered')->count();
+                $totalCount = $equipments->count();
+              @endphp
               <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
                 <div class="gauge-ring">
-                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill green" id="ringDesign" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="89.97" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:var(--accent);"/><text class="gauge-number" id="gaugeDesignNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">41%</text></svg>
+                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill green" id="ringDesign" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="{{ 150.8 - ($avgDesign/100)*150.8 }}" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:var(--accent);"/><text class="gauge-number" id="gaugeDesignNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">{{ $avgDesign }}%</text></svg>
                 </div>
                 <div>
                   <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Design Status</div>
-                  <div class="gauge-value green" id="gaugeDesign" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--accent);">41%</div>
+                  <div class="gauge-value green" id="gaugeDesign" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--accent);">{{ $avgDesign }}%</div>
                   <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
                 </div>
               </div>
               <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
                 <div class="gauge-ring">
-                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill blue" id="ringMaterial" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="91.99" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:var(--accent2);"/><text class="gauge-number" id="gaugeMaterialNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">39%</text></svg>
+                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill blue" id="ringMaterial" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="{{ 150.8 - ($avgMaterial/100)*150.8 }}" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:var(--accent2);"/><text class="gauge-number" id="gaugeMaterialNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">{{ $avgMaterial }}%</text></svg>
                 </div>
                 <div>
                   <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Material Status</div>
-                  <div class="gauge-value blue" id="gaugeMaterial" style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--accent2);">39%</div>
+                  <div class="gauge-value blue" id="gaugeMaterial" style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--accent2);">{{ $avgMaterial }}%</div>
                   <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
                 </div>
               </div>
               <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
                 <div class="gauge-ring">
-                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill warn" id="ringFab" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="93.5" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:var(--warn);"/><text class="gauge-number" id="gaugeFabNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">38%</text></svg>
+                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill warn" id="ringFab" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="{{ 150.8 - ($avgFab/100)*150.8 }}" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:var(--warn);"/><text class="gauge-number" id="gaugeFabNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">{{ $avgFab }}%</text></svg>
                 </div>
                 <div>
                   <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Fabrication Status</div>
-                  <div class="gauge-value warn" id="gaugeFab" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--warn);">38%</div>
+                  <div class="gauge-value warn" id="gaugeFab" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--warn);">{{ $avgFab }}%</div>
                   <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
                 </div>
               </div>
               <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
                 <div class="gauge-ring">
-                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill shipment" id="ringShipment" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="107.07" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#2563eb;"/><text class="gauge-number" id="gaugeShipmentNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">29%</text></svg>
+                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill shipment" id="ringShipment" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="{{ 150.8 - ($avgFat/100)*150.8 }}" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#2563eb;"/><text class="gauge-number" id="gaugeShipmentNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">{{ $avgFat }}%</text></svg>
                 </div>
                 <div>
                   <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">FAT Status</div>
-                  <div class="gauge-value silver" id="gaugeFat" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--muted2);">29%</div>
+                  <div class="gauge-value silver" id="gaugeFat" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:var(--muted2);">{{ $avgFat }}%</div>
                   <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
                 </div>
               </div>
               <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
                 <div class="gauge-ring">
-                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill delivered" id="ringDelivered" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="130" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#01426a;"/><text class="gauge-number" id="gaugeDeliveredNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">0%</text></svg>
+                  <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="24" style="fill:none;stroke:var(--border);stroke-width:5;"/><circle class="fill delivered" id="ringDelivered" cx="30" cy="30" r="24" stroke-dasharray="150.8" stroke-dashoffset="{{ $totalCount ? (150.8 - ($deliveredCount/$totalCount)*150.8) : 150.8 }}" style="fill:none;stroke-width:5;stroke-linecap:round;stroke:#3cb546;"/><text class="gauge-number" id="gaugeDeliveredNum" x="30" y="36" text-anchor="middle" style="font-size:12px;font-weight:500;color:var(--text);">{{ $deliveredCount }}/{{ $totalCount }}</text></svg>
                 </div>
                 <div>
                   <div class="gauge-title" style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Delivered</div>
-                  <div class="gauge-value delivered" id="gaugeDelivered" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:#01426a;">0%</div>
-                  <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Avg all equipment</div>
+                  <div class="gauge-value delivered" id="gaugeDelivered" style="font-family:'Figtree', ui-sans-serif, sans-serif;font-size:20px;font-weight:700;line-height:1;margin-bottom:3px;color:#3cb546;">{{ $deliveredCount }}/{{ $totalCount }}</div>
+                  <div class="gauge-sub" style="font-size:10px;color:var(--muted);">Delivered/Total</div>
                 </div>
               </div>
             </div>
@@ -758,254 +768,261 @@
   <div class="main">
     <!-- LEFT: WORK PACKAGE DETAILS -->
     <div class="left-panel">
-      <!-- ACCORDION: GENERAL INFO -->
-      <div class="accordion-item" id="work-package-accordion">
-        <button class="accordion-trigger" onclick="toggleAccordion(this)">
-          <div class="accordion-trigger-left">
-            <div class="panel-dot" style="background:#2563eb"></div>
-            <h2>Work Package</h2>
-          </div>
-          <div class="accordion-arrow">▼</div>
-        </button>
-        <div class="accordion-body">
-          <div class="field-group">
-            <div class="field-label">Work Package No.</div>
-            <input class="field-value" type="text" placeholder="Work Package No." name="work_package_no" value="{{ $context->work_package_no ?? '' }}">
-          </div>
-          <div class="field-group">
-            <div class="field-label">Work Package Name</div>
-            <input class="field-value" type="text" placeholder="Work Package Name" name="workpackage_name" value="{{ $context->workpackage_name ?? '' }}">
-          </div>
-          <div class="field-group">
-            <div class="field-label">PO Number</div>
-            <input class="field-value" type="text" placeholder="PO Number" name="po_number" value="{{ $context->po_number ?? '' }}">
-          </div>
-          <div class="field-group">
-            <div class="field-label">Expediting Category</div>
-            <select class="field-value" name="expediting_category">
-              <option value="">Select Category</option>
-              <option value="Low" {{ ($context->expediting_category ?? '') == 'Low' ? 'selected' : '' }}>Low</option>
-              <option value="Medium" {{ ($context->expediting_category ?? '') == 'Medium' ? 'selected' : '' }}>Medium</option>
-              <option value="High" {{ ($context->expediting_category ?? '') == 'High' ? 'selected' : '' }}>High</option>
-            </select>
-            <script>
-              document.addEventListener('DOMContentLoaded', function() {
-                const catSelect = document.querySelector('select[name="expediting_category"]');
-                function updateCategoryColor() {
-                  catSelect.classList.remove('cat-low', 'cat-medium', 'cat-high');
-                  if (catSelect.value === 'Low') catSelect.classList.add('cat-low');
-                  else if (catSelect.value === 'Medium') catSelect.classList.add('cat-medium');
-                  else if (catSelect.value === 'High') catSelect.classList.add('cat-high');
-                }
-                catSelect.addEventListener('change', updateCategoryColor);
-                updateCategoryColor();
-              });
-            </script>
+      <form id="workPackageForm" method="POST" action="{{ auth()->user() && auth()->user()->role == 'Supplier' ? route('supplier.expedition_v2.save') : route('manager.expedition_v2.save') }}">
+        @csrf
+        @if(isset($context) && $context->id)
+          <input type="hidden" name="context_id" value="{{ $context->id }}">
+        @endif
+        <!-- ACCORDION: GENERAL INFO -->
+        <div class="accordion-item" id="work-package-accordion">
+          <button class="accordion-trigger" type="button" onclick="toggleAccordion(this)">
+            <div class="accordion-trigger-left">
+              <div class="panel-dot" style="background:#2563eb"></div>
+              <h2>Work Package</h2>
+            </div>
+            <div class="accordion-arrow">▼</div>
+          </button>
+          <div class="accordion-body">
+          <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            const url = new URL(window.location.href);
+            if (url.searchParams.get('edit') === '1') {
+              const trigger = document.querySelector('#work-package-accordion .accordion-trigger');
+              const body = document.querySelector('#work-package-accordion .accordion-body');
+              if (trigger && body) {
+                trigger.classList.add('open');
+                body.classList.add('open');
+              }
+            }
+          });
+          </script>
+            <div class="field-group">
+              <div class="field-label">Work Package No.</div>
+              <input class="field-value" type="text" placeholder="Work Package No." name="work_package_no" value="{{ $context->work_package_no ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Work Package Name</div>
+              <input class="field-value" type="text" placeholder="Work Package Name" name="workpackage_name" value="{{ $context->workpackage_name ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">PO Number</div>
+              <input class="field-value" type="text" placeholder="PO Number" name="po_number" value="{{ $context->po_number ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Expediting Category</div>
+              <select class="field-value" name="expediting_category" @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
+                <option value="">Select Category</option>
+                <option value="Low" {{ ($context->expediting_category ?? '') == 'Low' ? 'selected' : '' }}>Low</option>
+                <option value="Medium" {{ ($context->expediting_category ?? '') == 'Medium' ? 'selected' : '' }}>Medium</option>
+                <option value="High" {{ ($context->expediting_category ?? '') == 'High' ? 'selected' : '' }}>High</option>
+              </select>
+              <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                  const catSelect = document.querySelector('select[name="expediting_category"]');
+                  function updateCategoryColor() {
+                    catSelect.classList.remove('cat-low', 'cat-medium', 'cat-high');
+                    if (catSelect.value === 'Low') catSelect.classList.add('cat-low');
+                    else if (catSelect.value === 'Medium') catSelect.classList.add('cat-medium');
+                    else if (catSelect.value === 'High') catSelect.classList.add('cat-high');
+                  }
+                  catSelect.addEventListener('change', updateCategoryColor);
+                  updateCategoryColor();
+                });
+              </script>
+              <style>
+                .cat-low { background: #d1fae5 !important; }
+                .cat-medium { background: #fef9c3 !important; }
+                .cat-high { background: #fecaca !important; }
+              </style>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Supplier</div>
+              <select class="field-value" name="supplier" @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
+                <option value="">Select Supplier</option>
+                @foreach(\App\Models\ExpeditingForm::distinct()->orderBy('supplier')->pluck('supplier') as $supplier)
+                  @if($supplier)
+                    <option value="{{ $supplier }}" {{ ($context->supplier ?? '') == $supplier ? 'selected' : '' }}>{{ $supplier }}</option>
+                  @endif
+                @endforeach
+              </select>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Order Date</div>
+              <input class="field-value" type="date" placeholder="Order Date" name="order_date" value="{{ $context->order_date ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Forecast Delivery to Site</div>
+              <input class="field-value" type="date" placeholder="Forecast Delivery to Site" name="forecast_delivery_to_site" value="{{ $context->forecast_delivery_to_site ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Incoterms</div>
+              <select class="field-value" name="incoterms" @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
+                <option value="">No Select</option>
+                <option value="Not Available" {{ ($context->incoterms ?? '') == 'Not Available' ? 'selected' : '' }}>Not Available</option>
+                <option value="DAP" {{ ($context->incoterms ?? '') == 'DAP' ? 'selected' : '' }}>DAP</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Exyte Procurement Contract Manager</div>
+              <input class="field-value" type="text" placeholder="Exyte Procurement Contract Manager" name="exyte_procurement_contract_manager" value="{{ $context->exyte_procurement_contract_manager ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Customer Procurement Contact</div>
+              <input class="field-value" type="text" placeholder="Customer Procurement Contact" name="customer_procurement_contact" value="{{ $context->customer_procurement_contact ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Technical Workpackage Owner</div>
+              <input class="field-value" type="text" placeholder="Technical Workpackage Owner" name="technical_workpackage_owner" value="{{ $context->technical_workpackage_owner ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Expediting Contact</div>
+              <input class="field-value" type="text" placeholder="Expediting Contact" name="expediting_contact" value="{{ $context->expediting_contact ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+              <input type="hidden" name="executions[0][expediting_contact]" id="exec_expediting_contact">
+            </div>
+            <div class="field-group">
+              <div class="field-label">Workstream/Building</div>
+              <input class="field-value" type="text" placeholder="Workstream/Building" name="workstream_building" value="{{ $context->workstream_building ?? '' }}" @if(auth()->user() && auth()->user()->role == 'Supplier') readonly disabled @endif>
+              <input type="hidden" name="executions[0][workstream_building]" id="exec_workstream_building">
+            </div>
+            <div style="display:none;">
+              <input type="hidden" name="executions[0][work_package]" id="exec_work_package">
+            </div>
+            <div style="display:none;">
+              <input type="hidden" name="ajaxform" value="1">
+            </div>
+            <div class="field-group" style="margin-top:24px;">
+              <div class="field-label" style="margin-bottom:8px;">MILESTONES <hr style="margin:0 0 8px 0; border: none; border-top: 1px solid #e0e0e0;"/></div>
+              <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
+                <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
+                  {{-- <span style="margin-bottom:4px;">COMPLETED</span>
+                  <input type="checkbox" name="milestones[]" value="Completed" class="toggle-switch" style="display:none;">
+                  <span class="custom-toggle"></span> --}}
+                </label>
+                <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
+                  <span style="margin-bottom:4px;">LLI</span>
+                  <input type="checkbox" name="lli" value="1" class="toggle-switch" style="display:none;" @if(($context->lli ?? null) == 1) checked @endif @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
+                  <span class="custom-toggle"></span>
+                </label>
+                <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
+                  <span style="margin-bottom:4px;">CONTRACT</span>
+                  <input type="checkbox" name="contract_data_available_dmcs" value="1" class="toggle-switch" style="display:none;" @if(($context->contract_data_available_dmcs ?? null) == 1) checked @endif @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
+                  <span class="custom-toggle"></span>
+                </label>
+                <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
+                  <span style="margin-bottom:4px;">KICK OFF</span>
+                  <input type="checkbox" name="kickoff_status" value="1" class="toggle-switch" style="display:none;" @if(($context->kickoff_status ?? null) == 1) checked @endif @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
+                  <span class="custom-toggle"></span>
+                </label>
+                <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
+                  <span style="margin-bottom:4px;">DELIVERED</span>
+                  <input type="checkbox" name="delivered" value="1" class="toggle-switch" style="display:none;" @if(($context->delivered ?? null) == 1) checked @endif @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
+                  <span class="custom-toggle"></span>
+                </label>
+              </div>
+            </div>
             <style>
-              .cat-low { background: #d1fae5 !important; }
-              .cat-medium { background: #fef9c3 !important; }
-              .cat-high { background: #fecaca !important; }
+              .custom-toggle {
+                display: inline-block;
+                width: 40px;
+                height: 22px;
+                background: #e5e7eb; /* light grey */
+                border-radius: 22px;
+                position: relative;
+                transition: background 0.2s;
+                cursor: pointer;
+              }
+              .custom-toggle:before {
+                content: '';
+                position: absolute;
+                left: 3px;
+                top: 3px;
+                width: 16px;
+                height: 16px;
+                background: #fff;
+                border-radius: 50%;
+                transition: transform 0.2s;
+              }
+              input.toggle-switch:checked + .custom-toggle {
+                background: #01426a; /* on color */
+              }
+              input.toggle-switch:checked + .custom-toggle:before {
+                transform: translateX(18px);
+              }
             </style>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Supplier</div>
-            <select class="field-value" name="supplier">
-              <option value="">Select Supplier</option>
-              @foreach(\App\Models\ExpeditingForm::distinct()->orderBy('supplier')->pluck('supplier') as $supplier)
-                @if($supplier)
-                  <option value="{{ $supplier }}" {{ ($context->supplier ?? '') == $supplier ? 'selected' : '' }}>{{ $supplier }}</option>
-                @endif
-              @endforeach
-            </select>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Order Date</div>
-            <input class="field-value" type="date" placeholder="Order Date" name="order_date" value="{{ $context->order_date ?? '' }}">
-          </div>
-          <div class="field-group">
-            <div class="field-label">Forecast Delivery to Site</div>
-            <input class="field-value" type="date" placeholder="Forecast Delivery to Site" name="forecast_delivery_to_site" value="{{ $context->forecast_delivery_to_site ?? '' }}">
-          </div>
-          <div class="field-group">
-            <div class="field-label">Incoterms</div>
-            <select class="field-value" name="incoterms">
-              <option value="">No Select</option>
-              <option value="Not Available" {{ ($context->incoterms ?? '') == 'Not Available' ? 'selected' : '' }}>Not Available</option>
-              <option value="DAP" {{ ($context->incoterms ?? '') == 'DAP' ? 'selected' : '' }}>DAP</option>
-            </select>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Exyte Procurement Contract Manager</div>
-            <input class="field-value" type="text" placeholder="Exyte Procurement Contract Manager" name="exyte_procurement_contract_manager" value="{{ $context->exyte_procurement_contract_manager ?? '' }}">
-          </div>
-          <div class="field-group">
-            <div class="field-label">Customer Procurement Contact</div>
-            <input class="field-value" type="text" placeholder="Customer Procurement Contact" name="customer_procurement_contact" value="{{ $context->customer_procurement_contact ?? '' }}">
-          </div>
-          <div class="field-group">
-            <div class="field-label">Technical Workpackage Owner</div>
-            <input class="field-value" type="text" placeholder="Technical Workpackage Owner" name="technical_workpackage_owner" value="{{ $context->technical_workpackage_owner ?? '' }}">
-          </div>
-          <div class="field-group">
-            <div class="field-label">Expediting Contact</div>
-            <input class="field-value" type="text" placeholder="Expediting Contact" name="expediting_contact" value="{{ $context->expediting_contact ?? '' }}">
-            <input type="hidden" name="executions[0][expediting_contact]" id="exec_expediting_contact">
-          </div>
-          <div class="field-group">
-            <div class="field-label">Workstream/Building</div>
-            <input class="field-value" type="text" placeholder="Workstream/Building" name="workstream_building" value="{{ $context->workstream_building ?? '' }}">
-            <input type="hidden" name="executions[0][workstream_building]" id="exec_workstream_building">
-          </div>
-          <div style="display:none;">
-            <input type="hidden" name="executions[0][work_package]" id="exec_work_package">
-          </div>
-          <div style="display:none;">
-            <input type="hidden" name="ajaxform" value="1">
-          </div>
-          <div class="field-group" style="margin-top:24px;">
-            <div class="field-label" style="margin-bottom:8px;">MILESTONES <hr style="margin:0 0 8px 0; border: none; border-top: 1px solid #e0e0e0;"/></div>
-            <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
-              <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
-                {{-- <span style="margin-bottom:4px;">COMPLETED</span>
-                <input type="checkbox" name="milestones[]" value="Completed" class="toggle-switch" style="display:none;">
-                <span class="custom-toggle"></span> --}}
-              </label>
-              <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
-                <span style="margin-bottom:4px;">LLI</span>
-                <input type="checkbox" name="milestones[]" value="LLI" class="toggle-switch" style="display:none;">
-                <span class="custom-toggle"></span>
-              </label>
-              <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
-                <span style="margin-bottom:4px;">CONTRACT</span>
-                <input type="checkbox" name="milestones[]" value="Contract" class="toggle-switch" style="display:none;">
-                <span class="custom-toggle"></span>
-              </label>
-              <label style="display:flex; flex-direction:column; align-items:center; font-size:12px; color:#3b3b3b;">
-                <span style="margin-bottom:4px;">KICK OFF</span>
-                <input type="checkbox" name="milestones[]" value="Kick Off" class="toggle-switch" style="display:none;">
-                <span class="custom-toggle"></span>
-              </label>
+            <div class="field-group" style="text-align:right; margin-top:12px;">
+              <button id="saveWorkPackage" class="btn btn-primary" type="submit">Save Work Package</button>
+              <script>
+              let workPackageSaved = false;
+              document.addEventListener('DOMContentLoaded', function() {
+                const form = document.getElementById('workPackageForm');
+                const btn = document.getElementById('saveWorkPackage');
+                // Only handle submit from the Save button
+                btn.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  if (workPackageSaved) return;
+                  // Autofill executions fields from visible fields
+                  const parent = btn.closest('.accordion-body');
+                  document.getElementById('exec_work_package').value = parent.querySelector('input[name="workpackage_name"]').value;
+                  document.getElementById('exec_workstream_building').value = parent.querySelector('input[name="workstream_building"]').value;
+                  document.getElementById('exec_expediting_contact').value = parent.querySelector('input[name="expediting_contact"]').value;
+                  var formData = new FormData(form);
+                  fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                      'X-Requested-With': 'XMLHttpRequest',
+                      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: formData
+                  })
+                  .then(res => res.json())
+                  .then(resp => {
+                    if (resp.success && resp.context_id) {
+                      workPackageSaved = true;
+                      btn.textContent = 'Update Work Package';
+                      btn.classList.remove('btn-primary');
+                      btn.classList.add('btn-success');
+                      // Update URL to edit mode with context_id
+                      const url = new URL(window.location.href);
+                      url.searchParams.set('context_id', resp.context_id);
+                      url.searchParams.set('edit', '1');
+                      window.history.replaceState({}, '', url);
+                      if (typeof showSavePopup === 'function') {
+                        showSavePopup('Work package saved successfully!');
+                      } else {
+                        alert('Work package saved successfully!');
+                      }
+                    } else if (resp.errors) {
+                      alert('Error: ' + (Array.isArray(resp.errors) ? resp.errors.join('\n') : JSON.stringify(resp.errors)));
+                    } else {
+                      alert('Failed to save work package.');
+                    }
+                  })
+                  .catch(() => {
+                    alert('Failed to save work package.');
+                  });
+                });
+              });
+              </script>
             </div>
           </div>
-          <style>
-            .custom-toggle {
-              display: inline-block;
-              width: 40px;
-              height: 22px;
-              background: #e5e7eb; /* light grey */
-              border-radius: 22px;
-              position: relative;
-              transition: background 0.2s;
-              cursor: pointer;
-            }
-            .custom-toggle:before {
-              content: '';
-              position: absolute;
-              left: 3px;
-              top: 3px;
-              width: 16px;
-              height: 16px;
-              background: #fff;
-              border-radius: 50%;
-              transition: transform 0.2s;
-            }
-            input.toggle-switch:checked + .custom-toggle {
-              background: #01426a; /* on color */
-            }
-            input.toggle-switch:checked + .custom-toggle:before {
-              transform: translateX(18px);
-            }
-          </style>
-          <div class="field-group" style="text-align:right; margin-top:12px;">
-            <button id="saveWorkPackage" class="btn btn-primary">Save Work Package</button>
-            <script>
-            let workPackageSaved = false;
-            document.addEventListener('DOMContentLoaded', function() {
-              const btn = document.getElementById('saveWorkPackage');
-              btn.addEventListener('click', function() {
-                if (workPackageSaved) return;
-                // Autofill executions fields from visible fields
-                const parent = btn.closest('.accordion-body');
-                document.getElementById('exec_work_package').value = parent.querySelector('input[name="workpackage_name"]').value;
-                document.getElementById('exec_workstream_building').value = parent.querySelector('input[name="workstream_building"]').value;
-                document.getElementById('exec_expediting_contact').value = parent.querySelector('input[name="expediting_contact"]').value;
-                var formData = new FormData();
-                parent.querySelectorAll('input, select').forEach(el => {
-                  if (el.type === 'checkbox') {
-                    if (!el.checked) return;
-                  }
-                  // Handle multiple values for checkboxes
-                  if (el.type === 'checkbox' && el.name.endsWith('[]')) {
-                    formData.append(el.name, el.value);
-                  } else {
-                    formData.append(el.name, el.value);
-                  }
-                });
-                fetch('http://127.0.0.1:8000/expediting-forms', {
-                  method: 'POST',
-                  headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                  },
-                  body: formData
-                })
-                .then(res => res.json())
-                .then(resp => {
-                  if (resp.success && resp.context_id) {
-                    workPackageSaved = true;
-                    btn.textContent = 'Update Work Package';
-                    btn.classList.remove('btn-primary');
-                    btn.classList.add('btn-success');
-                    // Update URL to edit mode with context_id
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('context_id', resp.context_id);
-                    url.searchParams.set('edit', '1');
-                    window.history.replaceState({}, '', url);
-                  } else if (resp.errors) {
-                    alert('Error: ' + (Array.isArray(resp.errors) ? resp.errors.join('\n') : JSON.stringify(resp.errors)));
-                  } else {
-                    alert('Failed to save work package.');
-                  }
-                })
-                .catch(() => {
-                  alert('Failed to save work package.');
-                });
-              });
-            });
-            </script>
-          </div>
         </div>
-      </div>
 
-      <!-- ACCORDION: CONTACTS -->
-      <div class="accordion-item">
-        <button class="accordion-trigger" onclick="toggleAccordion(this)">
-          <div class="accordion-trigger-left">
-            <div class="panel-dot" style="background:var(--accent2);"></div>
-            <h2>Contacts</h2>
+        <!-- ACCORDION: CONTACTS -->
+        <div class="accordion-item">
+          <button class="accordion-trigger" type="button" onclick="toggleAccordion(this)">
+            <div class="accordion-trigger-left">
+              <div class="panel-dot" style="background:var(--accent2);"></div>
+              <h2>Contacts</h2>
+            </div>
+            <div class="accordion-arrow">▼</div>
+          </button>
+          <div class="accordion-body">
+            <!-- Empty for now -->
           </div>
-          <div class="accordion-arrow">▼</div>
-        </button>
-        <div class="accordion-body">
-          <!-- Empty for now -->
         </div>
-      </div>
-
-      <!-- ACCORDION: MILESTONES -->
-      <div class="accordion-item">
-        <button class="accordion-trigger" onclick="toggleAccordion(this)">
-          <div class="accordion-trigger-left">
-            <div class="panel-dot" style="background:var(--warn);"></div>
-            <h2>Milestones</h2>
-          </div>
-          <div class="accordion-arrow">▼</div>
-        </button>
-        <div class="accordion-body">
-          <!-- Empty for now -->
-        </div>
-	  <!-- DELIVERY TRACKING -->
+        	  <!-- DELIVERY TRACKING -->
 <div class="accordion-item">
-  <button class="accordion-trigger" onclick="toggleAccordion(this)">
+  <button class="accordion-trigger" type="button" onclick="toggleAccordion(this)">
     <div class="accordion-trigger-left">
       <div class="panel-dot" style="background:#2563eb"></div>
       <h2>Delivery Tracking</h2>
@@ -1095,11 +1112,361 @@
           <div style="padding:20px;color:#888;">No equipment found for this context.</div>
         @endforelse
       </div>
+      
     </div>
 
   </div>
-</div>
+
+	  <!-- CALENDAR & COMMENTS ACCORDION -->
+      <div class="accordion-item">
+        <button class="accordion-trigger" type="button" onclick="toggleAccordion(this)">
+          <div class="accordion-trigger-left">
+            <div class="panel-dot" style="background:#7c3aed;"></div>
+            <h2>Calendar &amp; Comments</h2>
+          </div>
+          <div class="accordion-arrow">▼</div>
+        </button>
+        <div class="accordion-body">
+          <style>
+            /* Calendar styles (same as your provided code) */
+            .cal-card { padding: 16px 20px 12px; background: var(--surface); }
+            .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+            .cal-nav { width: 26px; height: 26px; border: 1px solid var(--border2); border-radius: 6px; background: var(--surface2); color: var(--muted2); font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; font-family: 'Figtree', ui-sans-serif, sans-serif; line-height: 1; }
+            .cal-nav:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+            .cal-month-label { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: -.2px; font-family: 'Figtree', ui-sans-serif, sans-serif; }
+            .cal-year-label { font-size: 11px; color: var(--muted2); font-weight: 400; margin-left: 5px; }
+            .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+            .cal-dow { text-align: center; font-size: 9px; font-weight: 700; color: var(--muted2); letter-spacing: 1px; text-transform: uppercase; padding-bottom: 6px; }
+            .cal-dow:nth-child(6), .cal-dow:nth-child(7) { color: var(--border2); }
+            #cal-days { display: contents; }
+            .cal-day { aspect-ratio: 1; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; gap: 2px; border: 1px solid transparent; }
+            .cal-day-num { font-size: 11px; font-weight: 600; color: var(--text); line-height: 1; font-family: 'Figtree', ui-sans-serif, sans-serif; }
+            .cal-day:hover:not(.cal-day-other) { background: var(--accent-light); border-color: rgba(10,124,85,.2); }
+            .cal-day:hover:not(.cal-day-other) .cal-day-num { color: var(--accent); }
+            .cal-day.cal-day-today { background: var(--accent); border-color: var(--accent); box-shadow: 0 2px 6px rgba(10,124,85,.3); }
+            .cal-day.cal-day-today .cal-day-num { color: #fff; font-weight: 700; font-size: 12px; }
+            .cal-day.cal-day-today:hover { background: #0a9966; }
+            .cal-day.cal-day-selected:not(.cal-day-today) { background: var(--surface2); border-color: var(--accent); box-shadow: 0 0 0 2px rgba(10,124,85,.12); }
+            .cal-day.cal-day-selected:not(.cal-day-today) .cal-day-num { color: var(--accent); font-weight: 700; }
+            .cal-day.cal-day-other { cursor: default; pointer-events: none; }
+            .cal-day.cal-day-other .cal-day-num { color: var(--border2); }
+            .cal-day.cal-day-weekend:not(.cal-day-today):not(.cal-day-selected) .cal-day-num { color: var(--muted2); }
+            .cal-day-dots { display: flex; gap: 2px; align-items: center; justify-content: center; min-height: 4px; }
+            .cal-evt-dot { width: 3px; height: 3px; border-radius: 50%; flex-shrink: 0; }
+            .cal-evt-dot.Inspection { background: #7c3aed; }
+            .cal-evt-dot.Material\ Planning { background: #0284c7; }
+            .cal-evt-dot.Fabrication\ Planning { background: var(--warn); }
+            .cal-panel { border-top: 1px solid var(--border); background: var(--surface); }
+            .cal-placeholder { padding: 12px 20px; font-size: 11px; color: var(--muted2); font-style: italic; text-align: center; border-bottom: 1px solid var(--border); background: var(--surface2); }
+            .cal-date-banner { padding: 9px 20px; border-bottom: 1px solid var(--border); background: var(--surface2); display: none; }
+            .cal-date-banner-text { font-size: 12px; font-weight: 700; color: var(--text); font-family: 'Figtree', ui-sans-serif, sans-serif; }
+            .cal-date-banner-sub { font-size: 10px; color: var(--muted2); margin-top: 1px; letter-spacing: .5px; }
+            .cal-cat-tabs { display: flex; border-bottom: 2px solid var(--border); }
+            .cal-cat-tab { flex: 1; padding: 8px 4px; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; border: none; background: none; cursor: pointer; color: var(--muted2); font-family: 'Figtree', ui-sans-serif, sans-serif; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .15s; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+            .cal-cat-tab:hover { background: var(--surface2); color: var(--text); }
+            .cal-tab-dot { width: 6px; height: 6px; border-radius: 50%; opacity: .35; transition: opacity .15s; }
+            .cal-cat-tab.active .cal-tab-dot { opacity: 1; }
+            .cal-cat-tab[data-cat="Inspection"].active { color: #7c3aed; border-bottom-color: #7c3aed; }
+            .cal-cat-tab[data-cat="Material Planning"].active { color: #0284c7; border-bottom-color: #0284c7; }
+            .cal-cat-tab[data-cat="Fabrication Planning"].active { color: var(--warn); border-bottom-color: var(--warn); }
+            .cal-cat-tab[data-cat="Inspection"] .cal-tab-dot { background: #7c3aed; }
+            .cal-cat-tab[data-cat="Material Planning"] .cal-tab-dot { background: #0284c7; }
+            .cal-cat-tab[data-cat="Fabrication Planning"] .cal-tab-dot { background: var(--warn); }
+            .cal-existing-comment { padding: 9px 12px; border-radius: 7px; margin-bottom: 10px; font-size: 12px; line-height: 1.5; color: var(--text); border: 1px solid; position: relative; display: none; }
+            .cal-existing-comment.Inspection { background: #f5f3ff; border-color: #ddd6fe; }
+            .cal-existing-comment.Material\ Planning { background: #f0f9ff; border-color: #bae6fd; }
+            .cal-existing-comment.Fabrication\ Planning { background: #fff7ed; border-color: #fed7aa; }
+            .cal-existing-meta { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+            .cal-existing-meta.Inspection { color: #7c3aed; }
+            .cal-existing-meta.Material\ Planning { color: #0284c7; }
+            .cal-existing-meta.Fabrication\ Planning { color: var(--warn); }
+            .cal-existing-del { position: absolute; top: 7px; right: 8px; background: none; border: none; color: var(--border2); cursor: pointer; font-size: 15px; line-height: 1; padding: 0; transition: color .15s; }
+            .cal-existing-del:hover { color: var(--warn); }
+            .cal-comment-area { padding: 10px 20px 14px; }
+            .cal-input-label { font-size: 11px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-bottom: 5px; display: block; }
+            .cal-textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 7px 12px; font-size: 12px; color: var(--text); width: 100%; outline: none; transition: border-color .2s, box-shadow .2s; font-family: 'Figtree', ui-sans-serif, sans-serif; box-shadow: 0 1px 3px rgba(0,0,0,.06); resize: none; height: 68px; line-height: 1.5; }
+            .cal-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(10,124,85,.1); background: #fff; }
+            .cal-textarea[data-cat="Inspection"]:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,.08); }
+            .cal-textarea[data-cat="Material Planning"]:focus { border-color: #0284c7; box-shadow: 0 0 0 3px rgba(2,132,199,.08); }
+            .cal-textarea[data-cat="Fabrication Planning"]:focus { border-color: var(--warn); box-shadow: 0 0 0 3px rgba(200,71,10,.08); }
+            .cal-save-row { display: flex; align-items: center; justify-content: space-between; margin-top: 7px; }
+            .cal-char-count { font-size: 10px; color: var(--border2); }
+            .cal-save-btn { border: none; border-radius: 7px; padding: 6px 18px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; font-family: 'Figtree', ui-sans-serif, sans-serif; color: #fff; transition: all .2s; }
+            .cal-save-btn.Inspection { background: #7c3aed; box-shadow: 0 2px 6px rgba(124,58,237,.25); }
+            .cal-save-btn.Material\ Planning { background: #0284c7; box-shadow: 0 2px 6px rgba(2,132,199,.25); }
+            .cal-save-btn.Fabrication\ Planning { background: var(--warn); box-shadow: 0 2px 6px rgba(200,71,10,.25); }
+            .cal-save-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+            .cal-timeline-section { border-top: 1px solid var(--border); padding: 12px 20px 18px; background: var(--surface2); }
+            .cal-timeline-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+            .cal-timeline-title { font-size: 9px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+            .cal-timeline-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+            .cal-filter-pills { display: flex; gap: 4px; }
+            .cal-filter-pill { padding: 2px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; border: 1px solid var(--border2); background: none; color: var(--muted2); cursor: pointer; font-family: 'Figtree', ui-sans-serif, sans-serif; transition: all .15s; letter-spacing: .3px; }
+            .cal-filter-pill.active { background: var(--muted2); border-color: var(--muted2); color: #fff; }
+            .cal-filter-pill[data-f="Inspection"].active { background: #7c3aed; border-color: #7c3aed; }
+            .cal-filter-pill[data-f="Material Planning"].active { background: #0284c7; border-color: #0284c7; }
+            .cal-filter-pill[data-f="Fabrication Planning"].active { background: var(--warn); border-color: var(--warn); }
+            .cal-tl-empty { font-size: 11px; color: var(--border2); font-style: italic; text-align: center; padding: 12px 0; }
+            .cal-tl-item { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .12s; }
+            .cal-tl-item:last-child { border-bottom: none; }
+            .cal-tl-item:hover { background: rgba(10,124,85,.03); }
+            .cal-tl-left { display: flex; flex-direction: column; align-items: center; gap: 1px; flex-shrink: 0; width: 32px; }
+            .cal-tl-date-d { font-size: 15px; font-weight: 800; color: var(--text); line-height: 1; font-family: 'Figtree', ui-sans-serif, sans-serif; }
+            .cal-tl-date-m { font-size: 9px; font-weight: 700; color: var(--muted2); letter-spacing: 1px; text-transform: uppercase; }
+            .cal-tl-dot { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--surface2); flex-shrink: 0; margin-top: 3px; }
+            .cal-tl-dot.Inspection { background: #7c3aed; box-shadow: 0 0 0 2px rgba(124,58,237,.15); }
+            .cal-tl-dot.Material\ Planning { background: #0284c7; box-shadow: 0 0 0 2px rgba(2,132,199,.15); }
+            .cal-tl-dot.Fabrication\ Planning { background: var(--warn); box-shadow: 0 0 0 2px rgba(200,71,10,.15); }
+            .cal-tl-content { flex: 1; min-width: 0; padding-top: 1px; }
+            .cal-tl-cat { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1px; }
+            .cal-tl-cat.Inspection { color: #7c3aed; }
+            .cal-tl-cat.Material\ Planning { color: #0284c7; }
+            .cal-tl-cat.Fabrication\ Planning { color: var(--warn); }
+            .cal-tl-text { font-size: 11.5px; color: var(--text); line-height: 1.4; word-break: break-word; }
+            .cal-tl-past .cal-tl-date-d, .cal-tl-past .cal-tl-date-m, .cal-tl-past .cal-tl-text { opacity: .4; }
+          </style>
+          <div class="cal-card">
+            <div class="cal-header">
+              <button class="cal-nav" onclick="calMove(-1)">‹</button>
+              <div>
+                <span class="cal-month-label" id="cal-month-label"></span>
+                <span class="cal-year-label"  id="cal-year-label"></span>
+              </div>
+              <button class="cal-nav" onclick="calMove(1)">›</button>
+            </div>
+            <div class="cal-grid">
+              <div class="cal-dow">Mo</div>
+              <div class="cal-dow">Tu</div>
+              <div class="cal-dow">We</div>
+              <div class="cal-dow">Th</div>
+              <div class="cal-dow">Fr</div>
+              <div class="cal-dow">Sa</div>
+              <div class="cal-dow">Su</div>
+              <div id="cal-days"></div>
+            </div>
+          </div>
+          <div class="cal-panel">
+            <div class="cal-placeholder" id="cal-placeholder">↑ Click a date to add or view a comment</div>
+            <div id="cal-date-content" style="display:none;">
+              <div class="cal-date-banner" id="cal-date-banner">
+                <div class="cal-date-banner-text" id="cal-date-banner-text"></div>
+                <div class="cal-date-banner-sub"  id="cal-date-banner-sub"></div>
+              </div>
+              <div class="cal-cat-tabs">
+                <button class="cal-cat-tab active" data-cat="Inspection" onclick="calSwitchCat(this)"><div class="cal-tab-dot"></div>Inspection</button>
+                <button class="cal-cat-tab" data-cat="Material Planning" onclick="calSwitchCat(this)"><div class="cal-tab-dot"></div>Material</button>
+                <button class="cal-cat-tab" data-cat="Fabrication Planning" onclick="calSwitchCat(this)"><div class="cal-tab-dot"></div>Fabrication</button>
+              </div>
+              <div class="cal-comment-area">
+                <div class="cal-existing-comment" id="cal-existing-comment">
+                  <div class="cal-existing-meta" id="cal-existing-meta"></div>
+                  <div id="cal-existing-text"></div>
+                  <button class="cal-existing-del" onclick="calDeleteComment()" title="Delete">×</button>
+                </div>
+                <label class="cal-input-label" id="cal-input-label">Add comment</label>
+                <textarea class="cal-textarea" id="cal-textarea" placeholder="Type your comment…" oninput="calCharCount(this)"></textarea>
+                <div class="cal-save-row">
+                  <span class="cal-char-count" id="cal-char-count">0 / 300</span>
+                  <button class="cal-save-btn Inspection" id="cal-save-btn" onclick="calSaveComment()">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cal-timeline-section">
+            <div class="cal-timeline-header">
+              <span class="cal-timeline-title">All Comments</span>
+              <div class="cal-filter-pills">
+                <button class="cal-filter-pill active" data-f="all" onclick="calFilterTl(this)">All</button>
+                <button class="cal-filter-pill" data-f="Inspection" onclick="calFilterTl(this)">Insp.</button>
+                <button class="cal-filter-pill" data-f="Material Planning" onclick="calFilterTl(this)">Mat.</button>
+                <button class="cal-filter-pill" data-f="Fabrication Planning" onclick="calFilterTl(this)">Fab.</button>
+              </div>
+            </div>
+            <div id="cal-timeline"></div>
+          </div>
+          <script>
+            (function () {
+              var CAL_TODAY   = new Date();
+              var calCursor   = new Date(CAL_TODAY.getFullYear(), CAL_TODAY.getMonth(), 1);
+              var calSel      = null;
+              var calActiveCat  = 'Inspection';
+              var calTlFilter   = 'all';
+              var calComments   = {};
+              var CY = CAL_TODAY.getFullYear(), CM = CAL_TODAY.getMonth() + 1;
+              function seed(d, cat, txt) {
+                var k = iso(CY, CM, d);
+                if (!calComments[k]) calComments[k] = {};
+                calComments[k][cat] = txt;
+              }
+              seed(5,  'Inspection',           'Witness test at ABB factory');
+              seed(12, 'Material Planning',    'Steel delivery confirmation');
+              seed(12, 'Fabrication Planning', 'Start panel assembly, shift A');
+              seed(20, 'Inspection',           'Pre-FAT checklist review');
+              function iso(y, m, d) { return y + '-' + pad(m) + '-' + pad(d); }
+              function pad(n) { return String(n).padStart(2, '0'); }
+              function todayStr() { return iso(CAL_TODAY.getFullYear(), CAL_TODAY.getMonth() + 1, CAL_TODAY.getDate()); }
+              function calRender() {
+                var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                var y = calCursor.getFullYear(), m = calCursor.getMonth();
+                document.getElementById('cal-month-label').textContent = MONTHS[m];
+                document.getElementById('cal-year-label').textContent  = y;
+                var firstDow   = new Date(y, m, 1).getDay();
+                var offset     = firstDow === 0 ? 6 : firstDow - 1;
+                var daysInMo   = new Date(y, m + 1, 0).getDate();
+                var daysInPrev = new Date(y, m, 0).getDate();
+                var today      = todayStr();
+                var cont       = document.getElementById('cal-days');
+                cont.innerHTML = '';
+                var cells = [];
+                for (var i = offset - 1; i >= 0; i--)
+                  cells.push({ day: daysInPrev - i, own: false, ds: null });
+                for (var d = 1; d <= daysInMo; d++)
+                  cells.push({ day: d, own: true, ds: iso(y, m + 1, d) });
+                while (cells.length % 7 !== 0)
+                  cells.push({ day: cells.length - offset - daysInMo + 1, own: false, ds: null });
+                cells.forEach(function (cell, idx) {
+                  var el  = document.createElement('div');
+                  var cls = ['cal-day'];
+                  if (!cell.own)                           cls.push('cal-day-other');
+                  if (idx % 7 >= 5 && cell.own)           cls.push('cal-day-weekend');
+                  if (cell.ds === today)                   cls.push('cal-day-today');
+                  if (cell.ds === calSel && cell.own)      cls.push('cal-day-selected');
+                  el.className = cls.join(' ');
+                  var num = document.createElement('div');
+                  num.className   = 'cal-day-num';
+                  num.textContent = cell.day;
+                  el.appendChild(num);
+                  var dotRow = document.createElement('div');
+                  dotRow.className = 'cal-day-dots';
+                  if (cell.ds && calComments[cell.ds]) {
+                    Object.keys(calComments[cell.ds]).slice(0, 3).forEach(function (cat) {
+                      var dot = document.createElement('div');
+                      dot.className = 'cal-evt-dot ' + cat;
+                      dotRow.appendChild(dot);
+                    });
+                  }
+                  el.appendChild(dotRow);
+                  if (cell.own && cell.ds) {
+                    el.onclick = (function (ds) { return function () { calSelectDay(ds); }; })(cell.ds);
+                  }
+                  cont.appendChild(el);
+                });
+              }
+              function calSelectDay(ds) {
+                calSel = ds;
+                calRender();
+                var d      = new Date(ds);
+                var isToday = ds === todayStr();
+                var weekday = d.toLocaleDateString('en-GB', { weekday: 'long' });
+                var daymon  = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
+                document.getElementById('cal-date-banner-text').textContent = weekday + ', ' + daymon;
+                document.getElementById('cal-date-banner-sub').textContent  = isToday ? 'Today' : d.getFullYear();
+                document.getElementById('cal-placeholder').style.display    = 'none';
+                document.getElementById('cal-date-content').style.display   = 'block';
+                document.getElementById('cal-date-banner').style.display    = 'block';
+                calRefreshCommentArea();
+              }
+              window.calSwitchCat = function (btn) {
+                document.querySelectorAll('.cal-cat-tab').forEach(function (b) {
+                  b.classList.remove('active');
+                });
+                btn.classList.add('active');
+                calActiveCat = btn.dataset.cat;
+                calRefreshCommentArea();
+              };
+              function calRefreshCommentArea() {
+                if (!calSel) return;
+                var cat      = calActiveCat;
+                var existing = calComments[calSel] && calComments[calSel][cat] ? calComments[calSel][cat] : null;
+                var exEl     = document.getElementById('cal-existing-comment');
+                var inLabel  = document.getElementById('cal-input-label');
+                var ta       = document.getElementById('cal-textarea');
+                var saveBtn  = document.getElementById('cal-save-btn');
+                var meta     = document.getElementById('cal-existing-meta');
+                var exText   = document.getElementById('cal-existing-text');
+                ta.setAttribute('data-cat', cat);
+                saveBtn.className = 'cal-save-btn ' + cat;
+                if (existing) {
+                  exEl.className      = 'cal-existing-comment ' + cat;
+                  exEl.style.display  = 'block';
+                  meta.className      = 'cal-existing-meta ' + cat;
+                  meta.textContent    = cat;
+                  exText.textContent  = existing;
+                  inLabel.textContent = 'Update comment';
+                  ta.value            = existing;
+                } else {
+                  exEl.style.display  = 'none';
+                  inLabel.textContent = 'Add comment';
+                  ta.value            = '';
+                }
+                document.getElementById('cal-char-count').textContent = ta.value.length + ' / 300';
+              }
+              window.calCharCount = function (ta) {
+                ta.value = ta.value.slice(0, 300);
+                document.getElementById('cal-char-count').textContent = ta.value.length + ' / 300';
+              };
+              window.calSaveComment = function () {
+                if (!calSel) return;
+                var text = document.getElementById('cal-textarea').value.trim();
+                if (!text) { document.getElementById('cal-textarea').focus(); return; }
+                if (!calComments[calSel]) calComments[calSel] = {};
+                calComments[calSel][calActiveCat] = text;
+                calRender();
+                calRefreshCommentArea();
+                calRenderTimeline();
+              };
+              window.calDeleteComment = function () {
+                if (!calSel || !calComments[calSel]) return;
+                delete calComments[calSel][calActiveCat];
+                if (Object.keys(calComments[calSel]).length === 0) delete calComments[calSel];
+                calRender();
+                calRefreshCommentArea();
+                calRenderTimeline();
+              };
+              window.calMove = function (dir) {
+                calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth() + dir, 1);
+                calRender();
+              };
+              window.calFilterTl = function (btn) {
+                calTlFilter = btn.dataset.f;
+                document.querySelectorAll('.cal-filter-pill').forEach(function (b) {
+                  b.classList.remove('active');
+                });
+                btn.classList.add('active');
+                calRenderTimeline();
+              };
+              function calRenderTimeline() {
+                var el    = document.getElementById('cal-timeline');
+                var today = todayStr();
+                var all   = [];
+                Object.keys(calComments).forEach(function (ds) {
+                  Object.keys(calComments[ds]).forEach(function (cat) {
+                    all.push({ ds: ds, cat: cat, text: calComments[ds][cat] });
+                  });
+                });
+                all.sort(function (a, b) { return a.ds.localeCompare(b.ds); });
+                var filtered = calTlFilter === 'all' ? all : all.filter(function (e) { return e.cat === calTlFilter; });
+                if (!filtered.length) {
+                  el.innerHTML = '<div class="cal-tl-empty">No comments yet</div>';
+                  return;
+                }
+                el.innerHTML = filtered.map(function (ev) {
+                  var d      = new Date(ev.ds);
+                  var isPast = ev.ds < today;
+                  return '<div class="cal-tl-item' + (isPast ? ' cal-tl-past' : '') + '" onclick="calSelectDay(\'' + ev.ds + '\')">' + '<div class="cal-tl-left">' + '<div class="cal-tl-date-d">' + d.getDate() + '</div>' + '<div class="cal-tl-date-m">' + d.toLocaleDateString('en-GB', { month: 'short' }) + '</div>' + '</div>' + '<div class="cal-tl-dot ' + ev.cat + '"></div>' + '<div class="cal-tl-content">' + '<div class="cal-tl-cat ' + ev.cat + '">' + ev.cat + '</div>' + '<div class="cal-tl-text">' + ev.text + '</div>' + '</div>' + '</div>';
+                }).join('');
+              }
+              document.addEventListener('DOMContentLoaded', function () {
+                calRender();
+                calRenderTimeline();
+              });
+              window.calSelectDay = calSelectDay;
+            })();
+          </script>
+        </div>
+      </div>
     </div>
+    
     
   </div>
   <!-- RIGHT: EQUIPMENT LIST -->
@@ -1107,14 +1474,8 @@
       <div class="equipment-header">
         <h2><span class="panel-dot" style="margin-right:8px;"></span>Equipment</h2>
         <div class="equipment-btn-row">
-          <form action="{{ route('expediting_forms.send_email', request('context_id')) }}" method="POST" class="inline email-form">
-            @csrf
-            <button type="button" class="add-btn email-btn" title="Email to Supplier">
-              <span class="material-icons" style="font-size:18px;vertical-align:middle;"></span> Send Email to Supplier
-            </button>
-            <input type="hidden" class="supplier-name" value="{{ $supplier ?? 'Supplier' }}">
-          </form>
-          <button class="add-btn" onclick="openModal()">+ Add Equipment</button>
+          <!-- Email button temporarily removed -->
+          <button type="button" class="add-btn" onclick="openModal()" @if(!request('context_id')) disabled style="opacity:0.5;cursor:not-allowed;" @endif>+ Add Equipment</button>
         </div>
         <style>
           .equipment-btn-row {
@@ -1213,6 +1574,7 @@
         });
         </script>
       </div>
+      @if(request('context_id'))
       <div class="equipment-table-wrap">
         <div class="col-headers">
           <span>Type / Tag</span>
@@ -1226,7 +1588,7 @@
           $filteredEquipments = $equipments->where('context_id', $contextId);
         @endphp
         @forelse($filteredEquipments as $equipment)
-          <div class="equipment-row" style="cursor:pointer;" onclick="openModal(@json($equipment))">
+          <div class="equipment-row" style="cursor:pointer;" onclick='openModal(@json($equipment))'>
             <div class="eq-name"><div class="eq-status-dot dot-green"></div>{{ $equipment->name ?? $equipment->tag ?? '—' }}</div>
             <div class="progress-cell"><div class="progress-label">{{ $equipment->design ?? 0 }}%</div><div class="progress-bar"><div class="progress-fill green" style="width:{{ $equipment->design ?? 0 }}%"></div></div></div>
             <div class="progress-cell"><div class="progress-label">{{ $equipment->material ?? 0 }}%</div><div class="progress-bar"><div class="progress-fill blue" style="width:{{ $equipment->material ?? 0 }}%"></div></div></div>
@@ -1237,6 +1599,7 @@
           <div style="padding:20px;color:#888;">No equipment found for this context.</div>
         @endforelse
       </div>
+      @endif
     </div>
 
   <!-- MODAL -->
@@ -1583,6 +1946,7 @@
     </div>
     <div class="modal-footer">
       <script>
+        let editingEquipmentId = null;
         function openModal(equipment) {
           var overlay = document.getElementById('modalOverlay');
           overlay.classList.add('active');
@@ -1592,6 +1956,7 @@
             equipment = window.equipments[equipment];
           }
           if (equipment) {
+            editingEquipmentId = equipment.id || null;
             const safe = (v, def) => (v === null || v === undefined ? def : v);
             document.getElementById('modalTitle').textContent = safe(equipment.name, 'Equipment');
             document.getElementById('eq-name').value = safe(equipment.name, '');
@@ -1609,12 +1974,20 @@
             document.getElementById('fabVal').textContent = safe(equipment.fab, 0) + '%';
             document.getElementById('eq-fat').value = safe(equipment.fat, 0);
             document.getElementById('fatVal').textContent = safe(equipment.fat, 0) + '%';
-            document.getElementById('eq-start').value = safe(equipment.start, '');
-            document.getElementById('eq-end').value = safe(equipment.end, '');
+            function formatDate(val) {
+              if (!val) return '';
+              if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}$/)) return val;
+              const d = new Date(val);
+              if (isNaN(d)) return '';
+              return d.toISOString().slice(0,10);
+            }
+            document.getElementById('eq-start').value = formatDate(equipment.start);
+            document.getElementById('eq-end').value = formatDate(equipment.end);
             document.getElementById('eq-duration').value = safe(equipment.duration, '');
-            document.getElementById('eq-fatdate').value = safe(equipment.fatdate, '');
-            document.getElementById('eq-contractualdate').value = safe(equipment.contractualdate, '');
-            document.getElementById('eq-actualdate').value = safe(equipment.actualdate, '');
+            document.getElementById('eq-fatdate').value = formatDate(equipment.fatdate);
+            document.getElementById('eq-contractualdate').value = formatDate(equipment.contractualdate);
+            document.getElementById('eq-actualdate').value = formatDate(equipment.actualdate);
+            document.getElementById('eq-neededsite').value = formatDate(equipment.neededsite);
             document.getElementById('eq-openpoints').value = safe(equipment.openpoints, '');
             document.getElementById('eq-remarks').value = safe(equipment.remarks, '');
             // Checkboxes
@@ -1662,6 +2035,7 @@
             fatdate: document.getElementById('eq-fatdate').value,
             contractualdate: document.getElementById('eq-contractualdate').value,
             actualdate: document.getElementById('eq-actualdate').value,
+            neededsite: document.getElementById('eq-neededsite').value,
             openpoints: document.getElementById('eq-openpoints').value,
             remarks: document.getElementById('eq-remarks').value,
             checks: Array.from(document.querySelectorAll('.modal-checkboxes .check-item')).map(item => item.classList.contains('checked')),
@@ -1674,8 +2048,14 @@
           }
           // CSRF token from meta tag
           const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-          fetch('/expediting-equipments', {
-            method: 'POST',
+          let url = '/expediting-equipments';
+          let method = 'POST';
+          if (editingEquipmentId) {
+            url = `/expediting-equipments/${editingEquipmentId}`;
+            method = 'PATCH';
+          }
+          fetch(url, {
+            method: method,
             headers: {
               'Content-Type': 'application/json',
               'X-CSRF-TOKEN': csrf,
@@ -1688,6 +2068,7 @@
             return response.json();
           })
           .then(result => {
+            editingEquipmentId = null;
             closeModal();
             // Optionally refresh equipment list or show success
             alert('Equipment saved successfully!');
@@ -1833,5 +2214,6 @@ function renderDeliveryCards() {
 
 document.addEventListener('DOMContentLoaded', renderDeliveryCards);
 </script>
+
 
 @endsection

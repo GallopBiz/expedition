@@ -33,7 +33,7 @@
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg-page); color: var(--text-dark); min-height: 100vh; }
-  main { max-width: 1240px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  main { max-width: 1270px; margin: 0 auto; }
   .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
   @media (max-width: 960px) { .card-grid { grid-template-columns: repeat(2,1fr); } }
   @media (max-width: 520px) { .card-grid { grid-template-columns: 1fr; } }
@@ -186,12 +186,12 @@
           @endif
         </div>
         <div style="margin-left: auto; text-align: right;">
-          <span style="font-size: .65rem; font-weight: 700; color: var(--text-dark);">Actual Delivery: {{ $form->actual_delivery_to_site_supplier ?? 'N/A' }}</span>
+          <span style="font-size: .65rem; font-weight: 700; color: var(--text-dark);">Kick Off: {{ ($form->kickoff_status ?? 0) == 1 ? 'Yes' : 'No' }}</span>
         </div>
       </div>
       <div class="card-head">
         <p class="card-title">
-          {{ $form->workpackage_name ?? $form->work_package_name ?? '' }} - {{ $form->work_package ?? $form->work_package_number ?? '' }}
+          {{ $form->workpackage_name ?? '' }} - {{ $form->work_package_no ?? $form->po_number ?? '' }}
         </p>
       </div>
       <div class="card-owner" style="display: flex; align-items: center; gap: .4rem; font-size: .76rem;">
@@ -206,7 +206,7 @@
         @if($supplierEmail)
           <span style="color: #357ab7; font-size: 1em; margin-left: 0.5em;">{{ $supplierEmail }}</span>
         @endif
-        <div style="margin-left:auto;display:flex;align-items:center;">
+        <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
           @if($supplierEmail)
             <form action="{{ route('expediting_forms.send_email', $form->id) }}" method="POST" class="inline email-form">
               @csrf
@@ -216,6 +216,39 @@
                 </svg>
               </button>
             </form>
+            <!-- New email icon for one-time supplier form submission -->
+                  <button type="button" class="email-btn-onetime" title="Send One-Time Supplier Link" style="background:none;border:none;padding:0;display:flex;align-items:center;color:#3cb546;cursor:pointer;font-size:1.1em;" onclick="confirmOneTimeSupplierEmail(this, {{ $form->context_id ?? $form->id }})">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M2 2h12v12H2V2zm1 1v10h10V3H3zm2 2h6v6H5V5zm1 1v4h4V6H6z"/>
+              </svg>
+            </button>
+          @push('scripts')
+          <script>
+          function confirmOneTimeSupplierEmail(btn, contextId) {
+            if (confirm('Send one-time supplier form link by email?')) {
+              fetch('/expediting-equipment/send-supplier-email', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: JSON.stringify({ context_id: contextId })
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  alert('Supplier email sent successfully!');
+                } else {
+                  alert('Error: ' + (data.error || 'Failed to send email.'));
+                }
+              })
+              .catch(() => {
+                alert('Failed to send email.');
+              });
+            }
+          }
+          </script>
+          @endpush
           @endif
         </div>
       </div>
@@ -272,47 +305,66 @@
       </div>
       @endif
       <hr class="card-divider">
+     
       <div class="circles-row">
         <div class="circle-item">
-          <div class="circle-wrap" data-pct="{{ $form->design_status ?? 0 }}">
+          <div class="circle-wrap" data-pct="{{ $form->avg_design ?? 0 }}">
             <svg class="circle-svg" viewBox="0 0 38 38"><circle class="circle-track" cx="19" cy="19" r="15.5"/><circle class="circle-fill" cx="19" cy="19" r="15.5" stroke-dasharray="97.4 97.4" stroke-dashoffset="97.4"/></svg>
-            <span class="circle-pct">{{ $form->design_status ?? 0 }}%</span>
+            <span class="circle-pct">{{ $form->avg_design ?? 0 }}%</span>
           </div>
           <span class="circle-label">Design</span>
         </div>
         <div class="circle-item">
-          <div class="circle-wrap" data-pct="{{ $form->material_status ?? 0 }}">
+          <div class="circle-wrap" data-pct="{{ $form->avg_material ?? 0 }}">
             <svg class="circle-svg" viewBox="0 0 38 38"><circle class="circle-track" cx="19" cy="19" r="15.5"/><circle class="circle-fill" cx="19" cy="19" r="15.5" stroke-dasharray="97.4 97.4" stroke-dashoffset="97.4"/></svg>
-            <span class="circle-pct">{{ $form->material_status ?? 0 }}%</span>
+            <span class="circle-pct">{{ $form->avg_material ?? 0 }}%</span>
           </div>
           <span class="circle-label">Material</span>
         </div>
         <div class="circle-item">
-          <div class="circle-wrap" data-pct="{{ $form->fabrication_status ?? 0 }}">
+          <div class="circle-wrap" data-pct="{{ $form->avg_fabrication ?? 0 }}">
             <svg class="circle-svg" viewBox="0 0 38 38"><circle class="circle-track" cx="19" cy="19" r="15.5"/><circle class="circle-fill" cx="19" cy="19" r="15.5" stroke-dasharray="97.4 97.4" stroke-dashoffset="97.4"/></svg>
-            <span class="circle-pct">{{ $form->fabrication_status ?? 0 }}%</span>
+            <span class="circle-pct">{{ $form->avg_fabrication ?? 0 }}%</span>
           </div>
           <span class="circle-label">Fabrication</span>
         </div>
         <div class="circle-item">
-          <div class="circle-wrap" data-pct="{{ $form->fat_status ?? 0 }}">
+          <div class="circle-wrap" data-pct="{{ $form->avg_fat ?? 0 }}">
             <svg class="circle-svg" viewBox="0 0 38 38"><circle class="circle-track" cx="19" cy="19" r="15.5"/><circle class="circle-fill" cx="19" cy="19" r="15.5" stroke-dasharray="97.4 97.4" stroke-dashoffset="97.4"/></svg>
-            <span class="circle-pct">{{ $form->fat_status ?? 0 }}%</span>
+            <span class="circle-pct">{{ $form->avg_fat ?? 0 }}%</span>
           </div>
           <span class="circle-label">FAT</span>
+        </div>
+        <div class="circle-item">
+          <div class="circle-wrap" data-pct="{{ $form->total_equipment ? round(($form->delivered_equipment / max($form->total_equipment,1)) * 100) : 0 }}">
+            <svg class="circle-svg" viewBox="0 0 38 38"><circle class="circle-track" cx="19" cy="19" r="15.5"/><circle class="circle-fill" cx="19" cy="19" r="15.5" stroke-dasharray="97.4 97.4" stroke-dashoffset="97.4"/></svg>
+            <span class="circle-pct">{{ $form->delivered_equipment ?? 0 }}/{{ $form->total_equipment ?? 0 }}</span>
+          </div>
+          <span class="circle-label">Delivered</span>
         </div>
       </div>
       <div class="card-actions">
         @php
           $delivered = $form->delivered;
-          $isDelivered = ($delivered === true || $delivered === 1 || $delivered === 'Yes');
+          $isDelivered = ($delivered == 1);
         @endphp
         <span class="badge-delivered {{ $isDelivered ? 'badge-delivered-yes' : 'badge-delivered-no' }}">
           Delivered {{ $isDelivered ? 'Yes' : 'No' }}
         </span>
         <!-- Hide Manage button and add View button -->
         <!-- <a href="{{ route('expediting_forms.edit', $form->id) }}" class="action-btn btn-view">Manage</a> -->
-        <a href="/supplier/expedition-v2?context_id={{ $form->context_id ?? $form->id }}&edit=1" class="action-btn btn-view" target="_blank">View</a>
+        @php
+          $user = Auth::user();
+          $viewUrl = '';
+          if ($user && $user->role === 'Manager') {
+            $viewUrl = route('manager.expedition_v2', ['context_id' => $form->context_id ?? $form->id, 'edit' => 1]);
+          } elseif ($user && $user->role === 'Expeditor') {
+            $viewUrl = route('expeditor.expedition_v2', ['context_id' => $form->context_id ?? $form->id, 'edit' => 1]);
+          } else {
+            $viewUrl = route('supplier.expedition_v2', ['context_id' => $form->context_id ?? $form->id, 'edit' => 1]);
+          }
+        @endphp
+        <a href="{{ $viewUrl }}" class="action-btn btn-view" target="_blank">View</a>
       </div>
     </div>
     @endforeach

@@ -10,7 +10,7 @@ class ExpeditingCardController extends Controller
     // Show expediting forms in card layout
     public function index(Request $request)
     {
-        $query = ExpeditingForm::query();
+        $query = \App\Models\ExpeditingContext::query();
         // Filters
         if ($request->filled('supplier_name')) {
             $query->where('supplier', 'like', '%' . $request->supplier_name . '%');
@@ -20,29 +20,36 @@ class ExpeditingCardController extends Controller
         }
         if ($request->filled('delivered')) {
             if ($request->delivered === 'Yes') {
-                $query->where('delivered', true);
+                $query->where('delivered', 1);
             } elseif ($request->delivered === 'No') {
-                $query->where('delivered', false);
+                $query->where('delivered', 0);
             }
         }
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('workpackage_name', 'like', '%' . $search . '%')
-                  ->orWhere('work_package_name', 'like', '%' . $search . '%')
-                  ->orWhere('work_package', 'like', '%' . $search . '%')
-                  ->orWhere('work_package_number', 'like', '%' . $search . '%')
-                  ->orWhere('equipment_type_tag_number', 'like', '%' . $search . '%');
+                  ->orWhere('work_package_no', 'like', '%' . $search . '%')
+                  ->orWhere('po_number', 'like', '%' . $search . '%');
             });
         }
         $perPage = 20;
         $page = $request->input('page', 1);
-        $expeditingForms = $query->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
-        // Attach supplier email to each form for card display
-        foreach ($expeditingForms as $form) {
-            $supplierUser = \App\Models\User::where('role', 'Supplier')->where('name', $form->supplier)->first();
-            $form->supplier_email = $supplierUser ? $supplierUser->email : null;
+        $expeditingContexts = $query->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
+        // Attach supplier email to each context for card display
+        foreach ($expeditingContexts as $context) {
+            $supplierUser = \App\Models\User::where('role', 'Supplier')->where('name', $context->supplier)->first();
+            $context->supplier_email = $supplierUser ? $supplierUser->email : null;
+            // Calculate average progress for each status using ExpeditingEquipment for this context_id
+            $equipments = \App\Models\ExpeditingEquipment::where('context_id', $context->id)->get();
+            $context->avg_design = $equipments->count() ? round($equipments->avg('design')) : 0;
+            $context->avg_material = $equipments->count() ? round($equipments->avg('material')) : 0;
+            $context->avg_fabrication = $equipments->count() ? round($equipments->avg('fab')) : 0;
+            $context->avg_fat = $equipments->count() ? round($equipments->avg('fat')) : 0;
+            // Delivered/Total equipment count
+            $context->total_equipment = $equipments->count();
+            $context->delivered_equipment = $equipments->where('status', 'Delivered')->count();
         }
-        return view('expediting.cards', compact('expeditingForms'));
+        return view('expediting.cards', ['expeditingForms' => $expeditingContexts]);
     }
 }

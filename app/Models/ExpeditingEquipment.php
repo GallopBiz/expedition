@@ -9,7 +9,7 @@ class ExpeditingEquipment extends Model
     use HasFactory;
     protected $table = 'expediting_equipments';
     protected $fillable = [
-        'expediting_form_id', 'context_id', 'name', 'design', 'material', 'fab', 'fat', 'status', 'subsupplier', 'qty', 'place', 'order_status', 'drawing', 'scope', 'start', 'end', 'duration', 'fatdate', 'contractualdate', 'actualdate', 'openpoints', 'remarks', 'checks'
+        'expediting_form_id', 'context_id', 'name', 'design', 'material', 'fab', 'fat', 'status', 'subsupplier', 'qty', 'place', 'order_status', 'drawing', 'scope', 'start', 'end', 'duration', 'fatdate', 'contractualdate', 'actualdate', 'neededsite', 'openpoints', 'remarks', 'checks'
     ];
     protected $casts = [
         'checks' => 'array',
@@ -18,6 +18,7 @@ class ExpeditingEquipment extends Model
         'fatdate' => 'date',
         'contractualdate' => 'date',
         'actualdate' => 'date',
+        'neededsite' => 'date',
     ];
 
     public function form()

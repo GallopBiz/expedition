@@ -9,6 +9,8 @@ use App\Http\Controllers\ExpeditingFormController;
 use App\Http\Controllers\ExpeditingCardController;
 use App\Http\Controllers\ExpeditingEquipmentController;
 
+// One-time supplier email for equipment context
+Route::post('/expediting-equipment/send-supplier-email', [ExpeditingEquipmentController::class, 'sendSupplierEmail'])->name('expediting_equipment.send_supplier_email');
 
 
 // API: Get all work packages and their equipment for a context
@@ -16,9 +18,21 @@ Route::get('/api/get-work-packages-by-context', [\App\Http\Controllers\Expeditin
 
 
 
-// Supplier Expedition Form V2 (for comparison/testing)
-Route::middleware(['auth', 'role:Manager,Supplier,Expeditor'])->group(function () {
+// Manager-only Expedition Form V2
+Route::middleware(['auth', 'role:Manager'])->group(function () {
+    Route::get('/manager/expedition-v2', [\App\Http\Controllers\SupplierExpeditionV2Controller::class, 'show'])->name('manager.expedition_v2');
+    Route::post('/manager/expedition-v2/save', [\App\Http\Controllers\ExpeditingContextController::class, 'saveOrUpdate'])->name('manager.expedition_v2.save');
+});
+
+// Expeditor-only Expedition Form V2
+Route::middleware(['auth', 'role:Expeditor'])->group(function () {
+    Route::get('/expeditor/expedition-v2', [\App\Http\Controllers\SupplierExpeditionV2Controller::class, 'show'])->name('expeditor.expedition_v2');
+});
+
+// Supplier-only Expedition Form V2
+Route::middleware(['auth', 'role:Supplier'])->group(function () {
     Route::get('/supplier/expedition-v2', [\App\Http\Controllers\SupplierExpeditionV2Controller::class, 'show'])->name('supplier.expedition_v2');
+    Route::post('/supplier/expedition-v2/save', [\App\Http\Controllers\ExpeditingContextController::class, 'saveOrUpdate'])->name('supplier.expedition_v2.save');
 });
 
 // Notification routes
@@ -80,8 +94,9 @@ Route::middleware(['auth', 'role:Supplier'])->group(function () {
 
 // Equipment list API route
 Route::get('/expediting-equipments-list', [\App\Http\Controllers\ExpeditingEquipmentController::class, 'list']);
-// Equipment API route
+// Equipment API routes
 Route::post('/expediting-equipments', [\App\Http\Controllers\ExpeditingEquipmentController::class, 'store'])->name('expediting_equipments.store');
+Route::patch('/expediting-equipments/{equipment}', [\App\Http\Controllers\ExpeditingEquipmentController::class, 'update'])->name('expediting_equipments.update');
 
 // Language switcher route
 Route::post('/language-switch', function (\Illuminate\Http\Request $request) {
