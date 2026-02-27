@@ -47,7 +47,7 @@
     .wp-btn-ghost { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
     .wp-btn-ghost:hover { background: var(--hover); }
     .toolbar-spacer { flex: 1; }
-    .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(79,124,255,.08); }
+    .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: none; }
     .table-wrap table { width: 100%; border-collapse: collapse; }
     .table-wrap thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
     .table-wrap thead th { padding: 13px 16px; text-align: left; font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; cursor: pointer; user-select: none; transition: color .2s; }
@@ -58,7 +58,7 @@
     .table-wrap tbody tr:hover { background: var(--hover); }
     .table-wrap tbody tr.selected { background: var(--selected); }
     .table-wrap td { padding: 14px 16px; font-size: 13.5px; color: var(--text); white-space: nowrap; }
-    .td-id     { font-weight: 600; color: var(--accent); font-size: 13px; }
+    .td-id     { font-weight: 600; color: var(--text); font-size: 13px; }
     .td-name   { font-weight: 500; }
     .td-po     { color: var(--muted); font-size: 13px; font-family: monospace; }
     .td-date   { color: var(--muted); font-size: 12.5px; }
@@ -84,27 +84,27 @@
 
 @section('content')
 <div class="wp-page">
-    <h1 class="wp-title">Work Packages</h1>
+    
     <div class="wp-stats">
         <div class="stat-card accent">
-            <div class="val">{{ $stats['total'] ?? $workPackages->count() }}</div>
-            <div class="lbl">Total Packages</div>
+            <div class="val">{{ $expeditingContexts->count() }}</div>
+            <div class="lbl">Total Work Package</div>
         </div>
         <div class="stat-card green">
-            <div class="val">{{ $stats['on_time'] ?? $workPackages->where('on_time', true)->count() }}</div>
+            <div class="val">{{ $expeditingContexts->where('on_time', true)->count() }}</div>
             <div class="lbl">On Time</div>
         </div>
         <div class="stat-card red">
-            <div class="val">{{ $stats['delayed'] ?? $workPackages->where('on_time', false)->count() }}</div>
+            <div class="val">{{ $expeditingContexts->where('on_time', false)->count() }}</div>
             <div class="lbl">Delayed</div>
         </div>
         <div class="stat-card">
-            <div class="val">{{ $stats['avg_design'] ?? round($workPackages->avg('design')) }}%</div>
-            <div class="lbl">Avg. Design</div>
+            <div class="val">{{ $expeditingContexts->where('po_number', '!=', null)->count() }}</div>
+            <div class="lbl">With PO Number</div>
         </div>
         <div class="stat-card">
-            <div class="val">{{ $stats['avg_manufacturing'] ?? round($workPackages->avg('manufacturing')) }}%</div>
-            <div class="lbl">Avg. Manufacturing</div>
+            <div class="val">{{ $expeditingContexts->where('po_number', null)->count() }}</div>
+            <div class="lbl">Without PO</div>
         </div>
     </div>
     <div class="wp-toolbar">
@@ -138,7 +138,7 @@
             Reset
         </button>
         <div class="toolbar-spacer"></div>
-        <a href="{{ route('work-packages.create') }}" class="wp-btn wp-btn-primary">
+        <a href="http://127.0.0.1:8000/manager/expedition-v2" class="wp-btn wp-btn-primary">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                  stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="5" x2="12" y2="19"/>
@@ -151,33 +151,13 @@
         <table id="wpTable">
             <thead>
                 <tr>
-                    <th onclick="wpSort('id')">
-                        ID
-                        <span class="sort-icon">
-                            <svg width="8" height="5" viewBox="0 0 8 5">
-                                <path d="M0 5l4-5 4 5z" fill="currentColor"/>
-                            </svg>
-                        </span>
-                    </th>
-                    <th onclick="wpSort('name')">
-                        Name
-                        <span class="sort-icon">
-                            <svg width="8" height="5" viewBox="0 0 8 5">
-                                <path d="M0 5l4-5 4 5z" fill="currentColor"/>
-                            </svg>
-                        </span>
-                    </th>
-                    <th>Purchase Order</th>
-                    <th onclick="wpSort('ordered')">
-                        Ordered
-                        <span class="sort-icon">
-                            <svg width="8" height="5" viewBox="0 0 8 5">
-                                <path d="M0 5l4-5 4 5z" fill="currentColor"/>
-                            </svg>
-                        </span>
-                    </th>
+                    <th>WP No.</th>
+                    <th>WP Name</th>
+                    <th>PO No.</th>
+                    <th>Supplier</th>
                     <th>Design</th>
-                    <th>Manufacturing</th>
+                    <th>Material</th>
+                    <th>Fabrication</th>
                     <th>FAT</th>
                     <th>Delivered</th>
                     <th>On Time</th>
@@ -188,38 +168,59 @@
                 @forelse($workPackages as $wp)
                 <tr class="wp-row"
                     data-id="{{ strtolower($wp->id) }}"
-                    data-name="{{ strtolower($wp->name) }}"
-                    data-po="{{ strtolower($wp->po) }}"
-                    data-status="{{ $wp->on_time ? 'on-time' : 'delayed' }}"
-                    data-ordered="{{ optional($wp->ordered)->format('Y-m-d') ?? '' }}"
+                    data-name="{{ strtolower($wp->workpackage_name) }}"
+                    data-po="{{ strtolower($wp->po_number ?? '') }}"
+                    data-status="{{ $wp->delivered == 1 ? 'on-time' : 'delayed' }}"
+                    data-ordered="{{ optional($wp->order_date)->format('Y-m-d') ?? '' }}"
                     onclick="this.classList.toggle('selected')">
-                    <td class="td-id">{{ $wp->id }}</td>
-                    <td class="td-name">{{ $wp->name }}</td>
-                    <td class="td-po">{{ $wp->po }}</td>
-                    <td class="td-date">
-                        {{ optional($wp->ordered)->format('d.m.Y') ?? '—' }}
-                    </td>
-                    <td>@include('work-packages._ring', ['pct' => $wp->design])</td>
-                    <td>@include('work-packages._ring', ['pct' => $wp->manufacturing])</td>
-                    <td>@include('work-packages._ring', ['pct' => $wp->fat])</td>
+                    <td class="td-id">{{ $wp->work_package_no }}</td>
+                    <td class="td-name">{{ $wp->workpackage_name }}</td>
+                    <td class="td-po">{{ $wp->po_number ?? '—' }}</td>
+                    <td>{{ $wp->supplier ?? '—' }}</td>
+                    <td>@include('work-packages.ring', ['pct' => $wp->avg_design ?? 0])</td>
+                    <td>@include('work-packages.ring', ['pct' => $wp->avg_material ?? 0])</td>
+                    <td>@include('work-packages.ring', ['pct' => $wp->avg_fabrication ?? 0])</td>
+                    <td>@include('work-packages.ring', ['pct' => $wp->avg_fat ?? 0])</td>
                     <td>
                         <span class="badge-delivered">
-                            {{ $wp->delivered_count }}/{{ $wp->delivered_total }}
+                            @php
+                                $equipments = \App\Models\ExpeditingEquipment::where('context_id', $wp->id)->get();
+                                $totalEquipment = $equipments->count();
+                                $deliveredEquipment = $equipments->filter(function($eq) {
+                                    $checks = $eq->checks ?? [];
+                                    // Only check the third value (index 2) for Delivered
+                                    return is_array($checks) && isset($checks[2]) && $checks[2] === true;
+                                })->count();
+                            @endphp
+                            {{ $deliveredEquipment }}/{{ $totalEquipment }}
                         </span>
                     </td>
                     <td>
-                        <span class="status-dot {{ $wp->on_time ? 'on-time' : 'delayed' }}"></span>
+                        <span class="status-dot {{ $wp->delayed ? 'delayed' : 'on-time' }}"></span>
                     </td>
                     <td>
                         <button class="wp-btn wp-btn-ghost"
-                                style="padding:5px 10px;font-size:12px;"
-                                onclick="event.stopPropagation(); openMenu({{ $wp->id }})">
+                                style="padding:3px 7px;font-size:12px;position:relative;"
+                                onclick="event.stopPropagation(); toggleMenu(this, {{ $wp->id }})">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
                                  stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="1"/>
                                 <circle cx="19" cy="12" r="1"/>
                                 <circle cx="5"  cy="12" r="1"/>
                             </svg>
+                            <div class="wp-menu" style="display:none;position:absolute;right:0;left:auto;top:28px;z-index:10;background:#fff;border:1px solid #e0e4ef;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.08);min-width:140px;">
+                                                         <a href="http://127.0.0.1:8000/manager/expedition-v2?context_id={{ $wp->id }}&edit=1" class="wp-menu-item" style="display:block;padding:7px 12px;font-size:13px;color:#222;text-decoration:none;cursor:pointer;text-align:left;">Edit</a>
+                                <a href="#" class="wp-menu-item" style="display:block;padding:7px 12px;font-size:13px;color:#e31717;text-decoration:none;cursor:pointer;text-align:left;" onclick="event.preventDefault(); confirmDelete({{ $wp->id }});">Delete</a>
+                                <form id="delete-form-{{ $wp->id }}" action="{{ route('expediting_forms.destroy', $wp->id) }}" method="POST" style="display:none;">
+// ...existing code...
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                                <a href="{{ route('expediting_forms.send_email', $wp->id) }}" class="wp-menu-item" style="display:block;padding:7px 12px;font-size:13px;color:#357ab7;text-decoration:none;cursor:pointer;text-align:left;" onclick="event.preventDefault(); document.getElementById('email-form-{{ $wp->id }}').submit();">Send Email</a>
+                                <form id="email-form-{{ $wp->id }}" action="{{ route('expediting_forms.send_email', $wp->id) }}" method="POST" style="display:none;">
+                                    @csrf
+                                </form>
+                            </div>
                         </button>
                     </td>
                 </tr>
@@ -230,6 +231,18 @@
                     </td>
                 </tr>
                 @endforelse
+            @push('scripts')
+            <script>
+            function confirmDelete(wpId) {
+                if (confirm('Are you sure you want to delete this work package?')) {
+                    document.getElementById('delete-form-' + wpId).submit();
+                    setTimeout(function() {
+                        window.location.href = '/expediting/list';
+                    }, 500);
+                }
+            }
+            </script>
+            @endpush
             </tbody>
         </table>
         <div class="wp-pagination">
@@ -302,8 +315,26 @@
         });
         sorted.forEach(tr => tbody.appendChild(tr));
     }
-    function openMenu(id) {
-        console.log('Actions for work package', id);
+    let openMenuRef = null;
+    function toggleMenu(btn, id) {
+        // Close any open menu
+        if (openMenuRef && openMenuRef !== btn) {
+            openMenuRef.querySelector('.wp-menu').style.display = 'none';
+        }
+        const menu = btn.querySelector('.wp-menu');
+        if (menu.style.display === 'block') {
+            menu.style.display = 'none';
+            openMenuRef = null;
+        } else {
+            menu.style.display = 'block';
+            openMenuRef = btn;
+        }
     }
+    document.addEventListener('click', function(e) {
+        if (openMenuRef && !openMenuRef.contains(e.target)) {
+            openMenuRef.querySelector('.wp-menu').style.display = 'none';
+            openMenuRef = null;
+        }
+    });
 </script>
 @endpush

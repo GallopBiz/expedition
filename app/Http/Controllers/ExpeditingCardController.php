@@ -55,6 +55,14 @@ class ExpeditingCardController extends Controller
             // Delivered/Total equipment count
             $context->total_equipment = $equipments->count();
             $context->delivered_equipment = $equipments->where('status', 'Delivered')->count();
+            // Per-equipment delivered status (true if all checks are true, else false)
+            $context->equipment_delivered_status = $equipments->map(function($eq) {
+                if (is_array($eq->checks) && count($eq->checks)) {
+                    // Consider delivered if all checks are true
+                    return collect($eq->checks)->every(fn($v) => $v === true);
+                }
+                return false;
+            })->toArray();
         }
         return view('expediting.cards', ['expeditingForms' => $expeditingContexts]);
     }
