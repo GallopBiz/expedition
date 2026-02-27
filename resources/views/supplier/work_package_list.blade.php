@@ -21,17 +21,15 @@
                 </thead>
                 <tbody>
                   @foreach($forms as $form)
-                    @if(auth()->user()->role === 'Supplier' && ($form->supplier == (auth()->user()->company_name ?? auth()->user()->name)))
-                      <tr>
-                        <td class="px-3 py-2 border">{{ $form->work_package }}</td>
-                        <td class="px-3 py-2 border">{{ $form->workpackage_name }}</td>
-                        <td class="px-3 py-2 border">{{ $form->po_number }}</td>
-                        <td class="px-3 py-2 border">{{ $form->delivered }}</td>
-                        <td class="px-3 py-2 border text-center">
-                          <a href="{{ route('supplier.expedition_v2', ['context_id' => $form->context_id ?? $form->id, 'edit' => 1]) }}" class="text-blue-700 underline" target="_blank">View</a>
-                        </td>
-                      </tr>
-                    @endif
+                    <tr>
+                      <td class="px-3 py-2 border">{{ $form->work_package }}</td>
+                      <td class="px-3 py-2 border">{{ $form->workpackage_name }}</td>
+                      <td class="px-3 py-2 border">{{ $form->po_number }}</td>
+                      <td class="px-3 py-2 border">{{ $form->delivered }}</td>
+                      <td class="px-3 py-2 border text-center">
+                        <a href="{{ route('supplier.expedition_v2', ['context_id' => $form->context_id ?? $form->id, 'edit' => 1]) }}" class="text-blue-700 underline" target="_blank">View</a>
+                      </td>
+                    </tr>
                   @endforeach
                 </tbody>
               </table>

@@ -84,6 +84,12 @@
 
 @section('content')
 <div class="wp-page">
+
+    @if(session('status'))
+        <div style="margin-bottom: 18px; padding: 12px 18px; background: #e8eeff; border: 1px solid #4f7cff; color: #1a1f36; border-radius: 8px; font-size: 15px;">
+            {{ session('status') }}
+        </div>
+    @endif
     
     <div class="wp-stats">
         <div class="stat-card accent">

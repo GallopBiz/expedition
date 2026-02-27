@@ -23,6 +23,7 @@ class ExpeditingContext extends Model
         'forecast_delivery_to_site',
         'workstream_building',
         'delivered',
+        'wp_user_id',
     ];
 
     public function executions()
