@@ -9,6 +9,34 @@ use App\Http\Controllers\ExpeditingFormController;
 use App\Http\Controllers\ExpeditingCardController;
 use App\Http\Controllers\ExpeditingEquipmentController;
 
+// Placeholder for Add Work Package button (prevents RouteNotFoundException)
+Route::get('/work-packages/create', function () {
+    return 'Work Package Create Form (to be implemented)';
+})->name('work-packages.create');
+
+// Modern Work Package List (all roles)
+use Illuminate\Http\Request;
+Route::get('/expediting/list', function (Request $request) {
+    $workPackages = \App\Models\ExpeditingForm::query()
+        ->when($request->search, fn($q, $s) =>
+            $q->where('workpackage_name', 'like', "%$s%")
+              ->orWhere('supplier', 'like', "%$s%")
+              ->orWhere('id', 'like', "%$s%")
+        )
+        ->when($request->name,  fn($q, $n) => $q->where('workpackage_name', $n))
+        ->orderBy('id')
+        ->paginate(15)
+        ->withQueryString();
+
+    $stats = [
+        'total'             => \App\Models\ExpeditingForm::count(),
+        'avg_design'        => (int) round(\App\Models\ExpeditingForm::avg('design_status')),
+        'avg_manufacturing' => (int) round(\App\Models\ExpeditingForm::avg('fabrication_status')),
+    ];
+
+    return view('work-packages.index', compact('workPackages', 'stats'));
+})->middleware(['auth'])->name('expediting.list');
+
 // Export all work packages with equipment
 Route::get('/workpackage/export-all', [\App\Http\Controllers\ExpeditingContextController::class, 'exportAll'])->name('workpackage.export.all');
 

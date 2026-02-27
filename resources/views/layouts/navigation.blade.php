@@ -72,7 +72,8 @@
                                         @elseif(Auth::user()->role === 'Expeditor')
                                             <x-dropdown-link href="/expeditor/expedition-v2">Create Work Package</x-dropdown-link>
                                         @endif
-                                        <x-dropdown-link :href="route('expediting_forms.cards')">All Work Package</x-dropdown-link>
+                                        <x-dropdown-link :href="route('expediting_forms.cards')">All Work Package (Cards)</x-dropdown-link>
+                                        <x-dropdown-link href="/expediting/list">All Work Package (List)</x-dropdown-link>
                                     </div>
                                 </div>
                             </div>
