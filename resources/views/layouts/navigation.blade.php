@@ -40,9 +40,25 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <div class="flex items-center space-x-4">
+                                               
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="main-nav-link" style="border-bottom: none;">
                             {{ __('Dashboard') }}
                         </x-nav-link>
+                         @if(Auth::user() && Auth::user()->role === 'Supplier')
+                                                    <!-- Supplier Work Package Management Dropdown -->
+                                                    <div x-data="{ open: false }" class="relative main-nav-dropdown">
+                                                        <button @click="open = !open" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md focus:outline-none transition">
+                                                            Work Package Management
+                                                            <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 20 20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8l5 5 5-5" /></svg>
+                                                        </button>
+                                                        <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                                                            <div class="py-1">
+                                                                <x-dropdown-link :href="route('supplier.work_package_cards')">All Work Package Cards</x-dropdown-link>
+                                                                <x-dropdown-link :href="route('supplier.work_package_list')">All Work Package List</x-dropdown-link>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
 
                         @if(Auth::user() && (Auth::user()->role === 'Manager' || Auth::user()->role === 'Expeditor'))
                             <!-- User Management Dropdown -->
