@@ -636,25 +636,11 @@ class ExpeditingFormController extends Controller
     public function destroy(ExpeditingForm $expeditingForm)
     {
         // Check for assigned values (supplier input columns)
-        $blockedFields = [
-            'detailed_scope_of_delivery', 'quantity', 'design_status', 'end_of_manufacturing_supplier',
-            'manufacturing_status', 'fat_date_scheduled_baseline', 'fat_date_actual', 'fat_status',
-            'ready_for_shipment', 'contractual_delivery_to_site_date', 'forecast_delivery_to_site',
-            'actual_delivery_to_site_supplier', 'storage_requirement', 'delivery_postponement_due_to_site_readiness',
-            'exyte_technical_discussion'
-        ];
-        $hasAssigned = false;
-        foreach ($blockedFields as $field) {
-            if (!empty($expeditingForm->$field)) {
-                $hasAssigned = true;
-                break;
-            }
-        }
-        if ($hasAssigned) {
-            return redirect()->route('expediting_forms.list')->with('error', 'Cannot delete: This work package has assigned values in expediting list.');
-        }
-        $expeditingForm->delete();
-        return redirect()->route('expediting_forms.list')->with('success', 'Work package deleted successfully!');
+        $contextId = $expeditingForm->context_id;
+        \App\Models\ExpeditingForm::where('context_id', $contextId)->delete();
+        \App\Models\ExpeditingEquipment::where('context_id', $contextId)->delete();
+        \App\Models\ExpeditingContext::where('id', $contextId)->delete();
+        return redirect()->route('expediting.list')->with('success', 'Work package and all mapped records deleted successfully!');
     }
 
     /**

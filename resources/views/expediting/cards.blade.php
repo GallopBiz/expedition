@@ -347,9 +347,19 @@
           <span class="circle-label">FAT</span>
         </div>
         <div class="circle-item">
-          <div class="circle-wrap" data-pct="{{ $form->total_equipment ? round(($form->delivered_equipment / max($form->total_equipment,1)) * 100) : 0 }}">
+          @php
+            $equipments = \App\Models\ExpeditingEquipment::where('context_id', $form->context_id ?? $form->id)->get();
+            $totalEquipment = $equipments->count();
+            $deliveredEquipment = $equipments->filter(function($eq) {
+              $checks = $eq->checks ?? [];
+              // Only check the third value (index 2) for Delivered
+              return is_array($checks) && isset($checks[2]) && $checks[2] === true;
+            })->count();
+            $deliveredPct = $totalEquipment ? round(($deliveredEquipment / max($totalEquipment,1)) * 100) : 0;
+          @endphp
+          <div class="circle-wrap" data-pct="{{ $deliveredPct }}">
             <svg class="circle-svg" viewBox="0 0 38 38"><circle class="circle-track" cx="19" cy="19" r="15.5"/><circle class="circle-fill" cx="19" cy="19" r="15.5" stroke-dasharray="97.4 97.4" stroke-dashoffset="97.4"/></svg>
-            <span class="circle-pct">{{ $form->delivered_equipment ?? 0 }}/{{ $form->total_equipment ?? 0 }}</span>
+            <span class="circle-pct">{{ $deliveredEquipment }}/{{ $totalEquipment }}</span>
           </div>
           <span class="circle-label">Delivered</span>
         </div>

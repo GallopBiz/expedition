@@ -17,24 +17,61 @@ Route::get('/work-packages/create', function () {
 // Modern Work Package List (all roles)
 use Illuminate\Http\Request;
 Route::get('/expediting/list', function (Request $request) {
-    $workPackages = \App\Models\ExpeditingForm::query()
-        ->when($request->search, fn($q, $s) =>
-            $q->where('workpackage_name', 'like', "%$s%")
-              ->orWhere('supplier', 'like', "%$s%")
-              ->orWhere('id', 'like', "%$s%")
-        )
-        ->when($request->name,  fn($q, $n) => $q->where('workpackage_name', $n))
-        ->orderBy('id')
-        ->paginate(15)
-        ->withQueryString();
+    $query = \App\Models\ExpeditingContext::query();
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('workpackage_name', 'like', "%$search%")
+              ->orWhere('work_package_no', 'like', "%$search%")
+              ->orWhere('po_number', 'like', "%$search%")
+              ->orWhere('supplier', 'like', "%$search%")
+              ->orWhere('id', 'like', "%$search%")
+              ->orWhere('expediting_category', 'like', "%$search%")
+              ->orWhere('customer_procurement_contact', 'like', "%$search%")
+              ->orWhere('technical_workpackage_owner', 'like', "%$search%")
+              ->orWhere('incoterms', 'like', "%$search%")
+              ->orWhere('order_date', 'like', "%$search%")
+              ->orWhere('delivered', 'like', "%$search%")
+              ;
+        });
+    }
+    if ($request->filled('name')) {
+        $query->where('workpackage_name', $request->name);
+    }
+    $workPackages = $query->orderByDesc('created_at')->paginate(15)->withQueryString();
+
+    // Attach averages, delivered counts, and delay status for each context
+    foreach ($workPackages as $context) {
+        $equipments = \App\Models\ExpeditingEquipment::where('context_id', $context->id)->get();
+        $context->avg_design = $equipments->count() ? round($equipments->avg('design')) : 0;
+        $context->avg_material = $equipments->count() ? round($equipments->avg('material')) : 0;
+        $context->avg_fabrication = $equipments->count() ? round($equipments->avg('fab')) : 0;
+        $context->avg_fat = $equipments->count() ? round($equipments->avg('fat')) : 0;
+        $context->total_equipment = $equipments->count();
+        $context->delivered_equipment = $equipments->where('status', 'Delivered')->count();
+
+        // Delay logic: If any equipment's FAT date < Actual Delivery date, mark as delayed
+        $context->delayed = false;
+        foreach ($equipments as $eq) {
+            $fatDate = $eq->fat_date ?? null;
+            $actualDelivery = $eq->actual_delivery_date ?? null;
+            if ($fatDate && $actualDelivery && strtotime($fatDate) < strtotime($actualDelivery)) {
+                $context->delayed = true;
+                break;
+            }
+        }
+    }
+
+    // Get all expediting contexts for stats
+    $expeditingContexts = \App\Models\ExpeditingContext::all();
 
     $stats = [
-        'total'             => \App\Models\ExpeditingForm::count(),
-        'avg_design'        => (int) round(\App\Models\ExpeditingForm::avg('design_status')),
-        'avg_manufacturing' => (int) round(\App\Models\ExpeditingForm::avg('fabrication_status')),
+        'total' => $workPackages->total(),
+        'avg_design' => $workPackages->count() ? round($workPackages->avg('avg_design')) : 0,
+        'avg_manufacturing' => $workPackages->count() ? round($workPackages->avg('avg_fabrication')) : 0,
     ];
 
-    return view('work-packages.index', compact('workPackages', 'stats'));
+    return view('work-packages.index', compact('workPackages', 'stats', 'expeditingContexts'));
 })->middleware(['auth'])->name('expediting.list');
 
 // Export all work packages with equipment
