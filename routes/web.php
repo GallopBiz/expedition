@@ -109,9 +109,9 @@ Route::middleware(['auth', 'role:Supplier'])->group(function () {
 Route::middleware(['auth', 'role:Supplier'])->group(function () {
     Route::get('/supplier/work-package-cards', [\App\Http\Controllers\ExpeditingCardController::class, 'index'])->name('supplier.work_package_cards');
     Route::get('/supplier/work-package-list', function (\Illuminate\Http\Request $request) {
-        $supplierName = auth()->user()->company_name ?? auth()->user()->name;
+        $supplierId = auth()->user()->id;
         $query = \App\Models\ExpeditingContext::query();
-        $query->where('supplier', $supplierName);
+        $query->where('wp_user_id', $supplierId);
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -133,7 +133,7 @@ Route::middleware(['auth', 'role:Supplier'])->group(function () {
             $query->where('workpackage_name', $request->name);
         }
         $workPackages = $query->orderByDesc('created_at')->paginate(15)->withQueryString();
-        $expeditingContexts = \App\Models\ExpeditingContext::where('supplier', $supplierName)->get();
+        $expeditingContexts = \App\Models\ExpeditingContext::where('wp_user_id', $supplierId)->get();
         $stats = [
             'total' => $workPackages->total(),
             'avg_design' => $workPackages->count() ? round($workPackages->avg('avg_design')) : 0,
@@ -155,7 +155,7 @@ Route::get('/work-packages', function () {
 })->name('work_packages');
 
 Route::get('/', function () {
-    return view('dashboard_new');
+    return redirect()->route('login');
 });
 
 Route::get('/dashboard-new', function () {

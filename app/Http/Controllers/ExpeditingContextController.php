@@ -34,6 +34,7 @@ class ExpeditingContextController extends Controller
             'technical_workpackage_owner',
             'forecast_delivery_to_site',
             'workstream_building',
+            'wp_user_id',
         ]);
         // Store toggles as 1 or 0
         $data['lli'] = $request->has('lli') ? 1 : 0;

@@ -837,14 +837,32 @@
             </div>
             <div class="field-group">
               <div class="field-label">Supplier</div>
-              <select class="field-value" name="supplier" @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
+              <select class="field-value" name="supplier" id="supplierSelect" @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
                 <option value="">Select Supplier</option>
-                @foreach(\App\Models\User::where('role', 'Supplier')->orderBy('name')->pluck('name') as $supplier)
+                @foreach(\App\Models\User::where('role', 'Supplier')->orderBy('name')->get() as $supplier)
                   @if($supplier)
-                    <option value="{{ $supplier }}" {{ ($context->supplier ?? '') == $supplier ? 'selected' : '' }}>{{ $supplier }}</option>
+                    <option value="{{ $supplier->name }}" data-user-id="{{ $supplier->id }}" {{ ($context->supplier ?? '') == $supplier->name ? 'selected' : '' }}>{{ $supplier->name }} ({{ $supplier->email }})</option>
                   @endif
                 @endforeach
               </select>
+              <input type="hidden" name="wp_user_id" id="wp_user_id" value="{{ isset($context->wp_user_id) ? $context->wp_user_id : '' }}">
+              <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                  var supplierSelect = document.getElementById('supplierSelect');
+                  var wpUserIdInput = document.getElementById('wp_user_id');
+                  if (supplierSelect && wpUserIdInput) {
+                    supplierSelect.addEventListener('change', function() {
+                      var selected = supplierSelect.options[supplierSelect.selectedIndex];
+                      wpUserIdInput.value = selected.getAttribute('data-user-id') || '';
+                    });
+                    // Set initial value if editing
+                    var selected = supplierSelect.options[supplierSelect.selectedIndex];
+                    if (selected) {
+                      wpUserIdInput.value = selected.getAttribute('data-user-id') || '';
+                    }
+                  }
+                });
+              </script>
             </div>
             <div class="field-group">
               <div class="field-label">Order Date</div>

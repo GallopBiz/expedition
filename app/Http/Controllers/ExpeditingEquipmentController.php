@@ -103,8 +103,8 @@ class ExpeditingEquipmentController extends Controller
         if (!$supplier) {
             return response()->json(['error' => 'Supplier not found.'], 404);
         }
-        // Generate signed URL (valid for 48 hours)
-        $link = URL::signedRoute('supplier.expedition_v2', ['context_id' => $contextId], now()->addHours(48));
+        // Generate direct URL to supplier work package (no signed route needed)
+        $link = url('/supplier/expedition-v2?context_id=' . $contextId . '&edit=1');
         // Send email using SMTP
         Mail::to($supplier->email)->send(new SupplierExpeditingFormLink($supplier->name, $link, $context));
         // Log email

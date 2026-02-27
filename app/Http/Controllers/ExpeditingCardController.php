@@ -13,9 +13,8 @@ class ExpeditingCardController extends Controller
         $query = \App\Models\ExpeditingContext::query();
         // Only show for supplier: filter by supplier name or company
         if (auth()->user()->role === 'Supplier') {
-            // Try to match by company_name or user name (adjust as needed)
-            $supplierName = auth()->user()->company_name ?? auth()->user()->name;
-            $query->where('supplier', $supplierName);
+            $supplierId = auth()->user()->id;
+            $query->where('wp_user_id', $supplierId);
         }
         // Filters
         if ($request->filled('supplier_name')) {

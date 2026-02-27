@@ -23,7 +23,18 @@ class SupplierExpeditingFormLink extends Mailable
 
     public function build()
     {
-        return $this->subject('Expediting Form Submission Link')
+        // Build subject: Exyte / PAR / 441 / MV Switchgear / Actemium / Expediting Follow-up
+        $project = 'Exyte';
+        $building = $this->form->workstream_building ?? null;
+        $wpNo = $this->form->work_package_no ?? $this->form->workpackage_no ?? '';
+        $wpName = $this->form->workpackage_name ?? '';
+        $supplier = $this->form->supplier ?? $this->supplierName;
+        $subject = $project;
+        if ($building) {
+            $subject .= ' / ' . $building;
+        }
+        $subject .= ' / ' . $wpNo . ' / ' . $wpName . ' / ' . $supplier . ' / Expediting Follow-up';
+        return $this->subject($subject)
             ->markdown('emails.supplier_expediting_form_link');
     }
 }
