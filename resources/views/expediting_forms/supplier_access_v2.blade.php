@@ -839,7 +839,7 @@
               <div class="field-label">Supplier</div>
               <select class="field-value" name="supplier" @if(auth()->user() && auth()->user()->role == 'Supplier') disabled @endif>
                 <option value="">Select Supplier</option>
-                @foreach(\App\Models\ExpeditingForm::distinct()->orderBy('supplier')->pluck('supplier') as $supplier)
+                @foreach(\App\Models\User::where('role', 'Supplier')->orderBy('name')->pluck('name') as $supplier)
                   @if($supplier)
                     <option value="{{ $supplier }}" {{ ($context->supplier ?? '') == $supplier ? 'selected' : '' }}>{{ $supplier }}</option>
                   @endif

@@ -49,11 +49,6 @@
                         </a>
                     </div>
 
-                    <div class="mt-8 flex justify-center">
-                        <a href="{{ route('supplier.expedition_modern') }}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-lg shadow transition">
-                            ✨ Fill New Supplier Expedition Form
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>

@@ -108,6 +108,39 @@ Route::middleware(['auth', 'role:Supplier'])->group(function () {
 // Supplier-only: Work Package Cards
 Route::middleware(['auth', 'role:Supplier'])->group(function () {
     Route::get('/supplier/work-package-cards', [\App\Http\Controllers\ExpeditingCardController::class, 'index'])->name('supplier.work_package_cards');
+    Route::get('/supplier/work-package-list', function (\Illuminate\Http\Request $request) {
+        $supplierName = auth()->user()->company_name ?? auth()->user()->name;
+        $query = \App\Models\ExpeditingContext::query();
+        $query->where('supplier', $supplierName);
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('workpackage_name', 'like', "%$search%")
+                  ->orWhere('work_package_no', 'like', "%$search%")
+                  ->orWhere('po_number', 'like', "%$search%")
+                  ->orWhere('supplier', 'like', "%$search%")
+                  ->orWhere('id', 'like', "%$search%")
+                  ->orWhere('expediting_category', 'like', "%$search%")
+                  ->orWhere('customer_procurement_contact', 'like', "%$search%")
+                  ->orWhere('technical_workpackage_owner', 'like', "%$search%")
+                  ->orWhere('incoterms', 'like', "%$search%")
+                  ->orWhere('order_date', 'like', "%$search%")
+                  ->orWhere('delivered', 'like', "%$search%")
+                  ;
+            });
+        }
+        if ($request->filled('name')) {
+            $query->where('workpackage_name', $request->name);
+        }
+        $workPackages = $query->orderByDesc('created_at')->paginate(15)->withQueryString();
+        $expeditingContexts = \App\Models\ExpeditingContext::where('supplier', $supplierName)->get();
+        $stats = [
+            'total' => $workPackages->total(),
+            'avg_design' => $workPackages->count() ? round($workPackages->avg('avg_design')) : 0,
+            'avg_manufacturing' => $workPackages->count() ? round($workPackages->avg('avg_fabrication')) : 0,
+        ];
+        return view('work-packages.index', compact('workPackages', 'stats', 'expeditingContexts'));
+    })->name('supplier.work_package_list');
 });
 
 // Notification routes
