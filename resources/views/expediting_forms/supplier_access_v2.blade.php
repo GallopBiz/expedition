@@ -1253,9 +1253,9 @@
                 <div class="cal-date-banner-sub"  id="cal-date-banner-sub"></div>
               </div>
               <div class="cal-cat-tabs">
-                <button class="cal-cat-tab active" data-cat="Inspection" onclick="calSwitchCat(this)"><div class="cal-tab-dot"></div>Inspection</button>
-                <button class="cal-cat-tab" data-cat="Material Planning" onclick="calSwitchCat(this)"><div class="cal-tab-dot"></div>Material</button>
-                <button class="cal-cat-tab" data-cat="Fabrication Planning" onclick="calSwitchCat(this)"><div class="cal-tab-dot"></div>Fabrication</button>
+                <button class="cal-cat-tab active" data-cat="Inspection" onclick="calSwitchCat(this, event)"><div class="cal-tab-dot"></div>Inspection</button>
+                <button class="cal-cat-tab" data-cat="Material Planning" onclick="calSwitchCat(this, event)"><div class="cal-tab-dot"></div>Material</button>
+                <button class="cal-cat-tab" data-cat="Fabrication Planning" onclick="calSwitchCat(this, event)"><div class="cal-tab-dot"></div>Fabrication</button>
               </div>
               <div class="cal-comment-area">
                 <div class="cal-existing-comment" id="cal-existing-comment">
@@ -1366,7 +1366,8 @@
                 document.getElementById('cal-date-banner').style.display    = 'block';
                 calRefreshCommentArea();
               }
-              window.calSwitchCat = function (btn) {
+              window.calSwitchCat = function (btn, event) {
+                if (event) event.preventDefault();
                 document.querySelectorAll('.cal-cat-tab').forEach(function (b) {
                   b.classList.remove('active');
                 });
@@ -1385,7 +1386,19 @@
                 var meta     = document.getElementById('cal-existing-meta');
                 var exText   = document.getElementById('cal-existing-text');
                 ta.setAttribute('data-cat', cat);
-                saveBtn.className = 'cal-save-btn ' + cat;
+                saveBtn.className = 'cal-save-btn ' + cat.replace(/ /g, '\ ');
+                // Set background color according to category
+                let bg = '';
+                if (cat === 'Inspection') bg = '#7c3aed';
+                else if (cat === 'Material Planning') bg = '#0284c7';
+                else if (cat === 'Fabrication Planning') bg = 'var(--warn)';
+                saveBtn.style.background = bg;
+                // Optional: set box-shadow for consistency
+                let shadow = '';
+                if (cat === 'Inspection') shadow = '0 2px 6px rgba(124,58,237,.25)';
+                else if (cat === 'Material Planning') shadow = '0 2px 6px rgba(2,132,199,.25)';
+                else if (cat === 'Fabrication Planning') shadow = '0 2px 6px rgba(200,71,10,.25)';
+                saveBtn.style.boxShadow = shadow;
                 if (existing) {
                   exEl.className      = 'cal-existing-comment ' + cat;
                   exEl.style.display  = 'block';
@@ -1428,6 +1441,7 @@
                 calRender();
               };
               window.calFilterTl = function (btn) {
+                if (event) event.preventDefault();
                 calTlFilter = btn.dataset.f;
                 document.querySelectorAll('.cal-filter-pill').forEach(function (b) {
                   b.classList.remove('active');
