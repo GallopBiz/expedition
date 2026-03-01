@@ -84,9 +84,9 @@
                                 <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
                                     <div class="py-1">
                                         @if(Auth::user()->role === 'Manager')
-                                            <x-dropdown-link href="/manager/expedition-v2">Create Work Package</x-dropdown-link>
+                                            <x-dropdown-link href="{{ url('/manager/expedition-v2') }}">Create Work Package</x-dropdown-link>
                                         @elseif(Auth::user()->role === 'Expeditor')
-                                            <x-dropdown-link href="/expeditor/expedition-v2">Create Work Package</x-dropdown-link>
+                                            <x-dropdown-link href="{{ url('/expeditor/expedition-v2') }}">Create Work Package</x-dropdown-link>
                                         @endif
                                         <x-dropdown-link :href="route('expediting_forms.cards')">All Work Package (Cards)</x-dropdown-link>
                                         <x-dropdown-link href="/expediting/list">All Work Package (List)</x-dropdown-link>
