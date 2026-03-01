@@ -68,6 +68,19 @@ class ExpeditingEquipmentController extends Controller
     }
     public function update(Request $request, ExpeditingEquipment $equipment)
     {
+        // Helper: fetch expediting_form_id from context_id if not provided or invalid
+        $formId = $request->input('expediting_form_id');
+        $contextId = $request->input('context_id');
+        if ($formId && !\App\Models\ExpeditingForm::find($formId)) {
+            // Try to fetch by context_id
+            $form = \App\Models\ExpeditingForm::where('context_id', $contextId)->first();
+            if ($form) {
+                \Log::info('Correcting expediting_form_id from context_id (update)', ['old' => $formId, 'new' => $form->id]);
+                $request->merge(['expediting_form_id' => $form->id]);
+            } else {
+                \Log::error('No expediting_form found for context_id (update)', ['context_id' => $contextId]);
+            }
+        }
         $validated = $request->validate([
             'expediting_form_id' => 'required|exists:expediting_forms,id',
             'context_id' => 'required|exists:expediting_contexts,id',
