@@ -13,9 +13,24 @@ use App\Models\ExpeditingFormEmailLog;
 
 class ExpeditingEquipmentController extends Controller
 {
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
+        public function store(Request $request)
+        {
+            // Helper: fetch expediting_form_id from context_id if not provided or invalid
+            $formId = $request->input('expediting_form_id');
+            $contextId = $request->input('context_id');
+            if ($formId && !\App\Models\ExpeditingForm::find($formId)) {
+                // Try to fetch by context_id
+                $form = \App\Models\ExpeditingForm::where('context_id', $contextId)->first();
+                if ($form) {
+                    \Log::info('Correcting expediting_form_id from context_id', ['old' => $formId, 'new' => $form->id]);
+                    $request->merge(['expediting_form_id' => $form->id]);
+                } else {
+                    \Log::error('No expediting_form found for context_id', ['context_id' => $contextId]);
+                }
+                }
+        \Log::info('Equipment creation request payload', ['payload' => $request->all()]);
+        try {
+            $validated = $request->validate([
             'expediting_form_id' => 'required|exists:expediting_forms,id',
             'context_id' => 'required|exists:expediting_contexts,id',
             'name' => 'required|string|max:255',
@@ -41,9 +56,15 @@ class ExpeditingEquipmentController extends Controller
             'remarks' => 'nullable|string',
             'checks' => 'nullable|array',
         ]);
-        $validated['checks'] = $request->input('checks', []);
-        $equipment = ExpeditingEquipment::create($validated);
-        return response()->json(['success' => true, 'equipment' => $equipment]);
+            $validated['checks'] = $request->input('checks', []);
+            \Log::info('Equipment validated data', ['validated' => $validated]);
+            $equipment = ExpeditingEquipment::create($validated);
+            \Log::info('Equipment created successfully', ['equipment' => $equipment]);
+            return response()->json(['success' => true, 'equipment' => $equipment]);
+        } catch (\Exception $e) {
+            \Log::error('Equipment creation error', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 422);
+        }
     }
     public function update(Request $request, ExpeditingEquipment $equipment)
     {

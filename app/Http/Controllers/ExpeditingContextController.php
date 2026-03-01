@@ -44,13 +44,37 @@ class ExpeditingContextController extends Controller
 
         if ($contextId && ($context = ExpeditingContext::find($contextId))) {
             $context->update($data);
+            // Get the expediting_form for this context
+            $expeditingForm = \App\Models\ExpeditingForm::where('context_id', $context->id)->first();
         } else {
             $context = ExpeditingContext::create($data);
+            // Create a new entry in expediting_forms table with all relevant columns
+            $expeditingForm = \App\Models\ExpeditingForm::create([
+                'context_id' => $context->id,
+                'work_package' => $context->work_package_no ?? '',
+                'lli' => $context->lli ?? '',
+                'expediting_category' => $context->expediting_category ?? '',
+                'workpackage_name' => $context->workpackage_name ?? '',
+                'supplier' => $context->supplier ?? '',
+                'order_date' => $context->order_date ?? '',
+                'contract_data_available_dmcs' => $context->contract_data_available_dmcs ?? '',
+                'po_number' => $context->po_number ?? '',
+                'incoterms' => $context->incoterms ?? '',
+                'exyte_procurement_contract_manager' => $context->exyte_procurement_contract_manager ?? '',
+                'customer_procurement_contact' => $context->customer_procurement_contact ?? '',
+                'kickoff_status' => $context->kickoff_status ?? '',
+                'technical_workpackage_owner' => $context->technical_workpackage_owner ?? '',
+                'workstream_building' => $context->workstream_building ?? '',
+                'delivered' => $context->delivered ?? '',
+                'forecast_delivery_to_site' => $context->forecast_delivery_to_site ?? '',
+                // Add other columns as needed
+            ]);
         }
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
                 'context_id' => $context->id,
+                'expediting_form_id' => $expeditingForm ? $expeditingForm->id : null,
             ]);
         }
         return redirect()->back()->with('status', 'Work package saved successfully.');
