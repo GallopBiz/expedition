@@ -248,13 +248,13 @@
               .then(response => response.json())
               .then(data => {
                 if (data.success) {
-                  alert('Supplier email sent successfully!');
+                  // Success: do nothing or show a non-blocking message
                 } else {
-                  alert('Error: ' + (data.error || 'Failed to send email.'));
+                  // Error: do nothing or show a non-blocking message
                 }
               })
               .catch(() => {
-                alert('Failed to send email.');
+                // Failed to send email: do nothing or show a non-blocking message
               });
             }
           }

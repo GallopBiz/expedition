@@ -144,6 +144,8 @@
             Reset
         </button>
         <div class="toolbar-spacer"></div>
+        @php $user = Auth::user(); @endphp
+        @if(!$user || $user->role !== 'Supplier')
         <a href="{{ url('/manager/expedition-v2') }}" class="wp-btn wp-btn-primary">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                  stroke="currentColor" stroke-width="2">
@@ -152,6 +154,7 @@
             </svg>
             Add Work Package
         </a>
+        @endif
     </div>
     <div class="table-wrap">
         <table id="wpTable">
@@ -235,7 +238,18 @@
                                 <circle cx="5"  cy="12" r="1"/>
                             </svg>
                             <div class="wp-menu" style="display:none;position:absolute;right:0;left:auto;top:28px;z-index:10;background:#fff;border:1px solid #e0e4ef;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.08);min-width:140px;">
-                                                         <a href="{{ url('/manager/expedition-v2') }}?context_id={{ $wp->id }}&edit=1" class="wp-menu-item" style="display:block;padding:7px 12px;font-size:13px;color:#222;text-decoration:none;cursor:pointer;text-align:left;">Edit</a>
+                            @php
+                                $user = Auth::user();
+                                $editUrl = '';
+                                if ($user && $user->role === 'Manager') {
+                                    $editUrl = url('/manager/expedition-v2') . '?context_id=' . $wp->id . '&edit=1';
+                                } elseif ($user && $user->role === 'Expeditor') {
+                                    $editUrl = url('/expeditor/expedition-v2') . '?context_id=' . $wp->id . '&edit=1';
+                                } elseif ($user && $user->role === 'Supplier') {
+                                    $editUrl = url('/supplier/expedition-v2') . '?context_id=' . $wp->id . '&edit=1';
+                                }
+                            @endphp
+                            <a href="{{ $editUrl }}" class="wp-menu-item" style="display:block;padding:7px 12px;font-size:13px;color:#222;text-decoration:none;cursor:pointer;text-align:left;">Edit</a>
                                 <a href="#" class="wp-menu-item" style="display:block;padding:7px 12px;font-size:13px;color:#e31717;text-decoration:none;cursor:pointer;text-align:left;" onclick="event.preventDefault(); confirmDelete({{ $wp->id }});">Delete</a>
                                 <form id="delete-form-{{ $wp->id }}" action="{{ route('expediting_forms.destroy', $wp->id) }}" method="POST" style="display:none;">
 // ...existing code...
