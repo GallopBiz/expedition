@@ -214,11 +214,11 @@
                         @php
                             $isDelayed = false;
                             foreach ($equipments as $eq) {
-                                // If FAT Date is set and Actual Delivery Date is set and FAT Date > Actual Delivery Date, mark as delayed
-                                if (!empty($eq->fatdate) && !empty($eq->actualdate)) {
-                                    $fatDate = is_string($eq->fatdate) ? strtotime($eq->fatdate) : ($eq->fatdate instanceof \Carbon\Carbon ? $eq->fatdate->timestamp : null);
+                                // If Contractual Date and Actual Date are set, use them for delay/on time logic
+                                if (!empty($eq->contractualdate) && !empty($eq->actualdate)) {
+                                    $contractualDate = is_string($eq->contractualdate) ? strtotime($eq->contractualdate) : ($eq->contractualdate instanceof \Carbon\Carbon ? $eq->contractualdate->timestamp : null);
                                     $actualDate = is_string($eq->actualdate) ? strtotime($eq->actualdate) : ($eq->actualdate instanceof \Carbon\Carbon ? $eq->actualdate->timestamp : null);
-                                    if ($fatDate && $actualDate && $fatDate > $actualDate) {
+                                    if ($contractualDate && $actualDate && $actualDate > $contractualDate) {
                                         $isDelayed = true;
                                         break;
                                     }
