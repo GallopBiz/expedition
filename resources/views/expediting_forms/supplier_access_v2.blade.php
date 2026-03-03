@@ -1113,14 +1113,17 @@
         @endphp
         @forelse($equipments as $equipment)
           @php
-            $fatDate = $equipment->fatdate ? strtotime($equipment->fatdate) : null;
-            $contractual = $equipment->contractualdate ? strtotime($equipment->contractualdate) : null;
-            $actual = $equipment->actualdate ? strtotime($equipment->actualdate) : null;
-            $onTime = ($fatDate && $contractual && $actual && $fatDate <= $contractual && $fatDate <= $actual);
-            $status = 'none';
-            if ($onTime) $status = 'ok';
-            else if ($fatDate && $contractual && $actual && ($fatDate > $contractual || $fatDate > $actual)) $status = 'late';
-            $count++;
+              $contractual = $equipment->contractualdate ? strtotime($equipment->contractualdate) : null;
+              $actual = $equipment->actualdate ? strtotime($equipment->actualdate) : null;
+              $status = 'none';
+              if ($contractual && $actual) {
+                if ($actual <= $contractual) {
+                  $status = 'ok'; // On time
+                } else if ($actual > $contractual) {
+                  $status = 'late'; // Delayed
+                }
+              }
+              $count++;
           @endphp
           <div class="dt-row {{ $status }}">
             <span>{{ $equipment->name ?? $equipment->tag ?? '—' }}</span>
@@ -1958,7 +1961,7 @@
           <div class="modal-field"><label>Manufacturing Duration (weeks)</label><input type="number" id="eq-duration" placeholder="0"></div>
           <div class="modal-field" style="grid-column: 1 / -1; margin-top: 2px;">
             <div id="fatdate-warning" style="display:none; color:#c8470a; background:#fff3e6; border:1px solid #c8470a; border-radius:5px; padding:7px 12px; font-size:13px; font-weight:500;">
-              <span style="font-weight:700;">Warning:</span> FAT Date is after Actual Delivery (Supplier) or Contractual Delivery to Site. Please check the dates.
+              <span style="font-weight:700;">Warning:</span> FAT Date is before Actual Delivery (Supplier) or Contractual Delivery to Site. Please check the dates.
             </div>
           </div>
         </div>
@@ -2169,6 +2172,27 @@ function toggleOverall() {
 }
 
 </script>
+</script>
+<script>
+function toggleAccordion(trigger) {
+  const leftPanel = trigger.closest('.left-panel');
+  const triggers = leftPanel.querySelectorAll('.accordion-trigger');
+  const bodies = leftPanel.querySelectorAll('.accordion-body');
+  const isOpen = trigger.classList.contains('open');
+  if (isOpen) {
+    // If already open, close it
+    trigger.classList.remove('open');
+    const body = trigger.nextElementSibling;
+    if (body) body.classList.remove('open');
+  } else {
+    // Close all, then open clicked
+    triggers.forEach(t => t.classList.remove('open'));
+    bodies.forEach(b => b.classList.remove('open'));
+    trigger.classList.add('open');
+    const body = trigger.nextElementSibling;
+    if (body) body.classList.add('open');
+  }
+}
 </script>
 <script>
 const deliveryEquipment = [
