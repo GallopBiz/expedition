@@ -697,7 +697,10 @@
                 $avgFab = round($equipments->avg('fab'));
                 $avgFat = round($equipments->avg('fat'));
                 $avgDelivered = round($equipments->avg('delivered'));
-                $deliveredCount = $equipments->where('status', 'Delivered')->count();
+                $deliveredCount = $equipments->filter(function($eq) {
+                    $checks = $eq->checks ?? [];
+                    return is_array($checks) && isset($checks[2]) && $checks[2] === true;
+                })->count();
                 $totalCount = $equipments->count();
               @endphp
               <div class="gauge-card" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
@@ -1203,7 +1206,7 @@
             .cal-comment-area { padding: 10px 20px 14px; }
             .cal-input-label { font-size: 11px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-bottom: 5px; display: block; }
             .cal-textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 7px 12px; font-size: 12px; color: var(--text); width: 100%; outline: none; transition: border-color .2s, box-shadow .2s; font-family: 'Figtree', ui-sans-serif, sans-serif; box-shadow: 0 1px 3px rgba(0,0,0,.06); resize: none; height: 68px; line-height: 1.5; }
-            .cal-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(10,124,85,.1); background: #fff; }
+            .cal-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(10,124,85,0.1); background: #fff; }
             .cal-textarea[data-cat="Inspection"]:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,.08); }
             .cal-textarea[data-cat="Material Planning"]:focus { border-color: #0284c7; box-shadow: 0 0 0 3px rgba(2,132,199,.08); }
             .cal-textarea[data-cat="Fabrication Planning"]:focus { border-color: var(--warn); box-shadow: 0 0 0 3px rgba(200,71,10,.08); }
@@ -1955,7 +1958,7 @@
           <div class="modal-field"><label>Manufacturing Duration (weeks)</label><input type="number" id="eq-duration" placeholder="0"></div>
           <div class="modal-field" style="grid-column: 1 / -1; margin-top: 2px;">
             <div id="fatdate-warning" style="display:none; color:#c8470a; background:#fff3e6; border:1px solid #c8470a; border-radius:5px; padding:7px 12px; font-size:13px; font-weight:500;">
-              <span style="font-weight:700;">Warning:</span> FAT Date is after Actual Delivery (Supplier). Please check the dates.
+              <span style="font-weight:700;">Warning:</span> FAT Date is after Actual Delivery (Supplier) or Contractual Delivery to Site. Please check the dates.
             </div>
           </div>
         </div>
@@ -2113,17 +2116,29 @@
         function validateFatVsActual() {
           const fatInput = document.getElementById('eq-fatdate');
           const actualInput = document.getElementById('eq-actualdate');
+          const contractualInput = document.getElementById('eq-contractualdate');
           const warning = document.getElementById('fatdate-warning');
-          if (!fatInput || !actualInput || !warning) return;
+          if (!fatInput || !actualInput || !contractualInput || !warning) return;
           const fatVal = fatInput.value;
           const actualVal = actualInput.value;
+          const contractualVal = contractualInput.value;
           // Remove previous highlight
           fatInput.classList.remove('highlight-warning');
           actualInput.classList.remove('highlight-warning');
+          contractualInput.classList.remove('highlight-warning');
           warning.style.display = 'none';
+          let showWarning = false;
           if (fatVal && actualVal && fatVal > actualVal) {
             fatInput.classList.add('highlight-warning');
             actualInput.classList.add('highlight-warning');
+            showWarning = true;
+          }
+          if (fatVal && contractualVal && fatVal > contractualVal) {
+            fatInput.classList.add('highlight-warning');
+            contractualInput.classList.add('highlight-warning');
+            showWarning = true;
+          }
+          if (showWarning) {
             warning.style.display = 'block';
           }
         }
@@ -2131,9 +2146,11 @@
         document.addEventListener('DOMContentLoaded', function() {
           const fatInput = document.getElementById('eq-fatdate');
           const actualInput = document.getElementById('eq-actualdate');
-          if (fatInput && actualInput) {
+          const contractualInput = document.getElementById('eq-contractualdate');
+          if (fatInput && actualInput && contractualInput) {
             fatInput.addEventListener('input', validateFatVsActual);
             actualInput.addEventListener('input', validateFatVsActual);
+            contractualInput.addEventListener('input', validateFatVsActual);
           }
         });
       </script>
@@ -2152,27 +2169,6 @@ function toggleOverall() {
 }
 
 </script>
-</script>
-<script>
-function toggleAccordion(trigger) {
-  const leftPanel = trigger.closest('.left-panel');
-  const triggers = leftPanel.querySelectorAll('.accordion-trigger');
-  const bodies = leftPanel.querySelectorAll('.accordion-body');
-  const isOpen = trigger.classList.contains('open');
-  if (isOpen) {
-    // If already open, close it
-    trigger.classList.remove('open');
-    const body = trigger.nextElementSibling;
-    if (body) body.classList.remove('open');
-  } else {
-    // Close all, then open clicked
-    triggers.forEach(t => t.classList.remove('open'));
-    bodies.forEach(b => b.classList.remove('open'));
-    trigger.classList.add('open');
-    const body = trigger.nextElementSibling;
-    if (body) body.classList.add('open');
-  }
-}
 </script>
 <script>
 const deliveryEquipment = [
