@@ -108,7 +108,23 @@ class ExpeditingEquipmentController extends Controller
             'checks' => 'nullable|array',
         ]);
         $validated['checks'] = $request->input('checks', []);
+        // Track changes and log IP address
+        $original = $equipment->getOriginal();
+        $changes = $equipment->getDirty();
         $equipment->update($validated);
+        $ip = $request->ip();
+        foreach ($changes as $field => $newValue) {
+            $oldValue = $original[$field] ?? null;
+            \App\Models\ExpeditingEquipmentHistory::create([
+                'expediting_equipment_id' => $equipment->id,
+                'field_changed' => $field,
+                'old_value' => $oldValue,
+                'new_value' => $newValue,
+                'changed_by' => auth()->user()->name ?? 'system',
+                'changed_at' => now(),
+                'ip_address' => $ip,
+            ]);
+        }
         return response()->json(['success' => true, 'equipment' => $equipment]);
     }
 

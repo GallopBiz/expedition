@@ -21,6 +21,26 @@ class ExpeditingEquipment extends Model
         'neededsite' => 'date',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::updating(function ($equipment) {
+            $original = $equipment->getOriginal();
+            $changes = $equipment->getDirty();
+            foreach ($changes as $field => $newValue) {
+                $oldValue = $original[$field] ?? null;
+                \App\Models\ExpeditingEquipmentHistory::create([
+                    'expediting_equipment_id' => $equipment->id,
+                    'field_changed' => $field,
+                    'old_value' => $oldValue,
+                    'new_value' => $newValue,
+                    'changed_by' => auth()->user()->name ?? 'system',
+                    'changed_at' => now(),
+                ]);
+            }
+        });
+    }
+
     public function form()
     {
         return $this->belongsTo(ExpeditingForm::class, 'expediting_form_id');
