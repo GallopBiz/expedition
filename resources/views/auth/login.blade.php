@@ -345,7 +345,7 @@
         {{-- Mountain logo SVG --}}
         <div class="logo-wrap">
             <div class="logo-icon">
-                <img src="/images/1exyte-logo.png" alt="Expedition Logo" style="width: 140px; height: 50px; object-fit: contain;">
+                <img src="/images/111.png" alt="Expedition Logo" style="width: 140px; height: 50px; object-fit: contain;">
             </div>
         </div>
 

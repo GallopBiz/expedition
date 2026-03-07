@@ -9,7 +9,14 @@ use App\Http\Controllers\ExpeditingFormController;
 use App\Http\Controllers\ExpeditingCardController;
 use App\Http\Controllers\ExpeditingEquipmentController;
 
+use App\Http\Controllers\ExpeditingFormHistoryController;
+use App\Http\Controllers\ExpeditingEquipmentHistoryController;
+
 // Placeholder for Add Work Package button (prevents RouteNotFoundException)
+// User Activity Tracking (Workpackage)
+// Equipment Activity Tracking
+Route::get('/equipment-activity', [ExpeditingEquipmentHistoryController::class, 'index'])->name('equipment.activity');
+Route::get('/workpackage-activity', [ExpeditingFormHistoryController::class, 'index'])->name('workpackage.activity');
 Route::get('/work-packages/create', function () {
     return 'Work Package Create Form (to be implemented)';
 })->name('work-packages.create');
