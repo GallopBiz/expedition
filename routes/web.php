@@ -253,5 +253,47 @@ Route::middleware(['web'])->group(function () {
         ->middleware(['signed']);
 });
 
+
 require __DIR__.'/auth.php';
 
+// Calendar update page and form submissions
+Route::get('/calendar-update', [App\Http\Controllers\CalendarUpdateController::class, 'show'])->name('calendar.update');
+Route::post('/calendar-update/inspection', [App\Http\Controllers\CalendarUpdateController::class, 'saveInspection'])->name('calendar.inspection.save');
+Route::post('/calendar-update/material', [App\Http\Controllers\CalendarUpdateController::class, 'saveMaterial'])->name('calendar.material.save');
+Route::post('/calendar-update/fabrication', [App\Http\Controllers\CalendarUpdateController::class, 'saveFabrication'])->name('calendar.fabrication.save');
+Route::post('/calendar-update/save-comment', [App\Http\Controllers\CalendarUpdateController::class, 'saveComment'])->name('calendar.saveComment');
+
+// Planning upload route
+Route::post('/planning/upload', function (\Illuminate\Http\Request $request) {
+    // Handle file upload and rdate saving here
+    // Example: Save file and rdate to database or storage
+    $rdate = $request->input('rdate');
+    $file = $request->file('planning_file');
+    $path = $file ? $file->store('planning_uploads', 'public') : null;
+    // Optionally, save to database
+    // \App\Models\ExpeditingContext::where('id', $request->input('context_id'))->update([
+    //     'rdate' => $rdate,
+    //     'planning_file_path' => $path,
+    // ]);
+    return back()->with('success', 'Planning file uploaded successfully.');
+})->name('planning.upload');
+
+// Add Equipment Save Route
+Route::post('/expediting-equipment/save', [\App\Http\Controllers\ExpeditingEquipmentController::class, 'store'])->name('expediting_equipment.save');
+
+// Calendar inspection edit route
+Route::get('/calendar-update/inspection/{inspection}/edit', [App\Http\Controllers\CalendarUpdateController::class, 'editInspection'])->name('calendar.inspection.edit');
+// Calendar inspection delete route
+Route::delete('/calendar-update/inspection/{inspection}', [App\Http\Controllers\CalendarUpdateController::class, 'deleteInspection'])->name('calendar.inspection.delete');
+
+// Calendar material edit route
+Route::get('/calendar-update/material/{materialPlan}/edit', [App\Http\Controllers\CalendarUpdateController::class, 'editMaterial'])->name('calendar.material.edit');
+
+// Calendar material delete route
+Route::delete('/calendar-update/material/{materialPlan}', [App\Http\Controllers\CalendarUpdateController::class, 'deleteMaterial'])->name('calendar.material.delete');
+
+// Calendar fabrication edit route
+Route::get('/calendar-update/fabrication/{fabricationPlan}/edit', [App\Http\Controllers\CalendarUpdateController::class, 'editFabrication'])->name('calendar.fabrication.edit');
+
+// Calendar fabrication delete route
+Route::delete('/calendar-update/fabrication/{fabricationPlan}', [App\Http\Controllers\CalendarUpdateController::class, 'deleteFabrication'])->name('calendar.fabrication.delete');

@@ -776,8 +776,26 @@
         @if(isset($context) && $context->id)
           <input type="hidden" name="context_id" value="{{ $context->id }}">
         @endif
+          <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var contextId = urlParams.get('context_id');
+            if (contextId) {
+              document.querySelectorAll('form').forEach(function(form) {
+                var input = form.querySelector('input[name="context_id"]');
+                if (!input) {
+                  input = document.createElement('input');
+                  input.type = 'hidden';
+                  input.name = 'context_id';
+                  form.appendChild(input);
+                }
+                input.value = contextId;
+              });
+            }
+          });
+          </script>
         <!-- ACCORDION: GENERAL INFO -->
-        <div class="accordion-item" id="work-package-accordion">
+        <div class="accordion-item" id="work-package-accordion">       
           <button class="accordion-trigger" type="button" onclick="toggleAccordion(this)">
             <div class="accordion-trigger-left">
               <div class="panel-dot" style="background:#2563eb"></div>
@@ -1446,11 +1464,35 @@
                 if (!calSel) return;
                 var text = document.getElementById('cal-textarea').value.trim();
                 if (!text) { document.getElementById('cal-textarea').focus(); return; }
-                if (!calComments[calSel]) calComments[calSel] = {};
-                calComments[calSel][calActiveCat] = text;
-                calRender();
-                calRefreshCommentArea();
-                calRenderTimeline();
+                // Get context_id from URL
+                var urlParams = new URLSearchParams(window.location.search);
+                var contextId = urlParams.get('context_id');
+                // Prepare data to send
+                var data = {
+                  date: calSel,
+                  category: calActiveCat,
+                  comment: text,
+                  context_id: contextId
+                };
+                // Example AJAX call (update URL and method as needed)
+                fetch('/calendar-update/save-comment', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                  },
+                  body: JSON.stringify(data)
+                })
+                .then(res => res.json())
+                .then(resp => {
+                  if (resp.success) {
+                    if (!calComments[calSel]) calComments[calSel] = {};
+                    calComments[calSel][calActiveCat] = text;
+                    calRender();
+                    calRefreshCommentArea();
+                    calRenderTimeline();
+                  }
+                });
               };
               window.calDeleteComment = function () {
                 if (!calSel || !calComments[calSel]) return;
@@ -1514,6 +1556,7 @@
         <div class="equipment-btn-row">
           <!-- Email button temporarily removed -->
           <button type="button" class="add-btn" onclick="openModal()" @if(!request('context_id')) disabled style="opacity:0.5;cursor:not-allowed;" @endif>+ Add Equipment</button>
+            <button type="button" class="add-btn" style="background:#2563eb;color:#fff;{{ request()->has('context_id') && !empty(request('context_id')) ? 'display:block;' : 'display:none;' }}" onclick="window.location.href='{{ url('/calendar-update') }}?context_id={{ request('context_id') }}'">Calendar Planning</button>
         </div>
         <style>
           .equipment-btn-row {
