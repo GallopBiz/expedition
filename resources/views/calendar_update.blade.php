@@ -1021,13 +1021,10 @@
     </button>
   </div>
 
-  {{-- ══════════════════════════════════════
-       PANEL 1: INSPECTION
-  ══════════════════════════════════════ --}}
+  {{-- PANEL 1: INSPECTION --}}
   <div class="tab-panel {{ $activeTab === 'insp' ? 'active' : '' }}" id="panel-insp">
     <div class="split-layout">
-
-      {{-- Form --}}
+      {{-- Inspection form visible to all roles --}}
       <div class="form-card">
         <div class="form-card-head head-blue">
           <div class="head-icon hi-blue">
@@ -1198,9 +1195,7 @@
     </div>
   </div>
 
-  {{-- ══════════════════════════════════════
-       PANEL 2: MATERIAL PLANNING
-  ══════════════════════════════════════ --}}
+  {{-- PANEL 2: MATERIAL PLANNING --}}
   <div class="tab-panel {{ $activeTab === 'mat' ? 'active' : '' }}" id="panel-mat">
     <div class="split-layout">
 
@@ -1353,9 +1348,7 @@
     </div>
   </div>
 
-  {{-- ══════════════════════════════════════
-       PANEL 3: FABRICATION PLANNING
-  ══════════════════════════════════════ --}}
+  {{-- PANEL 3: FABRICATION PLANNING --}}
   <div class="tab-panel {{ $activeTab === 'fab' ? 'active' : '' }}" id="panel-fab">
     <div class="split-layout">
 

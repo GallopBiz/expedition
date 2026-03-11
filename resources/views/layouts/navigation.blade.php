@@ -44,6 +44,11 @@
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="main-nav-link" style="border-bottom: none;">
                             {{ __('Dashboard') }}
                         </x-nav-link>
+                        @if(Auth::user() && (Auth::user()->role === 'Manager' || Auth::user()->role === 'Expeditor'))
+                            <x-nav-link href="/equipment-activity" :active="request()->is('equipment-activity')" class="main-nav-link" style="border-bottom: none;">
+                                Equipment Activity
+                            </x-nav-link>
+                        @endif
                          @if(Auth::user() && Auth::user()->role === 'Supplier')
                                                     <!-- Supplier Work Package Management Dropdown -->
                                                     <div x-data="{ open: false }" class="relative main-nav-dropdown">
