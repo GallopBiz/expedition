@@ -1053,15 +1053,7 @@
 
             <div class="form-group">
               <label class="f-label">Inspection For <span class="req">*</span></label>
-              <select class="f-select focus-blue @error('inspection_for') is-invalid @enderror" name="inspection_for">
-                <option value="">Select purpose…</option>
-                <option value="design" {{ old('inspection_for') == 'design'         ? 'selected' : '' }}>Design Review</option>
-                <option value="manufacturing" {{ old('inspection_for') == 'manufacturing'  ? 'selected' : '' }}>Manufacturing Check</option>
-                <option value="fat" {{ old('inspection_for') == 'fat'            ? 'selected' : '' }}>Factory Acceptance Test (FAT)</option>
-                <option value="delivery" {{ old('inspection_for') == 'delivery'       ? 'selected' : '' }}>Pre-Delivery Inspection</option>
-                <option value="site" {{ old('inspection_for') == 'site'           ? 'selected' : '' }}>Site Inspection</option>
-                <option value="other" {{ old('inspection_for') == 'other'          ? 'selected' : '' }}>Other</option>
-              </select>
+              <input type="text" class="f-input focus-blue @error('inspection_for') is-invalid @enderror" name="inspection_for" value="{{ old('inspection_for') }}" placeholder="Enter inspection purpose">
               @error('inspection_for')<span style="font-size:11.5px;color:var(--red)">{{ $message }}</span>@enderror
             </div>
 
@@ -1218,12 +1210,7 @@
           <input type="hidden" name="context_id" value="{{ request('context_id') }}">
           <div class="form-body">
 
-            <div class="form-group">
-              <label class="f-label">Contract Date <span class="req">*</span></label>
-              <input type="date" class="f-input focus-teal @error('contract_date') is-invalid @enderror"
-                name="contract_date" value="{{ old('contract_date') }}">
-              @error('contract_date')<span style="font-size:11.5px;color:var(--red)">{{ $message }}</span>@enderror
-            </div>
+
 
             <div class="form-group">
               <label class="f-label">First Handover Date <span class="req">*</span></label>
@@ -1237,6 +1224,13 @@
               <input type="date" class="f-input focus-teal @error('last_date') is-invalid @enderror"
                 name="last_date" value="{{ old('last_date') }}">
               @error('last_date')<span style="font-size:11.5px;color:var(--red)">{{ $message }}</span>@enderror
+            </div>
+
+            <!-- Comment Box for Material Plan (moved here) -->
+            <div class="form-group">
+              <label class="f-label">Comment</label>
+              <textarea class="f-input focus-teal @error('material_comment') is-invalid @enderror" name="material_comment" rows="3" placeholder="Add any comments here...">{{ old('material_comment') }}</textarea>
+              @error('material_comment')<span style="font-size:11.5px;color:var(--red)">{{ $message }}</span>@enderror
             </div>
 
             <div class="form-group">
@@ -1293,7 +1287,6 @@
         <table style="width:100%;border-collapse:collapse; font-size:13px;">
           <thead>
             <tr>
-              <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">Contract</th>
               <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">1st Handover</th>
               <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">Last Date</th>
               <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">By</th>
@@ -1370,12 +1363,7 @@
           <input type="hidden" name="context_id" value="{{ request('context_id') }}">
           <div class="form-body">
 
-            <div class="form-group">
-              <label class="f-label">Contract Date <span class="req">*</span></label>
-              <input type="date" class="f-input focus-amber @error('fabrication_contract_date') is-invalid @enderror"
-                name="fabrication_contract_date" value="{{ old('fabrication_contract_date') }}">
-              @error('fabrication_contract_date')<span style="font-size:11.5px;color:var(--red)">{{ $message }}</span>@enderror
-            </div>
+            <!-- Comment Box for Fabrication Plan -->
 
             <div class="form-group">
               <label class="f-label">First Handover Date <span class="req">*</span></label>
@@ -1392,6 +1380,13 @@
             </div>
 
             <div class="form-group">
+              <!-- Comment Box for Fabrication Plan (moved here) -->
+              <div class="form-group">
+                <label class="f-label">Comment</label>
+                <textarea class="f-input focus-amber @error('fabrication_comment') is-invalid @enderror" name="fabrication_comment" rows="3" placeholder="Add any comments here...">{{ old('fabrication_comment') }}</textarea>
+                @error('fabrication_comment')<span style="font-size:11.5px;color:var(--red)">{{ $message }}</span>@enderror
+              </div>
+
               <label class="f-label">Files <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">PDF, DOC, JPG, PNG</span></label>
               <div class="upload-zone amber" id="uz-fab"
                 ondragover="onDragOver(event,'uz-fab')" ondragleave="onDragLeave('uz-fab')"
@@ -1445,7 +1440,6 @@
         <table style="width:100%;border-collapse:collapse; font-size:13px;">
           <thead>
             <tr>
-              <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">Contract</th>
               <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">1st Handover</th>
               <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">Last Update</th>
               <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">By</th>

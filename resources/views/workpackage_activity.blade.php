@@ -1,7 +1,14 @@
 @extends('layouts.app')
 @section('content')
 <div class="container mx-auto py-8">
-    <h2 class="text-2xl font-bold mb-6 text-[#01426a]">User Activity (Workpackage)</h2>
+    <h2 class="text-2xl font-bold mb-2 text-[#01426a]">User Activity (Workpackage)</h2>
+    <nav class="text-sm text-gray-500 mb-6" aria-label="Breadcrumb">
+        <ol class="list-reset flex">
+            <li><a href="/dashboard" class="hover:underline text-[#01426a]">Dashboard</a></li>
+            <li><span class="mx-2">/</span></li>
+            <li class="text-gray-700">User Activity (Workpackage)</li>
+        </ol>
+    </nav>
     <div class="bg-white shadow rounded-lg p-6 mb-8">
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white border border-gray-200 rounded-lg text-xs">

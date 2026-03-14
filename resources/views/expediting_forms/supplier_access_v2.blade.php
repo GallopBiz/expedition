@@ -671,7 +671,14 @@
 .dt-row.none .dot { background:#94a3b8 }
 </style>
 
+
 <div class="font-sans expedition-app">
+
+  <nav class="text-sm text-gray-500 mb-8 mt-8 flex items-center bg-white/80 rounded-lg shadow-sm px-6 py-3 border border-gray-200" aria-label="Breadcrumb" style="backdrop-filter: blur(2px);">
+    <ol class="list-reset flex items-center">
+      <li><a href="/manager/expedition-v2" class="hover:underline text-[#01426a] font-semibold">Create Work Package</a></li>
+    </ol>
+  </nav>
 
  
 

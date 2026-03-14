@@ -65,7 +65,7 @@ class CalendarUpdateController extends Controller
 
     public function saveMaterial(Request $request)
     {
-        $data = $request->only(['contract_date', 'first_handover_date', 'last_date']);
+        $data = $request->only(['first_handover_date', 'last_date', 'material_comment']);
         $data['context_id'] = $request->input('context_id');
         $files = [];
         if ($request->hasFile('material_files')) {
@@ -86,7 +86,7 @@ class CalendarUpdateController extends Controller
 
     public function saveFabrication(Request $request)
     {
-        $data = $request->only(['fabrication_contract_date', 'fabrication_first_handover_date', 'fabrication_last_update']);
+        $data = $request->only(['fabrication_first_handover_date', 'fabrication_last_update', 'fabrication_comment']);
         $data['context_id'] = $request->input('context_id');
         $files = [];
         if ($request->hasFile('fabrication_files')) {

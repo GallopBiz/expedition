@@ -3,6 +3,15 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Create New User') }}
         </h2>
+        <nav class="text-sm text-gray-500 mt-1 mb-4" aria-label="Breadcrumb">
+            <ol class="list-reset flex">
+                <li><a href="/dashboard" class="hover:underline text-[#01426a]">Dashboard</a></li>
+                <li><span class="mx-2">/</span></li>
+                <li><a href="/users" class="hover:underline text-[#01426a]">Users</a></li>
+                <li><span class="mx-2">/</span></li>
+                <li class="text-gray-700">Create</li>
+            </ol>
+        </nav>
     </x-slot>
     <div class="py-12">
         <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
