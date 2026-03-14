@@ -13,7 +13,7 @@
                         <th class="py-2 px-4 border-b text-center">Old Value</th>
                         <th class="py-2 px-4 border-b text-center">New Value</th>
                         <th class="py-2 px-4 border-b text-center">Changed At</th>
-                        <th class="py-2 px-4 border-b text-center">IP Address</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
@@ -25,7 +25,7 @@
                             <td class="py-2 px-4 border-b text-center">{{ $activity->old_value }}</td>
                             <td class="py-2 px-4 border-b text-center">{{ $activity->new_value }}</td>
                             <td class="py-2 px-4 border-b text-center">{{ $activity->changed_at }}</td>
-                            <td class="py-2 px-4 border-b text-center">{{ $activity->ip_address ?? '-' }}</td>
+                            
                         </tr>
                     @endforeach
                 </tbody>
