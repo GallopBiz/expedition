@@ -389,6 +389,7 @@
         @endphp
         <a href="{{ $viewUrl }}" class="action-btn btn-view" target="_blank">View</a>
         <a href="{{ route('workpackage.export', ['context_id' => $form->context_id ?? $form->id]) }}" class="action-btn btn-view" style="background:#3cb546;" target="_blank">Export</a>
+        <a href="{{ route('calendar.inspection.consolidated.pdf', ['contextId' => $form->context_id ?? $form->id]) }}" class="action-btn btn-view" style="background:#2a5be8;" target="_blank">Inspections Report</a>
       </div>
     </div>
     @endforeach

@@ -6,6 +6,26 @@ use Illuminate\Support\Facades\Storage;
 
 class CalendarUpdateController extends Controller
 {
+    // Export inspection report as PDF
+    public function exportInspectionPdf($inspectionId)
+    {
+        $inspection = \App\Models\Inspection::findOrFail($inspectionId);
+        $context = $inspection->context;
+        $user = $inspection->user;
+        // Fetch related equipment for this context
+        $equipments = \App\Models\ExpeditingEquipment::where('context_id', $context ? $context->id : null)->get();
+        $pdf = \PDF::loadView('calendar.inspection_pdf', compact('inspection', 'context', 'user', 'equipments'));
+        $filename = 'inspection_report_' . $inspection->id . '.pdf';
+        return $pdf->stream($filename); // Stream in-browser for preview
+    }
+    // Print inspection report
+    public function printInspection($inspectionId)
+    {
+        $inspection = \App\Models\Inspection::findOrFail($inspectionId);
+        $context = $inspection->context;
+        $user = $inspection->user;
+        return view('calendar.inspection_print', compact('inspection', 'context', 'user'));
+    }
     public function deleteMaterial($materialPlanId)
     {
         $materialPlan = \App\Models\MaterialPlan::find($materialPlanId);
@@ -49,7 +69,7 @@ class CalendarUpdateController extends Controller
         $files = [];
         if ($request->hasFile('inspection_file')) {
             foreach ($request->file('inspection_file') as $file) {
-                $path = $file->store('calendar/inspection');
+                $path = $file->store('calendar/inspection', 'public');
                 $files[] = [
                     'name' => $file->getClientOriginalName(),
                     'path' => $path,
@@ -150,5 +170,15 @@ class CalendarUpdateController extends Controller
             ]);
         }
         return response()->json(['success' => true]);
+    }
+
+    // Export consolidated inspection report as PDF for a work package/context
+    public function exportConsolidatedInspectionPdf($contextId)
+    {
+        $context = \App\Models\ExpeditingContext::findOrFail($contextId);
+        $inspections = \App\Models\Inspection::where('context_id', $contextId)->with('user')->get();
+        $pdf = \PDF::loadView('calendar.inspection_consolidated', compact('context', 'inspections'));
+        $filename = 'consolidated_inspection_report_wp_' . $context->work_package_no . '.pdf';
+        return $pdf->stream($filename);
     }
 }

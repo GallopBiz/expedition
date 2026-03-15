@@ -1168,6 +1168,12 @@
                   @csrf @method('DELETE')
                   <button type="submit" class="row-btn del">Delete</button>
                 </form>
+                <a href="{{ route('calendar.inspection.print', $insp->id) }}" class="row-btn print" target="_blank" style="margin-left:6px;">
+                  Print Report
+                </a>
+                {{-- <a href="{{ route('calendar.inspection.pdf', $insp->id) }}" class="row-btn pdf" target="_blank" style="margin-left:6px;background:#3b82f6;color:#fff;">
+                  Download PDF
+                </a> --}}
               </td>
             </tr>
             @endforeach
