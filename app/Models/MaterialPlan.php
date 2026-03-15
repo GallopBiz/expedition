@@ -13,6 +13,7 @@ class MaterialPlan extends Model
         'last_date',
         'user_id',
         'files',
+        'material_comment',
     ];
         public function context()
         {

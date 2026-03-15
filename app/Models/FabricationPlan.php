@@ -13,6 +13,7 @@ class FabricationPlan extends Model
         'fabrication_last_update',
         'user_id',
         'files',
+        'fabrication_comment',
     ];
         public function context()
         {

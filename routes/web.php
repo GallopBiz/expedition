@@ -297,3 +297,12 @@ Route::get('/calendar-update/fabrication/{fabricationPlan}/edit', [App\Http\Cont
 
 // Calendar fabrication delete route
 Route::delete('/calendar-update/fabrication/{fabricationPlan}', [App\Http\Controllers\CalendarUpdateController::class, 'deleteFabrication'])->name('calendar.fabrication.delete');
+
+// Calendar inspection print report route
+Route::get('/calendar-update/inspection/{inspection}/print', [App\Http\Controllers\CalendarUpdateController::class, 'printInspection'])->name('calendar.inspection.print');
+
+// Calendar inspection PDF export route
+Route::get('/calendar-update/inspection/{inspection}/pdf', [App\Http\Controllers\CalendarUpdateController::class, 'exportInspectionPdf'])->name('calendar.inspection.pdf');
+
+// Consolidated inspection report for a work package (PDF)
+Route::get('/calendar-update/inspection/consolidated/{contextId}/pdf', [\App\Http\Controllers\CalendarUpdateController::class, 'exportConsolidatedInspectionPdf'])->name('calendar.inspection.consolidated.pdf');
