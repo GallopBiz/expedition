@@ -69,7 +69,7 @@ class CalendarUpdateController extends Controller
         $files = [];
         if ($request->hasFile('inspection_file')) {
             foreach ($request->file('inspection_file') as $file) {
-                $path = $file->store('calendar/inspection', 'public');
+                $path = $file->store('calendar/inspection', 'public_uploads');
                 $files[] = [
                     'name' => $file->getClientOriginalName(),
                     'path' => $path,
@@ -90,7 +90,7 @@ class CalendarUpdateController extends Controller
         $files = [];
         if ($request->hasFile('material_files')) {
             foreach ($request->file('material_files') as $file) {
-                $path = $file->store('calendar/material', 'public');
+                $path = $file->store('calendar/material', 'public_uploads');
                 $files[] = [
                     'name' => $file->getClientOriginalName(),
                     'path' => $path,
@@ -111,7 +111,7 @@ class CalendarUpdateController extends Controller
         $files = [];
         if ($request->hasFile('fabrication_files')) {
             foreach ($request->file('fabrication_files') as $file) {
-                $path = $file->store('calendar/fabrication', 'public');
+                $path = $file->store('calendar/fabrication', 'public_uploads');
                 $files[] = [
                     'name' => $file->getClientOriginalName(),
                     'path' => $path,
