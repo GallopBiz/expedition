@@ -29,6 +29,12 @@ return [
     */
 
     'disks' => [
+        'public_uploads' => [
+            'driver' => 'local',
+            'root' => public_path('storage'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            'visibility' => 'public',
+        ],
 
         'local' => [
             'driver' => 'local',
