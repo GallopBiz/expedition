@@ -1151,7 +1151,12 @@
                 @endphp
                 <a class="file-chip" href="{{ asset('storage/'.$filepath) }}" download>
                   <span>{{ $icon }}</span> {{ $filename }}
-                </a><br>
+                </a>
+                @if(in_array(strtolower($ext), ['jpg','jpeg','png','gif']))
+                  <br>
+                  <img src="{{ asset('storage/'.$filepath) }}" alt="Image" style="width:85px;height:85px;object-fit:cover;margin:8px 0 8px 8px;border:1px solid #eee;border-radius:6px;display:inline-block;vertical-align:middle;" />
+                @endif
+                <br>
                 @endforeach
                 @else
                 <span style="color:var(--text3);font-size:12px;">No files</span>
@@ -1318,7 +1323,11 @@
                 elseif (in_array($ext, ['doc','docx'])) $icon = '📝';
                 elseif (in_array($ext, ['jpg','jpeg','png'])) $icon = '🖼️';
                 @endphp
-                <a class="file-chip" href="{{ asset('storage/'.$filepath) }}" target="_blank">📄 {{ $filename }}</a>
+                <a class="file-chip" href="{{ asset('storage/'.$filepath) }}" target="_blank">{{ $icon }} {{ $filename }}</a>
+                @if(in_array(strtolower($ext), ['jpg','jpeg','png','gif']))
+                  <br>
+                  <img src="{{ asset('storage/'.$filepath) }}" alt="Image" style="width:85px;height:85px;object-fit:cover;margin:8px 0 8px 8px;border:1px solid #eee;border-radius:6px;display:inline-block;vertical-align:middle;" />
+                @endif
                 @empty
                 <span style="color:var(--text3);font-size:12px;">No files</span>
                 @endforelse
@@ -1471,7 +1480,12 @@
                 elseif (in_array($ext, ['doc','docx'])) $icon = '📝';
                 elseif (in_array($ext, ['jpg','jpeg','png'])) $icon = '🖼️';
                 @endphp
-                <a class="file-chip" href="{{ asset('storage/'.$filepath) }}" target="_blank">📄 {{ $filename }}</a>
+                <a class="file-chip" href="{{ asset('storage/'.$filepath) }}" target="_blank">{{ $icon }} {{ $filename }}</a>
+                @if(in_array(strtolower($ext), ['jpg','jpeg','png','gif']))
+                  <br>
+                  <img src="{{ asset('storage/'.$filepath) }}" alt="Image" style="width:85px;height:85px;object-fit:cover;margin:8px 0 8px 8px;border:1px solid #eee;border-radius:6px;display:inline-block;vertical-align:middle;" />
+                @endif
+                <br>
                 @empty
                 <span style="color:var(--text3);font-size:12px;">No files</span>
                 @endforelse
