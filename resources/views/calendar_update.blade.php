@@ -1224,7 +1224,7 @@
 
 
             <div class="form-group">
-              <label class="f-label">First Handover Date <span class="req">*</span></label>
+              <label class="f-label">Handover Date <span class="req">*</span></label>
               <input type="date" class="f-input focus-teal @error('first_handover_date') is-invalid @enderror"
                 name="first_handover_date" value="{{ old('first_handover_date') }}">
               @error('first_handover_date')<span style="font-size:11.5px;color:var(--red)">{{ $message }}</span>@enderror
@@ -1298,7 +1298,7 @@
         <table style="width:100%;border-collapse:collapse; font-size:13px;">
           <thead>
             <tr>
-              <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">1st Handover</th>
+              <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">Handover</th>
               <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">Last Date</th>
               <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">By</th>
               <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">Files</th>
@@ -1308,7 +1308,7 @@
           <tbody>
             @foreach($materialPlans as $plan)
             <tr>
-              <td style="padding:8px;border-bottom:1px solid #e2e7f3;">{{ \Carbon\Carbon::parse($plan->contract_date)->format('d M Y') }}</td>
+              <!-- <td style="padding:8px;border-bottom:1px solid #e2e7f3;">{{ \Carbon\Carbon::parse($plan->contract_date)->format('d M Y') }}</td> -->
               <td style="padding:8px;border-bottom:1px solid #e2e7f3;">{{ \Carbon\Carbon::parse($plan->first_handover_date)->format('d M Y') }}</td>
               <td style="padding:8px;border-bottom:1px solid #e2e7f3;">{{ \Carbon\Carbon::parse($plan->last_date)->format('d M Y') }}</td>
               <td style="padding:8px;border-bottom:1px solid #e2e7f3;">{{ $plan->user->name ?? '—' }}</td>
@@ -1381,7 +1381,7 @@
             <!-- Comment Box for Fabrication Plan -->
 
             <div class="form-group">
-              <label class="f-label">First Handover Date <span class="req">*</span></label>
+              <label class="f-label">Handover Date <span class="req">*</span></label>
               <input type="date" class="f-input focus-amber @error('fabrication_first_handover_date') is-invalid @enderror"
                 name="fabrication_first_handover_date" value="{{ old('fabrication_first_handover_date') }}">
               @error('fabrication_first_handover_date')<span style="font-size:11.5px;color:var(--red)">{{ $message }}</span>@enderror
@@ -1455,7 +1455,7 @@
         <table style="width:100%;border-collapse:collapse; font-size:13px;">
           <thead>
             <tr>
-              <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">1st Handover</th>
+              <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">Handover</th>
               <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">Last Update</th>
               <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">By</th>
               <th style="padding:8px;border-bottom:1px solid #e2e7f3;text-align:left;">Files</th>
@@ -1465,7 +1465,7 @@
           <tbody>
             @foreach($fabricationPlans as $plan)
             <tr>
-              <td style="padding:8px;border-bottom:1px solid #e2e7f3;">{{ \Carbon\Carbon::parse($plan->fabrication_contract_date)->format('d M Y') }}</td>
+              <!-- <td style="padding:8px;border-bottom:1px solid #e2e7f3;">{{ \Carbon\Carbon::parse($plan->fabrication_contract_date)->format('d M Y') }}</td> -->
               <td style="padding:8px;border-bottom:1px solid #e2e7f3;">{{ \Carbon\Carbon::parse($plan->fabrication_first_handover_date)->format('d M Y') }}</td>
               <td style="padding:8px;border-bottom:1px solid #e2e7f3;">{{ \Carbon\Carbon::parse($plan->fabrication_last_update)->format('d M Y') }}</td>
               <td style="padding:8px;border-bottom:1px solid #e2e7f3;">{{ $plan->user->name ?? '—' }}</td>
