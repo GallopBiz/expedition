@@ -29,6 +29,13 @@ class ExpeditingEquipment extends Model
             $changes = $equipment->getDirty();
             foreach ($changes as $field => $newValue) {
                 $oldValue = $original[$field] ?? null;
+                // Encode arrays as JSON for DB storage
+                if (is_array($oldValue)) {
+                    $oldValue = json_encode($oldValue);
+                }
+                if (is_array($newValue)) {
+                    $newValue = json_encode($newValue);
+                }
                 \App\Models\ExpeditingEquipmentHistory::create([
                     'expediting_equipment_id' => $equipment->id,
                     'field_changed' => $field,
